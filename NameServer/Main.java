@@ -1,6 +1,8 @@
+package NameServer;
+
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Niesl zijn mama");
+        System.out.println("Niels zijn mama");
     }
 }
