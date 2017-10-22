@@ -23,7 +23,4 @@ public class FileMap implements FileMapRemote {
         return Math.abs(fileName.hashCode() % 32768);
     }
 
-    public getOwner(){
-        
-    }
 }
