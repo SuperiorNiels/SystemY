@@ -25,10 +25,23 @@ public class Mapper {
 
     public Mapper() {}
 
-    public void updateMap(Integer hash, String ip, String name) {
-        hashes.add(hash);
-        map.put(hash, ip);
-        names.put(hash, name);
+    public Boolean updateMap(Integer hash, String ip, String name) {
+        Boolean error = true;
+        if(hashes.contains(hash)) {
+            System.out.println("Hash already exists.");
+            error = false;
+        } else if(map.containsValue(ip)) {
+            System.out.println("IP already exists.");
+            error = false;
+        } else if(names.containsValue(name)) {
+            System.out.println("Name already exists.");
+            error = false;
+        } else {
+            hashes.add(hash);
+            map.put(hash, ip);
+            names.put(hash, name);
+        }
+        return error;
     }
 
     /**
