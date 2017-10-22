@@ -45,22 +45,22 @@ public class Mapper {
 
             for(Integer hash : hashes) {
                 Element host = xml.createElement("host");
-                xml.appendChild(host);
                 host.setAttribute("id", Integer.toString(hash)); // ID can be changed to "hash"
+                root.appendChild(host);
                 // Add IP address
                 Element address = xml.createElement("address");
                 address.appendChild(xml.createTextNode(map.get(hash)));
-                xml.appendChild(address);
+                host.appendChild(address);
                 // Add hostname
                 Element hostname = xml.createElement("hostname");
                 hostname.appendChild(xml.createTextNode(names.get(hash)));
-                xml.appendChild(address);
+                host.appendChild(hostname);
             }
 
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(xml);
-            StreamResult result = new StreamResult(new File("../data/output.xml"));
+            StreamResult result = new StreamResult(new File("./data/output.xml"));
 
             transformer.transform(source, result);
         }
