@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Mapper {
+public class NamingServer {
 
-    TreeMap<Integer, String> map = new TreeMap<>();
-    TreeMap<Integer, String> names = new TreeMap<>();
-    ArrayList<Integer> hashes = new ArrayList<>();
+    private TreeMap<Integer, String> map = new TreeMap<>();
+    private TreeMap<Integer, String> names = new TreeMap<>();
+    private ArrayList<Integer> hashes = new ArrayList<>();
 
-    public Mapper() {}
+    public NamingServer() {}
 
     public Boolean updateMap(Integer hash, String ip, String name) {
         Boolean error = true;
