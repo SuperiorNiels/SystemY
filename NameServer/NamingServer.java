@@ -21,7 +21,9 @@ public class NamingServer {
 
     private TreeMap<Integer, String> map = new TreeMap<>();
     private TreeMap<Integer, String> names = new TreeMap<>();
+    private TreeMap<Integer,Integer> files = new TreeMap<>();
     private ArrayList<Integer> hashes = new ArrayList<>();
+
 
     public NamingServer() {}
 
@@ -87,5 +89,83 @@ public class NamingServer {
             e.printStackTrace();
         }
         return "../data/output.xml";
+    }
+
+    /**
+     * @param fileName
+     * @return the hash of the owner node
+     * This method adds a file to the files treemap
+     */
+    public int addFile(String fileName){
+        int hash = getHash(fileName);
+        int owner = calculateOwner(hash);
+        files.put(hash,owner);
+        return owner;
+    }
+
+    /**
+     * @param fileName
+     * Removes the files hash from the files treemap
+     */
+    public void removeFile(String fileName){
+        files.remove(getHash(fileName));
+    }
+
+    /**
+     *
+     * @param fileName
+     * @return the IP address of the owner node
+     */
+    public String getOwner(String fileName){
+        int hash = getHash(fileName);
+        return map.get(files.get(hash));
+    }
+
+    /**
+     * @return int (hash of new file owner)
+     * returns 0 if map is empty
+     * @param fileHash = the hash of the filename
+     */
+    private int calculateOwner(int fileHash) {
+        if(!map.isEmpty()) {
+            ArrayList<Integer> lowerHashes = new ArrayList<>();
+            //Find the lower hashes first
+            for(int h : hashes){
+                if(h<fileHash){
+                    lowerHashes.add(h);
+                }
+            }
+            //Check if lower hashes are found. If not take largest hash
+            if(!lowerHashes.isEmpty()){
+                //Look for the hash closest to the filehash
+                int diff = Integer.MAX_VALUE;
+                int owner = 0;
+                for(int h : lowerHashes){
+                    int newDiff = fileHash - h;
+                    if(newDiff<diff){
+                        diff = newDiff;
+                        owner = h;
+                    }
+                    return owner;
+                }
+            }else{
+                int big= -1;
+                for(int h : hashes){
+                    if(h>big){
+                        big = h;
+                    }
+                }
+                return big;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * @param name
+     * @return hash of the input string
+     */
+    public int getHash(String name){
+        return Math.abs(name.hashCode() % 32768);
     }
 }
