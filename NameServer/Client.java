@@ -15,7 +15,7 @@ public class Client {
             //Gets the bank object
             Registry registry = LocateRegistry.getRegistry("10.0.1.14");
             //import the stub
-             NamingServer = (NamingInterface) registry.lookup("NamingServer");
+            NamingServer = (NamingInterface) registry.lookup("NamingServer");
         }catch (RemoteException e) {
             System.out.println("Problem connecting to the RMI server: " + e.getMessage());
         }catch (NotBoundException e) {
