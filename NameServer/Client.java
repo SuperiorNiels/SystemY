@@ -24,29 +24,56 @@ public class Client {
     }
 
     public void communication(){
+        String name,ip;
+
         System.out.println("press 1 to add a node to the server");
         System.out.println("press 2 to remove a node");
         System.out.println("press 3 to add a filename to the server");
         System.out.println("press 4 to remove a filename from the serer");
         System.out.println("press 5 to get the owner of the file");
+        System.out.println("press 6 to export an xml file");
         int answer = scanner.nextInt();
         try {
             switch(answer){
                 case 1:
-                    NamingServer.addNode();
+
+                    System.out.print("Node Name :");
+                    name = scanner.next();
+                    System.out.print("Ip :");
+                    ip = scanner.next();
+                    try{
+                        NamingServer.addNode(ip , name);
+                    }catch(AlreadyExistsException e){
+                        System.out.println("Hash, name or ip already exists");
+                    }
+
                     break;
                 case 2:
-                    NamingServer.removeNode();
+                    System.out.print("Node Name :");
+                    name = scanner.next();
+                    NamingServer.removeNode(name);
                     break;
                 case 3:
-                    NamingServer.addFile();
+                    System.out.println("FileName: ");
+                    name = scanner.next();
+                    NamingServer.addFile(name);
                     break;
                 case 4:
-                    NamingServer.removeFile();
+                    System.out.println("FileName: ");
+                    name = scanner.next();
+                    NamingServer.removeFile(name);
                     break;
                 case 5:
-                    NamingServer.getOwner();
+                    System.out.println("FileName: ");
+                    name = scanner.next();
+                    NamingServer.getOwner(name);
                     break;
+                case 6:
+                    try {
+                        NamingServer.createXml();
+                    }catch(Exception e){
+                        System.out.println("error exporting xml "+e.getMessage());
+                    }
 
             }
         }catch(RemoteException e){
