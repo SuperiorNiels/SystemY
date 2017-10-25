@@ -7,7 +7,7 @@ import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class Client {
-    private Naming NamingServer;
+    private NamingInterface NamingServer;
     private Scanner scanner;
 
     public Client(){
@@ -15,7 +15,7 @@ public class Client {
             //Gets the bank object
             Registry registry = LocateRegistry.getRegistry("127.0.0.1");
             //import the stub
-             NamingServer = (Naming) registry.lookup("NamingServer");
+             NamingServer = (NamingInterface) registry.lookup("NamingServer");
         }catch (RemoteException e) {
             System.out.println("Problem connecting to the RMI server: " + e.getMessage());
         }catch (NotBoundException e) {
@@ -70,7 +70,7 @@ public class Client {
                     break;
                 case 6:
                     try {
-                        NamingServer.createXml();
+                        NamingServer.createXML();
                     }catch(Exception e){
                         System.out.println("error exporting xml "+e.getMessage());
                     }
