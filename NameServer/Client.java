@@ -37,7 +37,6 @@ public class Client {
             try {
                 switch (answer) {
                     case 1:
-
                         System.out.print("Node Name :");
                         name = scanner.next();
                         System.out.print("Ip: ");
@@ -74,7 +73,6 @@ public class Client {
                         System.out.println("Wrong input");
                         inLoop = true;
                         break;
-
                 }
             } catch (RemoteException e) {
                 System.err.println("error with RMI server" + e.getMessage());
