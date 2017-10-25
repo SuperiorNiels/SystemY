@@ -47,7 +47,7 @@ public class Client {
                         try {
                             NamingServer.addNode(ip, name);
                         } catch (AlreadyExistsException e) {
-                            System.out.println("Hash, name or ip already exists");
+                            System.err.println("Hash, name or ip already exists");
                         }
 
                         break;
@@ -69,7 +69,8 @@ public class Client {
                     case 5:
                         System.out.println("FileName: ");
                         name = scanner.next();
-                        NamingServer.getOwner(name);
+                        System.out.println("The owner ip is "+NamingServer.getOwner(name));
+
                         break;
                     case 6:
                         try {
@@ -81,6 +82,11 @@ public class Client {
                     case 7:
                         System.out.println("bye bye!");
                         inLoop= false;
+                        break;
+                    default:
+                        System.out.println("Wrong input");
+                        inLoop = true;
+                        break;
 
                 }
             } catch (RemoteException e) {
