@@ -2,6 +2,7 @@ package NameServer;
 
 import java.io.File;
 
+import javax.management.openmbean.KeyAlreadyExistsException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -19,29 +20,30 @@ import org.w3c.dom.Element;
 
 public class NamingServer {
 
-    private TreeMap<Integer, String> map = new TreeMap<>();
-    private TreeMap<Integer, String> names = new TreeMap<>();
-    private ArrayList<Integer> hashes = new ArrayList<>();
+    private TreeMap<Integer, Node> map = new TreeMap<>();
 
     public NamingServer() {}
 
-    public Boolean updateMap(Integer hash, String ip, String name) {
-        Boolean error = true;
-        if(hashes.contains(hash)) {
+    /**
+     * @param hash Integer, calculated hash for node
+     * @param ip String, ip address of node
+     * @param name String, hostname of node
+     * @throws AlreadyExistsException
+     *
+     */
+    public void addNode(Integer hash, String ip, String name) throws AlreadyExistsException {
+        if (map.containsKey(hash)) {
             System.out.println("Hash already exists.");
-            error = false;
-        } else if(map.containsValue(ip)) {
-            System.out.println("IP already exists.");
-            error = false;
-        } else if(names.containsValue(name)) {
-            System.out.println("Name already exists.");
-            error = false;
+            throw new AlreadyExistsException();
         } else {
-            hashes.add(hash);
-            map.put(hash, ip);
-            names.put(hash, name);
+            Node node = new Node(ip, name);
+            for (Node n : map.values()) {
+                if (node.equals(n)) {
+                    throw new AlreadyExistsException();
+                }
+            }
+            map.put(hash, node);
         }
-        return error;
     }
 
     /**
@@ -56,17 +58,17 @@ public class NamingServer {
             Element root = xml.createElement("nodes");
             xml.appendChild(root);
 
-            for(Integer hash : hashes) {
+            for(Integer hash : map.keySet()) {
                 Element host = xml.createElement("host");
                 host.setAttribute("id", Integer.toString(hash)); // ID can be changed to "hash"
                 root.appendChild(host);
                 // Add IP address
                 Element address = xml.createElement("address");
-                address.appendChild(xml.createTextNode(map.get(hash)));
+                address.appendChild(xml.createTextNode(map.get(hash).ip));
                 host.appendChild(address);
                 // Add hostname
                 Element hostname = xml.createElement("hostname");
-                hostname.appendChild(xml.createTextNode(names.get(hash)));
+                hostname.appendChild(xml.createTextNode(map.get(hash).name));
                 host.appendChild(hostname);
             }
 
