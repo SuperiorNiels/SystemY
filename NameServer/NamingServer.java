@@ -2,7 +2,6 @@ package NameServer;
 
 import java.io.File;
 
-import javax.management.openmbean.KeyAlreadyExistsException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,7 +11,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileNotFoundException;
 import java.util.TreeMap;
 import java.util.ArrayList;
 
@@ -39,12 +37,9 @@ public class NamingServer {
             throw new AlreadyExistsException();
         } else {
             Node node = new Node(ip, name);
-            for (Node n : map.values()) {
-                if (node.equals(n)) {
-                    throw new AlreadyExistsException();
-                }
+            if(!map.containsValue(node)) {
+                map.put(hash, node);
             }
-            map.put(hash, node);
         }
     }
 
