@@ -31,6 +31,7 @@ public class Client {
         System.out.println("press 3 to add a filename to the server");
         System.out.println("press 4 to remove a filename from the serer");
         System.out.println("press 5 to get the owner of the file");
+        System.out.println("press 6 to export an xml file");
         int answer = scanner.nextInt();
         try {
             switch(answer){
@@ -48,7 +49,9 @@ public class Client {
 
                     break;
                 case 2:
-                    NamingServer.removeNode();
+                    System.out.print("Node Name :");
+                    name = scanner.next();
+                    NamingServer.removeNode(name);
                     break;
                 case 3:
                     System.out.println("FileName: ");
@@ -65,6 +68,12 @@ public class Client {
                     name = scanner.next();
                     NamingServer.getOwner(name);
                     break;
+                case 6:
+                    try {
+                        NamingServer.createXml();
+                    }catch(Exception e){
+                        System.out.println("error exporting xml "+e.getMessage());
+                    }
 
             }
         }catch(RemoteException e){
