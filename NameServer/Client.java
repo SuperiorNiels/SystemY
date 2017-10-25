@@ -24,6 +24,8 @@ public class Client {
     }
 
     public void communication(){
+        String name,ip;
+
         System.out.println("press 1 to add a node to the server");
         System.out.println("press 2 to remove a node");
         System.out.println("press 3 to add a filename to the server");
@@ -33,19 +35,35 @@ public class Client {
         try {
             switch(answer){
                 case 1:
-                    NamingServer.addNode();
+
+                    System.out.print("Node Name :");
+                    name = scanner.next();
+                    System.out.print("Ip :");
+                    ip = scanner.next();
+                    try{
+                        NamingServer.addNode(ip , name);
+                    }catch(AlreadyExistsException e){
+                        System.out.println("Hash, name or ip already exists");
+                    }
+
                     break;
                 case 2:
                     NamingServer.removeNode();
                     break;
                 case 3:
-                    NamingServer.addFile();
+                    System.out.println("FileName: ");
+                    name = scanner.next();
+                    NamingServer.addFile(name);
                     break;
                 case 4:
-                    NamingServer.removeFile();
+                    System.out.println("FileName: ");
+                    name = scanner.next();
+                    NamingServer.removeFile(name);
                     break;
                 case 5:
-                    NamingServer.getOwner();
+                    System.out.println("FileName: ");
+                    name = scanner.next();
+                    NamingServer.getOwner(name);
                     break;
 
             }
