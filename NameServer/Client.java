@@ -13,7 +13,7 @@ public class Client {
     public Client(){
         try {
             //Gets the bank object
-            Registry registry = LocateRegistry.getRegistry("127.0.0.1");
+            Registry registry = LocateRegistry.getRegistry("10.0.1.14");
             //import the stub
              NamingServer = (NamingInterface) registry.lookup("NamingServer");
         }catch (RemoteException e) {
@@ -25,7 +25,7 @@ public class Client {
 
     public void communication(){
         String name,ip;
-
+        scanner = new Scanner(System.in);
         System.out.println("press 1 to add a node to the server");
         System.out.println("press 2 to remove a node");
         System.out.println("press 3 to add a filename to the server");
