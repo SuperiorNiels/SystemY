@@ -39,12 +39,9 @@ public class NamingServer {
             throw new AlreadyExistsException();
         } else {
             Node node = new Node(ip, name);
-            for (Node n : map.values()) {
-                if (node.equals(n)) {
-                    throw new AlreadyExistsException();
-                }
+            if(!map.containsValue(node)) {
+                map.put(hash, node);
             }
-            map.put(hash, node);
         }
     }
 
