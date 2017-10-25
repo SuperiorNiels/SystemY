@@ -27,13 +27,13 @@ public class NamingServer {
     public NamingServer() {}
 
     /**
-     * @param hash Integer, calculated hash for node
      * @param ip String, ip address of node
      * @param name String, hostname of node
      * @throws AlreadyExistsException
      *
      */
-    public void addNode(Integer hash, String ip, String name) throws AlreadyExistsException {
+    public void addNode(String ip, String name) throws AlreadyExistsException {
+        Integer hash = getHash(name);
         if (map.containsKey(hash)) {
             System.out.println("Hash already exists.");
             throw new AlreadyExistsException();
@@ -49,7 +49,15 @@ public class NamingServer {
     }
 
     /**
-     *
+     * Remove a Node from the map
+     * @param name, String, hostname of node
+     */
+    public void removeNode(String name) {
+        map.remove(getHash(name));
+    }
+
+    /**
+     * Create XML for map, and save it in the given file
      * @param path String, path of file to write xml to
      */
     public void createXML(String path) throws Exception {
@@ -171,5 +179,4 @@ public class NamingServer {
     public int getHash(String name){
         return Math.abs(name.hashCode() % 32768);
     }
-
 }
