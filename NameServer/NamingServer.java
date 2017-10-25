@@ -11,18 +11,36 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.TreeMap;
 import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class NamingServer {
+public class NamingServer implements NamingInterface{
 
     private TreeMap<Integer, Node> map = new TreeMap<>();
     private TreeMap<Integer,Integer> files = new TreeMap<>();
 
-    public NamingServer() {}
+    public NamingServer() {
+        try {
+            //Start the RMI-server
+            NamingServer server = this;
+            NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.bind("NamingServer", stub);
+            System.out.println("Server ready!");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * @param ip String, ip address of node
@@ -122,9 +140,9 @@ public class NamingServer {
      * @param fileName
      * @return a node object
      */
-    public Node getOwner(String fileName){
+    public String getOwner(String fileName){
         int hash = getHash(fileName);
-        return map.get(files.get(hash));
+        return map.get(files.get(hash)).getIp();
     }
 
     /**

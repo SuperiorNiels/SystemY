@@ -70,7 +70,7 @@ public class Client {
                     break;
                 case 6:
                     try {
-                        NamingServer.createXML();
+                        NamingServer.createXML("test");
                     }catch(Exception e){
                         System.out.println("error exporting xml "+e.getMessage());
                     }
