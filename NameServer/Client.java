@@ -13,7 +13,7 @@ public class Client {
     public Client(){
         try {
             //Gets the bank object
-            Registry registry = LocateRegistry.getRegistry("10.0.1.14");
+            Registry registry = LocateRegistry.getRegistry("localhost");
             //import the stub
             NamingServer = (NamingInterface) registry.lookup("NamingServer");
         }catch (RemoteException e) {
@@ -30,16 +30,13 @@ public class Client {
             scanner = new Scanner(System.in);
             System.out.println("press 1 to add a node to the server");
             System.out.println("press 2 to remove a node");
-            System.out.println("press 3 to add a filename to the server");
-            System.out.println("press 4 to remove a filename from the serer");
-            System.out.println("press 5 to get the owner of the file");
-            System.out.println("press 6 to export an xml file");
-            System.out.println("Press 7 to exit");
+            System.out.println("press 3 to get the owner of the file");
+            System.out.println("press 4 to export an xml file");
+            System.out.println("Press 5 to exit");
             int answer = scanner.nextInt();
             try {
                 switch (answer) {
                     case 1:
-
                         System.out.print("Node Name :");
                         name = scanner.next();
                         System.out.print("Ip: ");
@@ -59,26 +56,16 @@ public class Client {
                     case 3:
                         System.out.println("FileName: ");
                         name = scanner.next();
-                        NamingServer.addFile(name);
+                        System.out.println(NamingServer.calculateOwner(name));
                         break;
                     case 4:
-                        System.out.println("FileName: ");
-                        name = scanner.next();
-                        NamingServer.removeFile(name);
-                        break;
-                    case 5:
-                        System.out.println("FileName: ");
-                        name = scanner.next();
-                        NamingServer.getOwner(name);
-                        break;
-                    case 6:
                         try {
                             NamingServer.createXML("./data/output.xml");
                         } catch (Exception e) {
                             System.out.println("error exporting xml " + e.getMessage());
                         }
                         break;
-                    case 7:
+                    case 5:
                         System.out.println("bye bye!");
                         inLoop= false;
 
