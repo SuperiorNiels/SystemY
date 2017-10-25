@@ -31,7 +31,7 @@ public class NamingServer {
      * @throws AlreadyExistsException
      *
      */
-    public void addMap(Integer hash, String ip, String name) throws AlreadyExistsException {
+    public void addNode(Integer hash, String ip, String name) throws AlreadyExistsException {
         if (map.containsKey(hash)) {
             System.out.println("Hash already exists.");
             throw new AlreadyExistsException();
