@@ -12,6 +12,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.FileNotFoundException;
 import java.util.TreeMap;
 import java.util.ArrayList;
 
@@ -48,9 +49,10 @@ public class NamingServer {
     }
 
     /**
-     * @return String (path of xml file)
+     *
+     * @param path String, path of file to write xml to
      */
-    public String createXML() {
+    public void createXML(String path) throws Exception {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -76,20 +78,20 @@ public class NamingServer {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(xml);
-            StreamResult result = new StreamResult(new File("./data/output.xml"));
+            File file = new File(path);
+            StreamResult result = new StreamResult(file);
 
             transformer.transform(source, result);
         }
         catch(ParserConfigurationException e) {
-            e.printStackTrace();
+            throw e;
         }
         catch(TransformerConfigurationException e) {
-            e.printStackTrace();
+            throw e;
         }
         catch(TransformerException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return "../data/output.xml";
     }
 
     /**
