@@ -65,7 +65,7 @@ public class Node {
         if(my_hash < new_hash && this.previous > new_hash) {
             //
         } else if(my_hash > new_hash && this.previous < new_hash) {
-
+ 
         }
     }
 
