@@ -13,7 +13,7 @@ public class Client {
     public Client(){
         try {
             //Gets the bank object
-            Registry registry = LocateRegistry.getRegistry("localhost");
+            Registry registry = LocateRegistry.getRegistry("127.0.0.1");
             //import the stub
             NamingServer = (NamingInterface) registry.lookup("NamingServer");
         }catch (RemoteException e) {
@@ -50,7 +50,12 @@ public class Client {
                     case 2:
                         System.out.print("Node Name: ");
                         name = scanner.next();
-                        NamingServer.removeNode(name);
+                        try{
+                            NamingServer.removeNode(name);
+                        }catch(NullPointerException e){
+                            System.err.println("Given name doesn't exist");
+                        }
+
                         break;
                     case 3:
                         System.out.println("FileName: ");
@@ -58,6 +63,25 @@ public class Client {
                         System.out.println("The owner ip is "+NamingServer.calculateOwner(name));
                         break;
                     case 4:
+                        System.out.println("FileName: ");
+                        name = scanner.next();
+                        try{
+                            NamingServer.removeFile(name);
+                        }catch(NullPointerException e){
+                            System.err.println("Given file doesn't exist");
+                        }
+
+                        break;
+                    case 5:
+                        System.out.println("FileName: ");
+                        name = scanner.next();
+                        try{
+                            System.out.println("The owner ip is "+NamingServer.getOwner(name));
+                        }catch(NullPointerException e){
+                            System.err.println("No owner found");
+                        }
+                        break;
+                    case 6:
                         try {
                             NamingServer.createXML("./data/output.xml");
                         } catch (Exception e) {
