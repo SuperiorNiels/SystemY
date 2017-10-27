@@ -46,7 +46,6 @@ public class Client {
                         } catch (AlreadyExistsException e) {
                             System.err.println("Hash, name or ip already exists");
                         }
-
                         break;
                     case 2:
                         System.out.print("Node Name: ");
