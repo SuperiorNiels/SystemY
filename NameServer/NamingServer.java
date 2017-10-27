@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 public class NamingServer implements NamingInterface{
 
     private TreeMap<Integer, Node> map = new TreeMap<>();
-    private TreeMap<Integer,Integer> files = new TreeMap<>();
 
     public NamingServer() {
         try {
@@ -131,47 +130,13 @@ public class NamingServer implements NamingInterface{
     }
 
     /**
-     * @param fileName
-     * @return the hash of the owner node
-     * This method adds a file to the files treemap
-     */
-    public int addFile(String fileName){
-        int owner = calculateOwner(getHash(fileName));
-        files.put(getHash(fileName),owner);
-        return owner;
-    }
-
-    /**
-     * @param fileName
-     * Removes the files hash from the files treemap
-     */
-    public void removeFile(String fileName) throws NullPointerException{
-        if(files.remove(getHash(fileName)) == null){
-            throw new NullPointerException("File doesn't exist");
-        }
-
-    }
-
-    /**
-     *
-     * @param fileName
-     * @return a ip of the owner
-     */
-    public String getOwner(String fileName) throws NullPointerException{
-        int hash = getHash(fileName);
-        String ownerIp = map.get(files.get(hash)).getIp();
-        if(ownerIp == null){
-            throw new NullPointerException("No owner found");
-        }
-        return ownerIp;
-    }
-
-    /**
-     * @return int (hash of new file owner)
+     * @return hash of owner
      * returns 0 if map is empty
-     * @param fileHash = the hash of the filename
+     * @param fileName = name of the file
      */
-    private int calculateOwner(int fileHash) {
+    public String calculateOwner(String fileName) {
+        int ownerHash = 0;
+        int fileHash = getHash(fileName);
         if(!map.isEmpty()) {
             ArrayList<Integer> lowerHashes = new ArrayList<>();
             //Find the lower hashes first
@@ -191,7 +156,7 @@ public class NamingServer implements NamingInterface{
                         diff = newDiff;
                         owner = h;
                     }
-                    return owner;
+                    ownerHash = owner;
                 }
             }else{
                 int big= -1;
@@ -200,10 +165,10 @@ public class NamingServer implements NamingInterface{
                         big = h;
                     }
                 }
-                return big;
+                ownerHash = big;
             }
         }
-        return 0;
+        return (ownerHash!=0) ? map.get(ownerHash).ip: "0";
     }
 
     /**
