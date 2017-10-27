@@ -57,29 +57,18 @@ public class NamingServer implements NamingInterface{
             if(!map.containsValue(node)) {
                 map.put(hash, node);
             }
-            //recalculate all the owners
-            updateOwner();
         }
     }
-    private void updateOwner(){
 
-        for(Integer key : files.keySet()){
-            files.put(key,calculateOwner(key));
-        }
-    }
     /**
      * Remove a Node from the map
      * If there is no such node in the map throw an exception
      * @param name, String, hostname of node
      */
     public void removeNode(String name) throws NullPointerException {
-
         if(map.remove(getHash(name))== null){
             throw new NullPointerException();
-        }else{
-            updateOwner();
         }
-
     }
 
     /**
@@ -133,7 +122,7 @@ public class NamingServer implements NamingInterface{
      * returns 0 if map is empty
      * @param fileName = name of the file
      */
-    public String calculateOwner(String fileName) {
+    public String getOwner(String fileName) {
         int ownerHash = 0;
         int fileHash = getHash(fileName);
         if(!map.isEmpty()) {
@@ -167,7 +156,7 @@ public class NamingServer implements NamingInterface{
                 ownerHash = big;
             }
         }
-        return (ownerHash!=0) ? map.get(ownerHash).ip: "0";
+        return (ownerHash!=0) ? map.get(ownerHash).ip: null;
     }
 
     /**
