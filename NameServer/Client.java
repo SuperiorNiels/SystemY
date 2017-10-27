@@ -30,16 +30,13 @@ public class Client {
             scanner = new Scanner(System.in);
             System.out.println("press 1 to add a node to the server");
             System.out.println("press 2 to remove a node");
-            System.out.println("press 3 to add a filename to the server");
-            System.out.println("press 4 to remove a filename from the serer");
-            System.out.println("press 5 to get the owner of the file");
-            System.out.println("press 6 to export an xml file");
-            System.out.println("Press 7 to exit");
+            System.out.println("press 3 to get the owner of the file");
+            System.out.println("press 4 to export an xml file");
+            System.out.println("Press 5 to exit");
             int answer = scanner.nextInt();
             try {
                 switch (answer) {
                     case 1:
-
                         System.out.print("Node Name :");
                         name = scanner.next();
                         System.out.print("Ip: ");
@@ -49,7 +46,6 @@ public class Client {
                         } catch (AlreadyExistsException e) {
                             System.err.println("Hash, name or ip already exists");
                         }
-
                         break;
                     case 2:
                         System.out.print("Node Name: ");
@@ -64,7 +60,7 @@ public class Client {
                     case 3:
                         System.out.println("FileName: ");
                         name = scanner.next();
-                        NamingServer.addFile(name);
+                        System.out.println("The owner ip is "+NamingServer.calculateOwner(name));
                         break;
                     case 4:
                         System.out.println("FileName: ");
@@ -84,8 +80,6 @@ public class Client {
                         }catch(NullPointerException e){
                             System.err.println("No owner found");
                         }
-
-
                         break;
                     case 6:
                         try {
@@ -94,7 +88,7 @@ public class Client {
                             System.out.println("error exporting xml " + e.getMessage());
                         }
                         break;
-                    case 7:
+                    case 5:
                         System.out.println("bye bye!");
                         inLoop= false;
                         break;
@@ -102,7 +96,6 @@ public class Client {
                         System.out.println("Wrong input");
                         inLoop = true;
                         break;
-
                 }
             } catch (RemoteException e) {
                 System.err.println("error with RMI server" + e.getMessage());
