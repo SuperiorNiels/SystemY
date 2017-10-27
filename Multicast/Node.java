@@ -5,9 +5,14 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
-public class Node {
-    public Node(){
+public class Node extends Thread{
+    String nodeName;
+    public Node(String name){
+        this.nodeName = name;
+    }
+    public void run(){
         try {
             MulticastSocket socket = new MulticastSocket(4446);
             InetAddress groupAddress = InetAddress.getByName("10.");
@@ -19,7 +24,7 @@ public class Node {
             socket.receive(packet);
 
             String received = new String(packet.getData());
-            System.out.println("RECEIVED PACKET: " + received);
+            System.out.println("Node "+nodeName +" RECEIVED PACKET: " + received);
 
             socket.leaveGroup(groupAddress);
             socket.close();
@@ -29,4 +34,14 @@ public class Node {
             e.printStackTrace();
         }
     }
+}
+
+class NodeMain {
+
+    public static void main(String[] args) throws IOException {
+        new Node("1").run();
+        new Node("2").run();
+        new Node("3").run();
+    }
+
 }
