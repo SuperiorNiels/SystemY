@@ -57,9 +57,10 @@ public class NamingServer implements NamingInterface{
             Node node = new Node(ip, name);
             if(!map.containsValue(node)) {
                 map.put(hash, node);
+                //recalculate all the owners
+                updateOwner();
             }
-            //recalculate all the owners
-            updateOwner();
+
         }
     }
     private void updateOwner(){
