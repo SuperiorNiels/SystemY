@@ -60,28 +60,9 @@ public class Client {
                     case 3:
                         System.out.println("FileName: ");
                         name = scanner.next();
-                        System.out.println("The owner ip is "+NamingServer.calculateOwner(name));
+                        System.out.println("The owner ip is "+NamingServer.getOwner(name));
                         break;
                     case 4:
-                        System.out.println("FileName: ");
-                        name = scanner.next();
-                        try{
-                            NamingServer.removeFile(name);
-                        }catch(NullPointerException e){
-                            System.err.println("Given file doesn't exist");
-                        }
-
-                        break;
-                    case 5:
-                        System.out.println("FileName: ");
-                        name = scanner.next();
-                        try{
-                            System.out.println("The owner ip is "+NamingServer.getOwner(name));
-                        }catch(NullPointerException e){
-                            System.err.println("No owner found");
-                        }
-                        break;
-                    case 6:
                         try {
                             NamingServer.createXML("./data/output.xml");
                         } catch (Exception e) {
