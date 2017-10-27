@@ -28,7 +28,7 @@ class BroadcastServerThread extends Thread{
     }
     public void run(){
         try {
-            byte[] buf = new byte[256];
+            byte[] buf;
             buf = message.getBytes();
             InetAddress groupAddress = InetAddress.getByName("10.0.1.0");
             DatagramPacket packet;
