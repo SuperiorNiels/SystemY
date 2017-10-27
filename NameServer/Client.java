@@ -13,7 +13,7 @@ public class Client {
     public Client(){
         try {
             //Gets the bank object
-            Registry registry = LocateRegistry.getRegistry("10.0.1.14");
+            Registry registry = LocateRegistry.getRegistry("127.0.0.1");
             //import the stub
             NamingServer = (NamingInterface) registry.lookup("NamingServer");
         }catch (RemoteException e) {
@@ -47,14 +47,19 @@ public class Client {
                         try {
                             NamingServer.addNode(ip, name);
                         } catch (AlreadyExistsException e) {
-                            System.out.println("Hash, name or ip already exists");
+                            System.err.println("Hash, name or ip already exists");
                         }
 
                         break;
                     case 2:
                         System.out.print("Node Name: ");
                         name = scanner.next();
-                        NamingServer.removeNode(name);
+                        try{
+                            NamingServer.removeNode(name);
+                        }catch(NullPointerException e){
+                            System.err.println("Given name doesn't exist");
+                        }
+
                         break;
                     case 3:
                         System.out.println("FileName: ");
@@ -64,12 +69,23 @@ public class Client {
                     case 4:
                         System.out.println("FileName: ");
                         name = scanner.next();
-                        NamingServer.removeFile(name);
+                        try{
+                            NamingServer.removeFile(name);
+                        }catch(NullPointerException e){
+                            System.err.println("Given file doesn't exist");
+                        }
+
                         break;
                     case 5:
                         System.out.println("FileName: ");
                         name = scanner.next();
-                        NamingServer.getOwner(name);
+                        try{
+                            System.out.println("The owner ip is "+NamingServer.getOwner(name));
+                        }catch(NullPointerException e){
+                            System.err.println("No owner found");
+                        }
+
+
                         break;
                     case 6:
                         try {
@@ -81,6 +97,11 @@ public class Client {
                     case 7:
                         System.out.println("bye bye!");
                         inLoop= false;
+                        break;
+                    default:
+                        System.out.println("Wrong input");
+                        inLoop = true;
+                        break;
 
                 }
             } catch (RemoteException e) {

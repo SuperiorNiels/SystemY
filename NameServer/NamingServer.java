@@ -36,9 +36,9 @@ public class NamingServer implements NamingInterface{
             registry.bind("NamingServer", stub);
             System.out.println("Server ready!");
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {
-            e.printStackTrace();
+            System.err.println("Port already bound");
         }
     }
 
@@ -58,15 +58,29 @@ public class NamingServer implements NamingInterface{
             if(!map.containsValue(node)) {
                 map.put(hash, node);
             }
+            //recalculate all the owners
+            updateOwner();
         }
     }
+    private void updateOwner(){
 
+        for(Integer key : files.keySet()){
+            files.put(key,calculateOwner(key));
+        }
+    }
     /**
      * Remove a Node from the map
+     * If there is no such node in the map throw an exception
      * @param name, String, hostname of node
      */
-    public void removeNode(String name) {
-        map.remove(getHash(name));
+    public void removeNode(String name) throws NullPointerException {
+
+        if(map.remove(getHash(name))== null){
+            throw new NullPointerException();
+        }else{
+            updateOwner();
+        }
+
     }
 
     /**
@@ -121,9 +135,8 @@ public class NamingServer implements NamingInterface{
      * This method adds a file to the files treemap
      */
     public int addFile(String fileName){
-        int hash = getHash(fileName);
-        int owner = calculateOwner(hash);
-        files.put(hash,owner);
+        int owner = calculateOwner(getHash(fileName));
+        files.put(getHash(fileName),owner);
         return owner;
     }
 
@@ -131,18 +144,25 @@ public class NamingServer implements NamingInterface{
      * @param fileName
      * Removes the files hash from the files treemap
      */
-    public void removeFile(String fileName){
-        files.remove(getHash(fileName));
+    public void removeFile(String fileName) throws NullPointerException{
+        if(files.remove(getHash(fileName)) == null){
+            throw new NullPointerException("File doesn't exist");
+        }
+
     }
 
     /**
      *
      * @param fileName
-     * @return a node object
+     * @return a ip of the owner
      */
-    public String getOwner(String fileName){
+    public String getOwner(String fileName) throws NullPointerException{
         int hash = getHash(fileName);
-        return map.get(files.get(hash)).getIp();
+        String ownerIp = map.get(files.get(hash)).getIp();
+        if(ownerIp == null){
+            throw new NullPointerException("No owner found");
+        }
+        return ownerIp;
     }
 
     /**
