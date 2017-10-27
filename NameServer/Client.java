@@ -55,7 +55,6 @@ public class Client {
                         }catch(NullPointerException e){
                             System.err.println("Given name doesn't exist");
                         }
-
                         break;
                     case 3:
                         System.out.println("FileName: ");

@@ -1,12 +1,29 @@
-package NameServer;
+package Node;
 
 public class Node {
+    int previous = 0;
+    int next = 0;
     String ip = null;
     String name = null;
-
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
+    }
+
+    public void setNext(int next) {
+        this.next = next;
+    }
+
+    public void setPrevious(int previous) {
+        this.previous = previous;
+    }
+
+    public int getNext() {
+        return this.next;
+    }
+
+    public int getPrevious() {
+        return this.previous;
     }
 
     public String getIp() {
@@ -42,4 +59,14 @@ public class Node {
         }
         return error;
     }
+
+    public void updateNodes(Integer new_hash) {
+        int my_hash = Math.abs(this.name.hashCode() % 32768);
+        if(my_hash < new_hash && this.previous > new_hash) {
+            //
+        } else if(my_hash > new_hash && this.previous < new_hash) {
+
+        }
+    }
+
 }
