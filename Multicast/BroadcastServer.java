@@ -16,13 +16,15 @@ public class BroadcastServer {
 }
 
 class BroadcastServerThread extends Thread{
-    private DatagramSocket socket;
+    private MulticastSocket socket;
     private String message;
     public BroadcastServerThread(String message){
         this.message = message;
         try {
-            socket = new DatagramSocket(4446);
+            socket = new MulticastSocket(4446);
         } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -30,7 +32,7 @@ class BroadcastServerThread extends Thread{
         try {
             byte[] buf;
             buf = message.getBytes();
-            InetAddress groupAddress = InetAddress.getByName("10.0.1.0");
+            InetAddress groupAddress = InetAddress.getByName("224.0.0.1");
             DatagramPacket packet;
             packet = new DatagramPacket(buf, buf.length, groupAddress, 4446);
             socket.send(packet);
@@ -38,7 +40,7 @@ class BroadcastServerThread extends Thread{
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             socket.close();
         }
     }

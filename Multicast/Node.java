@@ -15,7 +15,7 @@ public class Node extends Thread{
     public void run(){
         try {
             MulticastSocket socket = new MulticastSocket(4446);
-            InetAddress groupAddress = InetAddress.getByName("10.0.1.0");
+            InetAddress groupAddress = InetAddress.getByName("224.0.0.1");
             socket.joinGroup(groupAddress);
 
             DatagramPacket packet;
@@ -39,9 +39,7 @@ public class Node extends Thread{
 class NodeMain {
 
     public static void main(String[] args) throws IOException {
-        new Node("1").run();
-        new Node("2").run();
-        new Node("3").run();
+        new Node("Dieter").run();
     }
 
 }
