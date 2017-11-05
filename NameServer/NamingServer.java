@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import Node.Node;
+
 public class NamingServer implements NamingInterface{
 
     private TreeMap<Integer, Node> map = new TreeMap<>();
@@ -90,11 +92,11 @@ public class NamingServer implements NamingInterface{
                 root.appendChild(host);
                 // Add IP address
                 Element address = xml.createElement("address");
-                address.appendChild(xml.createTextNode(map.get(hash).ip));
+                address.appendChild(xml.createTextNode(map.get(hash).getIp()));
                 host.appendChild(address);
                 // Add hostname
                 Element hostname = xml.createElement("hostname");
-                hostname.appendChild(xml.createTextNode(map.get(hash).name));
+                hostname.appendChild(xml.createTextNode(map.get(hash).getName()));
                 host.appendChild(hostname);
             }
 
@@ -156,7 +158,7 @@ public class NamingServer implements NamingInterface{
                 ownerHash = big;
             }
         }
-        return (ownerHash!=0) ? map.get(ownerHash).ip: null;
+        return (ownerHash!=0) ? map.get(ownerHash).getIp(): null;
     }
 
     /**
