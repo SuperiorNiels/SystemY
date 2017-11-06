@@ -1,29 +1,58 @@
 package Node;
 
-public class Node {
-    int previous = 0;
-    int next = 0;
-    String ip = null;
-    String name = null;
+import NameServer.NamingInterface;
+import NameServer.NamingServer;
+
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+public class Node implements NodeInterface {
+    private Node previous = null;
+    private Node next = null;
+    private String ip = null;
+    private String name = null;
+
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
+
+
+    }
+    /*
+    * Starts the RMI server
+     */
+    public void startRMI(){
+        try {
+            //Start the RMI-server
+            Node node = this;
+            NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(node,0);
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.bind(name, stub);
+            System.out.println("Server ready!");
+        } catch (RemoteException e) {
+            System.err.println("Remote exception: "+e.getMessage());
+        } catch (AlreadyBoundException e) {
+            System.err.println("Port already bound");
+        }
     }
 
-    public void setNext(int next) {
-        this.next = next;
+    public void setNext(Node nextNode) {
+        next = nextNode;
     }
 
-    public void setPrevious(int previous) {
-        this.previous = previous;
+    public void setPrevious(Node previousNode) {
+        previous = previousNode;
     }
 
-    public int getNext() {
-        return this.next;
+    public Node getNext() {
+        return next;
     }
 
-    public int getPrevious() {
-        return this.previous;
+    public Node getPrevious() {
+        return previous;
     }
 
     public String getIp() {
@@ -60,15 +89,13 @@ public class Node {
         return error;
     }
 
+    /**
+     *
+     * @param new_hash
+     */
     public void updateNodes(Integer new_hash) {
         int my_hash = Math.abs(this.name.hashCode() % 32768);
-        if(my_hash < new_hash && this.next > new_hash) {
-            // node becomes previous
-        } else if(my_hash > new_hash && this.previous < new_hash) {
-            // node becomes next
-        } else if(my_hash == new_hash || new_hash == this.previous || new_hash == this.next) {
-            // new_hash is same as other node
-        }
+
     }
 
 }
