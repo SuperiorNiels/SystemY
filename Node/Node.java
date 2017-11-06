@@ -1,28 +1,28 @@
 package Node;
 
 public class Node {
-    int previous = 0;
-    int next = 0;
-    String ip = null;
-    String name = null;
+    private String previous = null;
+    private String next = null;
+    private String ip = null;
+    private String name = null;
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
     }
 
-    public void setNext(int next) {
+    public void setNext(String next) {
         this.next = next;
     }
 
-    public void setPrevious(int previous) {
+    public void setPrevious(String previous) {
         this.previous = previous;
     }
 
-    public int getNext() {
+    public String getNext() {
         return this.next;
     }
 
-    public int getPrevious() {
+    public String getPrevious() {
         return this.previous;
     }
 
@@ -60,15 +60,13 @@ public class Node {
         return error;
     }
 
+    /**
+     *
+     * @param new_hash
+     */
     public void updateNodes(Integer new_hash) {
         int my_hash = Math.abs(this.name.hashCode() % 32768);
-        if(my_hash < new_hash && this.next > new_hash) {
-            // node becomes previous
-        } else if(my_hash > new_hash && this.previous < new_hash) {
-            // node becomes next
-        } else if(my_hash == new_hash || new_hash == this.previous || new_hash == this.next) {
-            // new_hash is same as other node
-        }
+        
     }
 
 }
