@@ -1,8 +1,8 @@
 package Node;
 
 public class Node {
-    private String previous = null;
-    private String next = null;
+    private Node previous = null;
+    private Node next = null;
     private String ip = null;
     private String name = null;
     public Node(String ip, String name) {
@@ -10,19 +10,19 @@ public class Node {
         this.name = name;
     }
 
-    public void setNext(String next) {
+    public void setNext(Node next) {
         this.next = next;
     }
 
-    public void setPrevious(String previous) {
+    public void setPrevious(Node previous) {
         this.previous = previous;
     }
 
-    public String getNext() {
+    public Node getNext() {
         return this.next;
     }
 
-    public String getPrevious() {
+    public Node getPrevious() {
         return this.previous;
     }
 
@@ -49,11 +49,11 @@ public class Node {
      */
     public Boolean equals(Node node) {
         Boolean error = false;
-        if(this.ip == node.ip) {
+        if(this.ip.equals(node.ip)) {
             //System.out.println("IP address already in use.");
             error = true;
         }
-        if(this.name == node.name) {
+        if(this.name.equals(node.name)) {
             //System.out.println("Name already in use.");
             error = true;
         }
@@ -61,12 +61,27 @@ public class Node {
     }
 
     /**
-     *
-     * @param new_hash
+     * This method updates the nodes next en previous ip addresses
+     * @param new_name, String name of the new node (recieved via multicast)
+     * @param new_ip, String ip address of the new node
      */
-    public void updateNodes(Integer new_hash) {
-        int my_hash = Math.abs(this.name.hashCode() % 32768);
+    public void updateNodes(String new_name, String new_ip) throws NodeAlreadyExistsException {
+        int my_hash = calculateHash(name);
+        int new_hash = calculateHash(new_name);
 
+        if(my_hash == new_hash) throw new NodeAlreadyExistsException();
+
+        if(my_hash < new_hash && new_hash < calculateHash(next.name)) {
+            next = new Node(new_ip, new_name);
+            //update new node
+        } else if(calculateHash(previous.name) < new_hash && new_hash < my_hash) {
+            previous = new Node(new_ip, new_name);
+        }
     }
 
+    
+
+    private int calculateHash(String name) {
+        return Math.abs(name.hashCode() % 32768);
+    }
 }
