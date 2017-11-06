@@ -10,8 +10,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Node implements NodeInterface {
-    private String previous = null;
-    private String next = null;
+    private Node previous = null;
+    private Node next = null;
     private String ip = null;
     private String name = null;
 
@@ -19,6 +19,12 @@ public class Node implements NodeInterface {
         this.ip = ip;
         this.name = name;
 
+
+    }
+    /*
+    * Starts the RMI server
+     */
+    public void startRMI(){
         try {
             //Start the RMI-server
             Node node = this;
@@ -33,20 +39,20 @@ public class Node implements NodeInterface {
         }
     }
 
-    public void setNext(String next) {
-        this.next = next;
+    public void setNext(Node nextNode) {
+        next = nextNode;
     }
 
-    public void setPrevious(String previous) {
-        this.previous = previous;
+    public void setPrevious(Node previousNode) {
+        previous = previousNode;
     }
 
-    public String getNext() {
-        return this.next;
+    public Node getNext() {
+        return next;
     }
 
-    public String getPrevious() {
-        return this.previous;
+    public Node getPrevious() {
+        return previous;
     }
 
     public String getIp() {
