@@ -66,7 +66,7 @@ public class Node {
      */
     public void updateNodes(Integer new_hash) {
         int my_hash = Math.abs(this.name.hashCode() % 32768);
-        
+
     }
 
 }
