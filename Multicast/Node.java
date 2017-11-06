@@ -16,6 +16,7 @@ public class Node extends Thread{
         try {
             MulticastSocket socket = new MulticastSocket(4446);
             InetAddress groupAddress = InetAddress.getByName("224.0.0.1");
+            socket.setInterface(InetAddress.getByName(groupAddress.getHostName()));
             socket.joinGroup(groupAddress);
 
             DatagramPacket packet;
