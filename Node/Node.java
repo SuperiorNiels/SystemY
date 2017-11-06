@@ -38,13 +38,13 @@ public class Node implements NodeInterface {
     /*
     * Connects with another node
      */
-    public NodeInterface startCommunication(Node node){
+    public NodeInterface startCommunication(String name, String ip){
         NodeInterface commNode = null;
         try {
             //Gets the bank object
-            Registry registry = LocateRegistry.getRegistry(node.getIp());
+            Registry registry = LocateRegistry.getRegistry(ip);
             //import the stub
-            commNode= (NodeInterface) registry.lookup(node.getName());
+            commNode= (NodeInterface) registry.lookup(name);
         }catch (RemoteException e) {
             System.out.println("Problem connecting to the RMI server: " + e.getMessage());
         }catch (NotBoundException e) {
