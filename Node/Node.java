@@ -1,9 +1,8 @@
 package Node;
 
-import NameServer.NamingInterface;
-import NameServer.NamingServer;
 
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -14,13 +13,11 @@ public class Node implements NodeInterface {
     private Node next = null;
     private String ip = null;
     private String name = null;
-
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
-
-
     }
+
     /*
     * Starts the RMI server
      */
@@ -38,21 +35,37 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-
-    public void setNext(Node nextNode) {
-        next = nextNode;
+    /*
+    * Connects with another node
+     */
+    public NodeInterface startCommunication(Node node){
+        NodeInterface commNode = null;
+        try {
+            //Gets the bank object
+            Registry registry = LocateRegistry.getRegistry(node.getIp());
+            //import the stub
+            commNode= (NodeInterface) registry.lookup(node.getName());
+        }catch (RemoteException e) {
+            System.out.println("Problem connecting to the RMI server: " + e.getMessage());
+        }catch (NotBoundException e) {
+            System.out.println("Problem binding a registry to a stub: " + e.getMessage());
+        }
+        return commNode;
+    }
+    public void setNext(Node next) {
+        this.next = next;
     }
 
-    public void setPrevious(Node previousNode) {
-        previous = previousNode;
+    public void setPrevious(Node previous) {
+        this.previous = previous;
     }
 
     public Node getNext() {
-        return next;
+        return this.next;
     }
 
     public Node getPrevious() {
-        return previous;
+        return this.previous;
     }
 
     public String getIp() {
@@ -78,11 +91,11 @@ public class Node implements NodeInterface {
      */
     public Boolean equals(Node node) {
         Boolean error = false;
-        if(this.ip == node.ip) {
+        if(this.ip.equals(node.ip)) {
             //System.out.println("IP address already in use.");
             error = true;
         }
-        if(this.name == node.name) {
+        if(this.name.equals(node.name)) {
             //System.out.println("Name already in use.");
             error = true;
         }
@@ -90,12 +103,25 @@ public class Node implements NodeInterface {
     }
 
     /**
-     *
-     * @param new_hash
+     * This method updates the nodes next en previous ip addresses
+     * @param new_name, String name of the new node (recieved via multicast)
+     * @param new_ip, String ip address of the new node
      */
-    public void updateNodes(Integer new_hash) {
-        int my_hash = Math.abs(this.name.hashCode() % 32768);
+    public void updateNodes(String new_name, String new_ip) throws NodeAlreadyExistsException {
+        int my_hash = calculateHash(name);
+        int new_hash = calculateHash(new_name);
 
+        if(my_hash == new_hash) throw new NodeAlreadyExistsException();
+
+        if(my_hash < new_hash && new_hash < calculateHash(next.name)) {
+            next = new Node(new_ip, new_name);
+            //update new node
+        } else if(calculateHash(previous.name) < new_hash && new_hash < my_hash) {
+            previous = new Node(new_ip, new_name);
+        }
     }
 
+    private int calculateHash(String name) {
+        return Math.abs(name.hashCode() % 32768);
+    }
 }
