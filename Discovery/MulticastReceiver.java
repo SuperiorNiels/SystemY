@@ -9,7 +9,7 @@ public class MulticastReceiver {
     public static void main(String[] args) throws Exception {
 
         int mcPort =12345;
-        String mcIPStr = "230.1.1.1";
+        String mcIPStr = "10.0.1.0";
         MulticastSocket mcSocket = null;
         InetAddress mcIPAddress = null;
         mcIPAddress = InetAddress.getByName(mcIPStr);

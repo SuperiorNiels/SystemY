@@ -15,7 +15,7 @@ public class Node extends Thread{
     public void run(){
         try {
             MulticastSocket socket = new MulticastSocket(4446);
-            InetAddress groupAddress = InetAddress.getByName("10.0.1.0");
+            InetAddress groupAddress = InetAddress.getByName("10.");
             socket.joinGroup(groupAddress);
 
             DatagramPacket packet;
