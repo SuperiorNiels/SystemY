@@ -1,13 +1,35 @@
 package Node;
 
-public class Node {
+import NameServer.NamingInterface;
+import NameServer.NamingServer;
+
+import java.rmi.AlreadyBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+public class Node implements NodeInterface {
     private Node previous = null;
     private Node next = null;
     private String ip = null;
     private String name = null;
+
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
+        try {
+            //Start the RMI-server
+            Node node = this;
+            NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(node,0);
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.bind(name, stub);
+            System.out.println("Server ready!");
+        } catch (RemoteException e) {
+            System.err.println("Remote exception: "+e.getMessage());
+        } catch (AlreadyBoundException e) {
+            System.err.println("Port already bound");
+        }
     }
 
     public void setNext(Node next) {
