@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 
 public class Node extends Thread{
     String nodeName;
@@ -16,7 +15,6 @@ public class Node extends Thread{
         try {
             MulticastSocket socket = new MulticastSocket(4446);
             InetAddress groupAddress = InetAddress.getByName("224.0.0.1");
-            socket.setInterface(InetAddress.getByName(groupAddress.getHostName()));
             socket.joinGroup(groupAddress);
 
             DatagramPacket packet;
