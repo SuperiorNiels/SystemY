@@ -1,6 +1,8 @@
 package Node;
 
+
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -33,7 +35,23 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-
+    /*
+    * Connects with another node
+     */
+    public NodeInterface startCommunication(Node node){
+        NodeInterface commNode = null;
+        try {
+            //Gets the bank object
+            Registry registry = LocateRegistry.getRegistry(node.getIp());
+            //import the stub
+            commNode= (NodeInterface) registry.lookup(node.getName());
+        }catch (RemoteException e) {
+            System.out.println("Problem connecting to the RMI server: " + e.getMessage());
+        }catch (NotBoundException e) {
+            System.out.println("Problem binding a registry to a stub: " + e.getMessage());
+        }
+        return commNode;
+    }
     public void setNext(Node next) {
         this.next = next;
     }
