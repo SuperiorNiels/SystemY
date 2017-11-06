@@ -1,8 +1,5 @@
 package Node;
 
-import NameServer.NamingInterface;
-import NameServer.NamingServer;
-
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,10 +11,15 @@ public class Node implements NodeInterface {
     private Node next = null;
     private String ip = null;
     private String name = null;
-
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
+    }
+
+    /*
+    * Starts the RMI server
+     */
+    public void startRMI(){
         try {
             //Start the RMI-server
             Node node = this;
@@ -100,8 +102,6 @@ public class Node implements NodeInterface {
             previous = new Node(new_ip, new_name);
         }
     }
-
-    
 
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
