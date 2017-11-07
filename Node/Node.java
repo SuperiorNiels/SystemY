@@ -18,10 +18,12 @@ public class Node implements NodeInterface {
         this.name = name;
     }
 
+   
+
     /*
     * Starts the RMI server
      */
-    public void startRMI(){
+    public void startRMI() {
         try {
             //Start the RMI-server
             Node node = this;
@@ -35,10 +37,14 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-    /*
-    * Connects with another node
+
+    /**
+     *
+     * @param name
+     * @param ip
+     * @return
      */
-    public NodeInterface startCommunication(String name, String ip){
+    public Object startCommunication(String name, String ip){
         NodeInterface commNode = null;
         try {
             //Gets the bank object
