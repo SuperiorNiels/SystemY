@@ -1,6 +1,9 @@
 package Node;
 
 
+import NameServer.NamingInterface;
+import com.sun.corba.se.impl.naming.pcosnaming.NameServer;
+
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -128,5 +131,31 @@ public class Node implements NodeInterface {
 
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
+    }
+
+    /**
+     * This methode executes when a node wants to communicate with annother node
+     * and the communication cannot find place because their is a problem with the other node (failedNode)
+     * @param failedNode
+     */
+    public void failure(Node failedNode){
+        /*
+        //Start communication with the nameserver
+        String ip = "10.0.0.1" ;
+        Object nameserver = startCommunication("NameServer", ip);
+        //ask the nameServer for the previous and next node from the failedNode
+
+        //not sure if getName would work because failedNode cannot be accesed
+        String name = failedNode.getName();
+        
+        Node previous = nameserver.findPreviousNode(name);
+        Node next     = nameserver.findNextNode(name);
+        //Update the previous node, next node address with the next node
+        previous.setNext(next);
+        //Update the next node, previous next node address with the previous node
+        next.setPrevious(previous);
+        //Verwijder de node bij de nameserver.
+        nameserver.remove(failedNode);
+        */
     }
 }

@@ -168,4 +168,29 @@ public class NamingServer implements NamingInterface{
     public int getHash(String name){
         return Math.abs(name.hashCode() % 32768);
     }
+
+    /**
+     * finds the previous node from another node n by chechking the hashes
+     * the node with a lower hash (closest by node n) is the previousNode
+     * @param nameFailedNode
+     * @return
+     */
+    public Node findPreviousNode(String nameFailedNode){
+        int hashFailedNode      = getHash(nameFailedNode);
+        int hashPreviousNode    = map.lowerKey(hashFailedNode);
+        return map.get(hashPreviousNode);
+    }
+
+    /**
+     * finds the next node from another node n by chechking the hashes
+     * the node with a highest hash (closest by node n) is the nextNode
+     * @param nameFailedNode
+     * @return
+     */
+    public Node findNextNode(String nameFailedNode){
+        int hashFailedNode  = getHash(nameFailedNode);
+        int hashNextNode    = map.higherKey(hashFailedNode);
+        return map.get(hashNextNode);
+
+    }
 }
