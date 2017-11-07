@@ -21,7 +21,7 @@ public class Node implements NodeInterface {
     /*
     * Starts the RMI server
      */
-    public void startRMI(){
+    public void startRMI() {
         try {
             //Start the RMI-server
             Node node = this;
@@ -35,10 +35,14 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-    /*
-    * Connects with another node
+
+    /**
+     *
+     * @param name
+     * @param ip
+     * @return
      */
-    public NodeInterface startCommunication(String name, String ip){
+    public Object startCommunication(String name, String ip){
         NodeInterface commNode = null;
         try {
             //Gets the bank object
@@ -114,12 +118,13 @@ public class Node implements NodeInterface {
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
         if(my_hash < new_hash && new_hash < calculateHash(next.name)) {
-            next = new Node(new_ip, new_name);
+            //next = new Node(new_ip, new_name);
             //update new node
         } else if(calculateHash(previous.name) < new_hash && new_hash < my_hash) {
-            previous = new Node(new_ip, new_name);
+            //previous = new Node(new_ip, new_name);
         }
     }
+
 
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
