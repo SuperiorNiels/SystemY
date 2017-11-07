@@ -18,8 +18,6 @@ public class Node implements NodeInterface {
         this.name = name;
     }
 
-   
-
     /*
     * Starts the RMI server
      */
@@ -120,12 +118,13 @@ public class Node implements NodeInterface {
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
         if(my_hash < new_hash && new_hash < calculateHash(next.name)) {
-            next = new Node(new_ip, new_name);
+            //next = new Node(new_ip, new_name);
             //update new node
         } else if(calculateHash(previous.name) < new_hash && new_hash < my_hash) {
-            previous = new Node(new_ip, new_name);
+            //previous = new Node(new_ip, new_name);
         }
     }
+
 
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
