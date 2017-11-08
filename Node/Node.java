@@ -38,8 +38,8 @@ public class Node implements NodeInterface, Observer {
             MulticastObserverable observer = new MulticastObserverable();
             observer.addObserver(this);
             multicast.start();
+            //startRMI();
             multicast.sendMulticast("00;" + name + ";" + ip);
-            multicast.stopService();
         }
         catch (IOException e) {
             System.out.println("IOException: multicast failed.");
@@ -52,26 +52,28 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     *
+     * Method when a multicast message is recieved
      * @param observable
      * @param o
      */
     @Override
     public void update(Observable observable, Object o) {
-
+        if(observable.equals(this)) {
+            System.out.println("Message recieved!");
+        }
     }
 
     /*
     * Starts the RMI server
      */
-    public void startRMI() {
+    private void startRMI() {
         try {
             //Start the RMI-server
             Node node = this;
             NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(node,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("Node", stub);
-            System.out.println("Server ready!");
+            //System.out.println("Server ready!");
         } catch (RemoteException e) {
             System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {

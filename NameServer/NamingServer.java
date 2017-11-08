@@ -36,20 +36,7 @@ public class NamingServer implements NamingInterface, Observer {
     private TreeMap<Integer, Node> map = new TreeMap<>();
     private String ip = null;
 
-    public NamingServer() {
-        try {
-            //Start the RMI-server
-            NamingServer server = this;
-            NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
-            Registry registry = LocateRegistry.createRegistry(1099);
-            registry.bind("NamingServer", stub);
-            System.out.println("Server ready!");
-        } catch (RemoteException e) {
-            System.err.println("Remote exception: "+e.getMessage());
-        } catch (AlreadyBoundException e) {
-            System.err.println("Port already bound");
-        }
-    }
+    public NamingServer() { }
 
     public void start() {
         try {
@@ -58,7 +45,6 @@ public class NamingServer implements NamingInterface, Observer {
             MulticastObserverable observer = new MulticastObserverable();
             observer.addObserver(this);
             multicast.start();
-            multicast.stopService();
         }
         catch (IOException e) {
             System.err.println("IOException: multicast failed.");
@@ -73,6 +59,24 @@ public class NamingServer implements NamingInterface, Observer {
     @Override
     public void update(Observable observable, Object o) {
 
+    }
+
+    /**
+     * Create RMI registry
+     */
+    private void startRMI() {
+        try {
+            //Start the RMI-server
+            NamingServer server = this;
+            NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
+            Registry registry = LocateRegistry.createRegistry(1099);
+            registry.bind("NamingServer", stub);
+            System.out.println("Server ready!");
+        } catch (RemoteException e) {
+            System.err.println("Remote exception: "+e.getMessage());
+        } catch (AlreadyBoundException e) {
+            System.err.println("Port already bound");
+        }
     }
 
     /**
