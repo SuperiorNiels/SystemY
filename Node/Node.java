@@ -15,6 +15,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Scanner;
 
 public class Node implements NodeInterface, Observer {
     private Neighbour previous = null;
@@ -33,22 +34,32 @@ public class Node implements NodeInterface, Observer {
      */
     public void start() {
         try {
-            //MulticastObserverable observer = new MulticastObserverable();
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
-            multicast.attachObserver(this);
+            multicast.addObserver(this);
             multicast.start();
             //startRMI();
             multicast.sendMulticast("00;" + name + ";" + ip);
+            System.out.println("Node started.");
+            Scanner input = new Scanner(System.in);
+            while(running) {
+                String command = input.nextLine();
+                String parts[] = command.split(" ");
+                if(parts[0].toLowerCase().equals("multicast")) {
+                    if (parts.length != 1) {
+                        multicast.sendMulticast(parts[1]);
+                    } else {
+                        System.out.println("Please enter a message to multicast.");
+                    }
+                } else {
+                    System.out.println("Command not found.");
+                }
+            }
         }
         catch (IOException e) {
             System.out.println("IOException: multicast failed.");
         }
-        System.out.println("Node started.");
-        while(running) {
-            // Parse commands and execute
 
-        }
     }
 
     /**
@@ -58,9 +69,8 @@ public class Node implements NodeInterface, Observer {
      */
     @Override
     public void update(Observable observable, Object o) {
-        if(observable.equals(this)) {
-            System.out.println("Message recieved!");
-        }
+        String message = o.toString();
+        System.out.println(message);
     }
 
     /*

@@ -103,7 +103,7 @@ public class MulticastService extends Thread {
 
     }
 
-    public void attachObserver(Observer o) {
+    public void addObserver(Observer o) {
         observer.addObserver(o);
     }
 
