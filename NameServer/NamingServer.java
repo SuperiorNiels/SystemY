@@ -12,6 +12,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -169,11 +170,8 @@ public class NamingServer implements NamingInterface{
      */
     public void sendNumberOfNodes(String node_ip) {
         try {
-            Registry registry = LocateRegistry.getRegistry(node_ip);
-            NodeInterface stub = (NodeInterface) registry.lookup("Node");
+            NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
-            stub = null;
-            registry = null;
         }
         catch (Exception e) {
             System.out.println("RMI to node failed.");
@@ -186,5 +184,24 @@ public class NamingServer implements NamingInterface{
      */
     public int getHash(String name){
         return Math.abs(name.hashCode() % 32768);
+    }
+
+    public Node findPreviousNode(String nameFailedNode){
+        int hashFailedNode      = getHash(nameFailedNode);
+        int hashPreviousNode    = map.lowerKey(hashFailedNode);
+        return map.get(hashPreviousNode);
+    }
+
+    /**
+     * finds the next node from another node n by chechking the hashes
+     * the node with a highest hash (closest by node n) is the nextNode
+     * @param nameFailedNode
+     * @return
+     */
+    public Node findNextNode(String nameFailedNode){
+        int hashFailedNode  = getHash(nameFailedNode);
+        int hashNextNode    = map.higherKey(hashFailedNode);
+        return map.get(hashNextNode);
+
     }
 }

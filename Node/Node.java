@@ -1,8 +1,12 @@
 package Node;
 
+import NameServer.NamingInterface;
 import Network.MulticastService;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -14,20 +18,27 @@ public class Node implements NodeInterface {
     private Neighbour next = null;
     private String ip = null;
     private String name = null;
+    private String namingServerIp = null;
     private int numberOfNodesInNetwork = 0;
+    private boolean running = true;
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
     }
 
     public void start() {
-        MulticastService multicast = new MulticastService("224.0.0.1",4446);
-        multicast.setupService();
-        multicast.sendMulticast("00;"+name+";"+ip);
-        multicast.stopService();
+        try {
+            MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            multicast.setupService();
+            multicast.sendMulticast("00;" + name + ";" + ip);
+            multicast.stopService();
+        }
+        catch (IOException e) {
+            System.out.println("IOException: multicast failed.");
+        }
 
         // Node loop
-        while(true) {
+        while(running) {
 
         }
     }
@@ -49,7 +60,7 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-    
+
     public void setNext(Neighbour next) {
         this.next = next;
     }
@@ -120,33 +131,98 @@ public class Node implements NodeInterface {
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
         if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
-            next = new Neighbour(new_ip, new_name);
+            // Update new node neighbours previous = self and next = self next
             try {
-                Registry registry = LocateRegistry.getRegistry(next.getIp());
-                NodeInterface stub = (NodeInterface) registry.lookup("Node");
-                //stub.setNumberOfNodesInNetwork(map.size());
-                stub = null;
-                registry = null;
+                NodeInterface stub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
+                stub.updateNode(new Neighbour(name,ip), next);
             }
             catch (Exception e) {
                 System.out.println("RMI to node failed.");
             }
+            // update next with new node
+            next = new Neighbour(new_ip, new_name);
         } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
+            // update previous with new node
             previous = new Neighbour(new_ip, new_name);
         }
     }
 
-    public void updateNode() {
+    public void updateNode(Neighbour previous, Neighbour next) {
         if(numberOfNodesInNetwork < 1) {
-            next = new Neighbour(name, ip);
-            previous = new Neighbour(name, ip);
+            this.next = new Neighbour(name, ip);
+            this.previous = new Neighbour(name, ip);
         } else {
-
+            this.next = next;
+            this.previous = previous;
         }
+    }
+
+    /**
+     * Method that gets invoked when a graceful shutdown has to be processed.
+     * Sends your next 
+     */
+    public void shutDown(){
+        try {
+            //sends the neighbour of the next Node to the previous Node
+            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
+            nodeStub.setNext(next);
+            //sends the neighbour of the previous node to the next Node
+            nodeStub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
+            nodeStub.setPrevious(previous);
+            //Deletes itself by the naming server
+            NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            namingStub.removeNode(name);
+            //stops the SystemY process
+            running = false;
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
     }
+
+    /**
+     * This methode executes when a node wants to communicate with annother node
+     * and the communication cannot find place because their is a problem with the other node (failedNode)
+     * @param failedNode
+     */
+    public void failure(Node failedNode){
+
+        //Start communication with the nameserver
+        NamingInterface nameServer = null;
+        try {
+            nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+
+            //ask the nameServer for the previous and next node from the failedNode
+
+            //not sure if getName would work because failedNode cannot be accesed
+            String nameFailed = failedNode.getName();
+
+            Node previous = nameServer.findPreviousNode(nameFailed);
+            Node next     = nameServer.findNextNode(nameFailed);
+            //Update the previous node, next node address with the next node
+            previous.setNext(new Neighbour(next.getName(),next.getIp()));
+            //Update the next node, previous next node address with the previous node
+            next.setPrevious(new Neighbour(previous.getName(),previous.getIp()));
+            //Verwijder de node bij de nameserver.
+            nameServer.removeNode(nameFailed);
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }
