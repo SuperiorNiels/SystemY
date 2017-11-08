@@ -1,8 +1,10 @@
 package Node;
 
+import NameServer.NamingInterface;
 import Network.MulticastService;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -16,7 +18,9 @@ public class Node implements NodeInterface {
     private Neighbour next = null;
     private String ip = null;
     private String name = null;
+    private String namingServerIp = null;
     private int numberOfNodesInNetwork = 0;
+    private boolean running = true;
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
@@ -34,7 +38,7 @@ public class Node implements NodeInterface {
         }
 
         // Node loop
-        while(true) {
+        while(running) {
 
         }
     }
@@ -130,8 +134,9 @@ public class Node implements NodeInterface {
             next = new Neighbour(new_ip, new_name);
             try {
                 NodeInterface stub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
-                //stub;
-                stub = null;
+                //stub.setNumberOfNodesInNetwork(map.size());
+
+
             }
             catch (Exception e) {
                 System.out.println("RMI to node failed.");
@@ -147,6 +152,33 @@ public class Node implements NodeInterface {
             previous = new Neighbour(name, ip);
         } else {
         }
+    }
+
+    /**
+     * Method that gets invoked when a graceful shutdown has to be processed.
+     * Sends your next 
+     */
+    public void shutDown(){
+        try {
+            //sends the neighbour of the next Node to the previous Node
+            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
+            nodeStub.setNext(next);
+            //sends the neighbour of the previous node to the next Node
+            nodeStub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
+            nodeStub.setPrevious(previous);
+            //Deletes itself by the naming server
+            NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            namingStub.removeNode(name);
+            //stops the SystemY process
+            running = false;
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

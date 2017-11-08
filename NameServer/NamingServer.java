@@ -172,7 +172,7 @@ public class NamingServer implements NamingInterface{
         try {
             NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
-            stub = null;
+
         }
         catch (Exception e) {
             System.out.println("RMI to node failed.");
