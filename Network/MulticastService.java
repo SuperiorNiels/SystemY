@@ -1,11 +1,9 @@
-package network;
+package Network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
-import java.util.Observable;
 
 public class MulticastService extends Thread {
     private String multicast_ip;

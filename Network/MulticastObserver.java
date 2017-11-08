@@ -1,4 +1,4 @@
-package network;
+package Network;
 
 import java.util.Observable;
 
