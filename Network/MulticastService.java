@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 
 public class MulticastService extends Thread {
     private String multicast_ip;
@@ -12,14 +13,14 @@ public class MulticastService extends Thread {
     private MulticastSocket socket;
     private Boolean running;
     private String received;
-    private MulticastObserver observer;
+    private MulticastObserverable observer;
 
     public MulticastService(String multicast_ip,String ip,int port) throws IOException {
         this.multicast_ip = multicast_ip;
         this.interface_ip = ip;
         this.multicast_port = port;
         received = "";
-        observer = new MulticastObserver();
+        observer = new MulticastObserverable();
     }
 
     /**
@@ -77,7 +78,7 @@ public class MulticastService extends Thread {
     @Override
     public void run() {
 
-        if(socket!=null) {
+        if(socket==null) {
             if (!this.setupService()) {
                 return;
             }
@@ -87,7 +88,7 @@ public class MulticastService extends Thread {
         try {
             groupAddress = InetAddress.getByName(multicast_ip);
             //Set the interface where to listen to the multicast packets
-            socket.setInterface(InetAddress.getByAddress(interface_ip.getBytes()));
+            socket.setInterface(InetAddress.getByName(interface_ip));
             socket.joinGroup(groupAddress);
             DatagramPacket packet;
             while(running) {
