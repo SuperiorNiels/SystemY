@@ -12,6 +12,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -169,11 +170,9 @@ public class NamingServer implements NamingInterface{
      */
     public void sendNumberOfNodes(String node_ip) {
         try {
-            Registry registry = LocateRegistry.getRegistry(node_ip);
-            NodeInterface stub = (NodeInterface) registry.lookup("Node");
+            NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
             stub = null;
-            registry = null;
         }
         catch (Exception e) {
             System.out.println("RMI to node failed.");

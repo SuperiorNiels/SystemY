@@ -2,7 +2,9 @@ package Node;
 
 import Network.MulticastService;
 
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -21,10 +23,15 @@ public class Node implements NodeInterface {
     }
 
     public void start() {
-        MulticastService multicast = new MulticastService("224.0.0.1",4446);
-        multicast.setupService();
-        multicast.sendMulticast("00;"+name+";"+ip);
-        multicast.stopService();
+        try {
+            MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            multicast.setupService();
+            multicast.sendMulticast("00;" + name + ";" + ip);
+            multicast.stopService();
+        }
+        catch (IOException e) {
+            System.out.println("IOException: multicast failed.");
+        }
 
         // Node loop
         while(true) {
@@ -49,7 +56,7 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-    
+
     public void setNext(Neighbour next) {
         this.next = next;
     }
@@ -122,11 +129,9 @@ public class Node implements NodeInterface {
         if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
             next = new Neighbour(new_ip, new_name);
             try {
-                Registry registry = LocateRegistry.getRegistry(next.getIp());
-                NodeInterface stub = (NodeInterface) registry.lookup("Node");
+                NodeInterface stub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
                 //stub.setNumberOfNodesInNetwork(map.size());
                 stub = null;
-                registry = null;
             }
             catch (Exception e) {
                 System.out.println("RMI to node failed.");
