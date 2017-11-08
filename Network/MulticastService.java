@@ -1,10 +1,8 @@
 package Network;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.NetworkInterface;
+import java.net.*;
+import java.util.Enumeration;
 
 public class MulticastService extends Thread {
     private String multicast_ip;
@@ -15,12 +13,44 @@ public class MulticastService extends Thread {
     private String received;
     private MulticastObserverable observer;
 
-    public MulticastService(String multicast_ip,String ip,int port) throws IOException {
+    public MulticastService(String multicast_ip,int port) throws IOException {
         this.multicast_ip = multicast_ip;
-        this.interface_ip = ip;
+        this.interface_ip = getIpAddress();
         this.multicast_port = port;
         received = "";
         observer = new MulticastObserverable();
+    }
+
+    /**
+     * Helper class to get ip address of the interface
+     * This method tries to find the ethernet interface and not the wlans
+     * @return the host ethernet interface ip address
+     * @throws SocketException
+     */
+    private String getIpAddress() throws SocketException {
+        String ip = null;
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface iface = interfaces.nextElement();
+                // filters out 127.0.0.1 and inactive interfaces
+                if (iface.isLoopback() || !iface.isUp() || !iface.supportsMulticast() ||
+                        iface.getDisplayName().contains("wlan") || iface.getDisplayName().contains("Wireless LAN") ||
+                        iface.getDisplayName().contains("wlp"))
+                    continue;
+
+                Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                while(addresses.hasMoreElements()) {
+                    InetAddress addr = addresses.nextElement();
+                    if(addr instanceof Inet4Address )
+                        ip = addr.getHostAddress();
+                    System.out.println(iface.getDisplayName() + " " + ip);
+                }
+            }
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+        return ip;
     }
 
     /**

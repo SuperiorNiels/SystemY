@@ -46,6 +46,13 @@ public class NamingServer implements NamingInterface{
         }
     }
 
+    public void start() {
+        // Nameserver loop
+        while(true) {
+
+        }
+    }
+
     /**
      * @param ip String, ip address of node
      * @param name String, hostname of node
@@ -172,6 +179,7 @@ public class NamingServer implements NamingInterface{
         try {
             NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
+            // set ip address of nameserver on node
         }
         catch (Exception e) {
             System.out.println("RMI to node failed.");
