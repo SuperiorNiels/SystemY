@@ -23,7 +23,7 @@ public class MulticastService extends Thread {
     }
 
     /**
-     * Sets teh socket on the specified port
+     * Sets the socket on the specified port
      * @return true when succeeded, false when socket not available
      */
     public Boolean setupService(){
