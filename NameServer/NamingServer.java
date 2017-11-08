@@ -19,10 +19,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.TreeMap;
 import java.util.ArrayList;
 
+import Network.MulticastService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import Node.Node;
+import Node.NodeInterface;
 
 public class NamingServer implements NamingInterface{
 
@@ -159,6 +161,23 @@ public class NamingServer implements NamingInterface{
             }
         }
         return (ownerHash!=0) ? map.get(ownerHash).getIp(): null;
+    }
+
+    /**
+     * Send number of nodes in the network to the ip (paramater) via RMI
+     * @param node_ip, ip address of node (RMI server)
+     */
+    public void sendNumberOfNodes(String node_ip) {
+        try {
+            Registry registry = LocateRegistry.getRegistry(node_ip);
+            NodeInterface stub = (NodeInterface) registry.lookup("Node");
+            stub.setNumberOfNodesInNetwork(map.size());
+            stub = null;
+            registry = null;
+        }
+        catch (Exception e) {
+            System.out.println("RMI to node failed.");
+        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package Node;
 
+import Network.MulticastService;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
@@ -13,9 +14,22 @@ public class Node implements NodeInterface {
     private Neighbour next = null;
     private String ip = null;
     private String name = null;
+    private int numberOfNodesInNetwork = 0;
     public Node(String ip, String name) {
         this.ip = ip;
         this.name = name;
+    }
+
+    public void start() {
+        MulticastService multicast = new MulticastService("224.0.0.1",4446);
+        multicast.setupService();
+        multicast.sendMulticast("00;"+name+";"+ip);
+        multicast.stopService();
+
+        // Node loop
+        while(true) {
+
+        }
     }
 
     /*
@@ -27,7 +41,7 @@ public class Node implements NodeInterface {
             Node node = this;
             NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(node,0);
             Registry registry = LocateRegistry.createRegistry(1099);
-            registry.bind(name, stub);
+            registry.bind("Node", stub);
             System.out.println("Server ready!");
         } catch (RemoteException e) {
             System.err.println("Remote exception: "+e.getMessage());
@@ -35,27 +49,7 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-
-    /**
-     *
-     * @param name
-     * @param ip
-     * @return
-     */
-    public Object startCommunication(String name, String ip){
-        NodeInterface commNode = null;
-        try {
-            //Gets the bank object
-            Registry registry = LocateRegistry.getRegistry(ip);
-            //import the stub
-            commNode= (NodeInterface) registry.lookup(name);
-        }catch (RemoteException e) {
-            System.out.println("Problem connecting to the RMI server: " + e.getMessage());
-        }catch (NotBoundException e) {
-            System.out.println("Problem binding a registry to a stub: " + e.getMessage());
-        }
-        return commNode;
-    }
+    
     public void setNext(Neighbour next) {
         this.next = next;
     }
@@ -88,6 +82,14 @@ public class Node implements NodeInterface {
         this.name = name;
     }
 
+    public void setNumberOfNodesInNetwork(int number) {
+        this.numberOfNodesInNetwork = number;
+    }
+
+    public int getNumberOfNodesInNetwork() {
+        return numberOfNodesInNetwork;
+    }
+
     /**
      * Function compares 2 nodes and returns Boolean if either name or ip are same
      * @param node the node to compare to
@@ -111,17 +113,35 @@ public class Node implements NodeInterface {
      * @param new_name, String name of the new node (recieved via multicast)
      * @param new_ip, String ip address of the new node
      */
-    public void updateNodes(String new_name, String new_ip) throws NodeAlreadyExistsException {
+    public void updateNeighbors(String new_name, String new_ip) throws NodeAlreadyExistsException {
         int my_hash = calculateHash(name);
         int new_hash = calculateHash(new_name);
 
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
         if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
-            //next = new Node(new_ip, new_name);
-            //update new node
+            next = new Neighbour(new_ip, new_name);
+            try {
+                Registry registry = LocateRegistry.getRegistry(next.getIp());
+                NodeInterface stub = (NodeInterface) registry.lookup("Node");
+                //stub.setNumberOfNodesInNetwork(map.size());
+                stub = null;
+                registry = null;
+            }
+            catch (Exception e) {
+                System.out.println("RMI to node failed.");
+            }
         } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
-            //previous = new Node(new_ip, new_name);
+            previous = new Neighbour(new_ip, new_name);
+        }
+    }
+
+    public void updateNode() {
+        if(numberOfNodesInNetwork < 1) {
+            next = new Neighbour(name, ip);
+            previous = new Neighbour(name, ip);
+        } else {
+
         }
     }
 
