@@ -131,26 +131,29 @@ public class Node implements NodeInterface {
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
         if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
-            next = new Neighbour(new_ip, new_name);
+            // Update new node neighbours previous = self and next = self next
             try {
                 NodeInterface stub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
-                //stub.setNumberOfNodesInNetwork(map.size());
-
-
+                stub.updateNode(new Neighbour(name,ip), next);
             }
             catch (Exception e) {
                 System.out.println("RMI to node failed.");
             }
+            // update next with new node
+            next = new Neighbour(new_ip, new_name);
         } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
+            // update previous with new node
             previous = new Neighbour(new_ip, new_name);
         }
     }
 
-    public void updateNode() {
+    public void updateNode(Neighbour previous, Neighbour next) {
         if(numberOfNodesInNetwork < 1) {
-            next = new Neighbour(name, ip);
-            previous = new Neighbour(name, ip);
+            this.next = new Neighbour(name, ip);
+            this.previous = new Neighbour(name, ip);
         } else {
+            this.next = next;
+            this.previous = previous;
         }
     }
 
