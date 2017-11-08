@@ -35,7 +35,7 @@ public class Node implements NodeInterface {
 
         // Node loop
         while(true) {
-
+            
         }
     }
 

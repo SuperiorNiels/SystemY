@@ -172,6 +172,7 @@ public class NamingServer implements NamingInterface{
         try {
             NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
+            //update nameserver ip address
             stub = null;
         }
         catch (Exception e) {
