@@ -74,7 +74,7 @@ public class NamingServer implements NamingInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
             try {
                 addNode(parts[2],parts[1]);
-                multicast.sendMulticast("01;"+map.size()+";"+parts[1]+";"+parts[2]);
+                multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]);
             }
             catch (AlreadyExistsException e) {
                 System.out.println("Node name taken, node rejected.");
