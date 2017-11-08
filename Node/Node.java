@@ -33,10 +33,10 @@ public class Node implements NodeInterface, Observer {
      */
     public void start() {
         try {
+            //MulticastObserverable observer = new MulticastObserverable();
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
-            MulticastObserverable observer = new MulticastObserverable();
-            observer.addObserver(this);
+            multicast.attachObserver(this);
             multicast.start();
             //startRMI();
             multicast.sendMulticast("00;" + name + ";" + ip);

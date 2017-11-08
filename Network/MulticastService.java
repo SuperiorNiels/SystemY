@@ -3,6 +3,7 @@ package Network;
 import java.io.IOException;
 import java.net.*;
 import java.util.Enumeration;
+import java.util.Observer;
 
 public class MulticastService extends Thread {
     private String multicast_ip;
@@ -100,6 +101,10 @@ public class MulticastService extends Thread {
             socket.close();
         }
 
+    }
+
+    public void attachObserver(Observer o) {
+        observer.addObserver(o);
     }
 
     /**

@@ -21,8 +21,8 @@ public class MulticastTest implements Observer{
             MulticastObserverable observer = new MulticastObserverable();
             MulticastTest ob = new MulticastTest(observer);
             observer.addObserver(ob);
-            service.run();
-            service.sendMulticast("Hello world!");
+            service.start();
+            //service.sendMulticast("Hello world!");
 
 
         } catch (IOException e) {
