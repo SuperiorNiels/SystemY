@@ -1,6 +1,7 @@
 package Node;
 
 import NameServer.NamingInterface;
+import Network.MulticastObserverable;
 import Network.MulticastService;
 
 import java.io.IOException;
@@ -12,8 +13,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Observable;
+import java.util.Observer;
 
-public class Node implements NodeInterface {
+public class Node implements NodeInterface, Observer {
     private Neighbour previous = null;
     private Neighbour next = null;
     private String ip = null;
@@ -29,7 +32,9 @@ public class Node implements NodeInterface {
     public void start() {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
-            multicast.setupService();
+            MulticastObserverable observer = new MulticastObserverable();
+            observer.addObserver(this);
+            multicast.run();
             multicast.sendMulticast("00;" + name + ";" + ip);
             multicast.stopService();
         }
@@ -184,7 +189,6 @@ public class Node implements NodeInterface {
 
     }
 
-
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
     }
@@ -194,8 +198,7 @@ public class Node implements NodeInterface {
      * and the communication cannot find place because their is a problem with the other node (failedNode)
      * @param failedNode
      */
-    public void failure(Node failedNode){
-
+    public void failure(Node failedNode) {
         //Start communication with the nameserver
         NamingInterface nameServer = null;
         try {
@@ -221,8 +224,10 @@ public class Node implements NodeInterface {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-
-
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
+
+    }
 }
