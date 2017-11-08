@@ -43,7 +43,7 @@ public class MulticastService extends Thread {
      * @return true when success, false when not send
      */
     public Boolean sendMulticast(String message){
-        if(socket!=null) {
+        if(socket==null) {
             if (!this.setupService()) {
                 return false;
             }
