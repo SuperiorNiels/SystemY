@@ -28,6 +28,9 @@ public class Node implements NodeInterface, Observer {
         this.name = name;
     }
 
+    /**
+     * Start the node, this method also starts a multicast service.
+     */
     public void start() {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
@@ -42,10 +45,20 @@ public class Node implements NodeInterface, Observer {
             System.out.println("IOException: multicast failed.");
         }
         System.out.println("Node started.");
-        // Node loop
         while(running) {
+            // Parse commands and execute
 
         }
+    }
+
+    /**
+     *
+     * @param observable
+     * @param o
+     */
+    @Override
+    public void update(Observable observable, Object o) {
+
     }
 
     /*
@@ -233,10 +246,5 @@ public class Node implements NodeInterface, Observer {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void update(Observable observable, Object o) {
-
     }
 }

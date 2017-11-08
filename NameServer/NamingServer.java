@@ -11,15 +11,19 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.TreeMap;
 import java.util.ArrayList;
 
+import Network.MulticastObserverable;
 import Network.MulticastService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,9 +31,10 @@ import org.w3c.dom.Element;
 import Node.Node;
 import Node.NodeInterface;
 
-public class NamingServer implements NamingInterface{
+public class NamingServer implements NamingInterface, Observer {
 
     private TreeMap<Integer, Node> map = new TreeMap<>();
+    private String ip = null;
 
     public NamingServer() {
         try {
@@ -47,10 +52,27 @@ public class NamingServer implements NamingInterface{
     }
 
     public void start() {
-        // Nameserver loop
-        while(true) {
-
+        try {
+            MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            ip = multicast.getIpAddress();
+            MulticastObserverable observer = new MulticastObserverable();
+            observer.addObserver(this);
+            multicast.start();
+            multicast.stopService();
         }
+        catch (IOException e) {
+            System.err.println("IOException: multicast failed.");
+        }
+        System.out.println("Node started.");
+        // Node loop
+        while(true) {
+            // Parse commands and execute
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+
     }
 
     /**
@@ -62,7 +84,7 @@ public class NamingServer implements NamingInterface{
     public void addNode(String ip, String name) throws AlreadyExistsException {
         Integer hash = getHash(name);
         if (map.containsKey(hash)) {
-            System.out.println("Hash already exists.");
+            System.err.println("Hash already exists.");
             throw new AlreadyExistsException();
         } else {
             Node node = new Node(name);
@@ -179,10 +201,10 @@ public class NamingServer implements NamingInterface{
         try {
             NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
-            // set ip address of nameserver on node
+            stub.setNameServerIp(ip);
         }
         catch (Exception e) {
-            System.out.println("RMI to node failed.");
+            System.err.println("RMI to node failed.");
         }
     }
 
@@ -206,9 +228,9 @@ public class NamingServer implements NamingInterface{
      * @param nameFailedNode
      * @return
      */
-    public Node findNextNode(String nameFailedNode){
-        int hashFailedNode  = getHash(nameFailedNode);
-        int hashNextNode    = map.higherKey(hashFailedNode);
+    public Node findNextNode(String nameFailedNode) {
+        int hashFailedNode = getHash(nameFailedNode);
+        int hashNextNode = map.higherKey(hashFailedNode);
         return map.get(hashNextNode);
 
     }
