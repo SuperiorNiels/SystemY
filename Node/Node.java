@@ -36,7 +36,10 @@ public class Node implements NodeInterface, Observer {
     public void start() {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            // update ip, and set self as neighbours
             ip = multicast.getIpAddress();
+            Neighbour self = new Neighbour(name, ip);
+            updateNode(self, self);
             multicast.addObserver(this);
             multicast.start();
             startRMI();
@@ -87,11 +90,6 @@ public class Node implements NodeInterface, Observer {
                 } catch (NodeAlreadyExistsException e) {
                     System.err.println("New node hash is the same as my hash. Node rejected.");
                     // Handle error?
-                }
-            } else {
-                if(numberOfNodesInNetwork < 1) {
-                    Neighbour self = new Neighbour(name, ip);
-                    updateNode(self, self);
                 }
             }
         }
