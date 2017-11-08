@@ -65,7 +65,7 @@ public class NamingServer implements NamingInterface{
             System.out.println("Hash already exists.");
             throw new AlreadyExistsException();
         } else {
-            Node node = new Node(ip, name);
+            Node node = new Node(name);
             if(!map.containsValue(node)) {
                 map.put(hash, node);
             }

@@ -27,7 +27,7 @@ public class MulticastService extends Thread {
      * @return the host ethernet interface ip address
      * @throws SocketException
      */
-    private String getIpAddress() throws SocketException {
+    public String getIpAddress() throws SocketException {
         String ip = null;
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -122,7 +122,7 @@ public class MulticastService extends Thread {
             socket.joinGroup(groupAddress);
             DatagramPacket packet;
             while(running) {
-                byte[] buf = new byte[256];
+                byte[] buf = new byte[62*1024];
                 packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
                 received = new String(packet.getData());

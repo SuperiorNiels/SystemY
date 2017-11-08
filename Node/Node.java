@@ -24,24 +24,24 @@ public class Node implements NodeInterface, Observer {
     private String namingServerIp = null;
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
-    public Node(String ip, String name) {
-        this.ip = ip;
+    public Node(String name) {
         this.name = name;
     }
 
     public void start() {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            ip = multicast.getIpAddress();
             MulticastObserverable observer = new MulticastObserverable();
             observer.addObserver(this);
-            multicast.run();
+            multicast.start();
             multicast.sendMulticast("00;" + name + ";" + ip);
             multicast.stopService();
         }
         catch (IOException e) {
             System.out.println("IOException: multicast failed.");
         }
-
+        System.out.println("Node started.");
         // Node loop
         while(running) {
 
