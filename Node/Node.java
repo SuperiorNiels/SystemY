@@ -25,6 +25,11 @@ public class Node implements NodeInterface {
         multicast.setupService();
         multicast.sendMulticast("00;"+name+";"+ip);
         multicast.stopService();
+
+        // Node loop
+        while(true) {
+
+        }
     }
 
     /*
@@ -44,25 +49,7 @@ public class Node implements NodeInterface {
             System.err.println("Port already bound");
         }
     }
-
-    /**
-     *
-     * @param name
-     * @param ip
-     * @return
-     */
-    public Object startCommunication(String name, String ip){
-        NodeInterface commNode = null;
-        try {
-            //import the stub
-            commNode= (NodeInterface) registry.lookup(name);
-        }catch (RemoteException e) {
-            System.out.println("Problem connecting to the RMI server: " + e.getMessage());
-        }catch (NotBoundException e) {
-            System.out.println("Problem binding a registry to a stub: " + e.getMessage());
-        }
-        return commNode;
-    }
+    
     public void setNext(Neighbour next) {
         this.next = next;
     }
@@ -154,7 +141,6 @@ public class Node implements NodeInterface {
             next = new Neighbour(name, ip);
             previous = new Neighbour(name, ip);
         } else {
-
 
         }
     }
