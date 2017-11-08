@@ -9,8 +9,8 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 public class Node implements NodeInterface {
-    private Node previous = null;
-    private Node next = null;
+    private Neighbour previous = null;
+    private Neighbour next = null;
     private String ip = null;
     private String name = null;
     public Node(String ip, String name) {
@@ -56,19 +56,19 @@ public class Node implements NodeInterface {
         }
         return commNode;
     }
-    public void setNext(Node next) {
+    public void setNext(Neighbour next) {
         this.next = next;
     }
 
-    public void setPrevious(Node previous) {
+    public void setPrevious(Neighbour previous) {
         this.previous = previous;
     }
 
-    public Node getNext() {
+    public Neighbour getNext() {
         return this.next;
     }
 
-    public Node getPrevious() {
+    public Neighbour getPrevious() {
         return this.previous;
     }
 
@@ -117,10 +117,10 @@ public class Node implements NodeInterface {
 
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
-        if(my_hash < new_hash && new_hash < calculateHash(next.name)) {
+        if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
             //next = new Node(new_ip, new_name);
             //update new node
-        } else if(calculateHash(previous.name) < new_hash && new_hash < my_hash) {
+        } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
             //previous = new Node(new_ip, new_name);
         }
     }
