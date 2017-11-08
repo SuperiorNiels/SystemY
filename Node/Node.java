@@ -158,6 +158,15 @@ public class Node implements NodeInterface {
     }
 
     /**
+     *
+     * @param ip
+     * sets the ip of the nameServer
+     */
+    public void setNameServerIp(String ip){
+        namingServerIp = ip;
+    }
+
+    /**
      * Method that gets invoked when a graceful shutdown has to be processed.
      * Sends your next 
      */
