@@ -12,6 +12,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -19,10 +20,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.TreeMap;
 import java.util.ArrayList;
 
+import Network.MulticastService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import Node.Node;
+import Node.NodeInterface;
 
 public class NamingServer implements NamingInterface{
 
@@ -162,6 +165,21 @@ public class NamingServer implements NamingInterface{
     }
 
     /**
+     * Send number of nodes in the network to the ip (paramater) via RMI
+     * @param node_ip, ip address of node (RMI server)
+     */
+    public void sendNumberOfNodes(String node_ip) {
+        try {
+            NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
+            stub.setNumberOfNodesInNetwork(map.size());
+            stub = null;
+        }
+        catch (Exception e) {
+            System.out.println("RMI to node failed.");
+        }
+    }
+
+    /**
      * @param name
      * @return hash of the input string
      */
@@ -169,12 +187,6 @@ public class NamingServer implements NamingInterface{
         return Math.abs(name.hashCode() % 32768);
     }
 
-    /**
-     * finds the previous node from another node n by chechking the hashes
-     * the node with a lower hash (closest by node n) is the previousNode
-     * @param nameFailedNode
-     * @return
-     */
     public Node findPreviousNode(String nameFailedNode){
         int hashFailedNode      = getHash(nameFailedNode);
         int hashPreviousNode    = map.lowerKey(hashFailedNode);
