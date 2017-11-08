@@ -3,7 +3,7 @@ package Network;
 import java.util.Observable;
 
 
-public class MulticastObserver extends Observable {
+public class MulticastObserverable extends Observable {
     /**
      * Clears the internal changed state
      */
