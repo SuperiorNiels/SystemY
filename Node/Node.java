@@ -147,7 +147,7 @@ public class Node implements NodeInterface {
 
         //not sure if getName would work because failedNode cannot be accesed
         String name = failedNode.getName();
-        
+
         Node previous = nameserver.findPreviousNode(name);
         Node next     = nameserver.findNextNode(name);
         //Update the previous node, next node address with the next node
