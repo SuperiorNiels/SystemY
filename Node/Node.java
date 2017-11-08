@@ -192,24 +192,34 @@ public class Node implements NodeInterface {
      * @param failedNode
      */
     public void failure(Node failedNode){
-        /*
+
         //Start communication with the nameserver
-        String ip = "10.0.0.1" ;
-        Object nameserver = startCommunication("NameServer", ip);
-        //ask the nameServer for the previous and next node from the failedNode
+        NamingInterface nameServer = null;
+        try {
+            nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
 
-        //not sure if getName would work because failedNode cannot be accesed
-        String name = failedNode.getName();
+            //ask the nameServer for the previous and next node from the failedNode
 
-        Node previous = nameserver.findPreviousNode(name);
-        Node next     = nameserver.findNextNode(name);
-        //Update the previous node, next node address with the next node
-        previous.setNext(next);
-        //Update the next node, previous next node address with the previous node
-        next.setPrevious(previous);
-        //Verwijder de node bij de nameserver.
-        nameserver.remove(failedNode);
-        */
+            //not sure if getName would work because failedNode cannot be accesed
+            String nameFailed = failedNode.getName();
+
+            Node previous = nameServer.findPreviousNode(nameFailed);
+            Node next     = nameServer.findNextNode(nameFailed);
+            //Update the previous node, next node address with the next node
+            previous.setNext(new Neighbour(next.getName(),next.getIp()));
+            //Update the next node, previous next node address with the previous node
+            next.setPrevious(new Neighbour(previous.getName(),previous.getIp()));
+            //Verwijder de node bij de nameserver.
+            nameServer.removeNode(nameFailed);
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 }
