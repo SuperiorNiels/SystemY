@@ -24,4 +24,8 @@ public class Neighbour {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String toString() {
+        return "Name: "+name+" IP: "+ip;
+    }
 }

@@ -1,6 +1,9 @@
 package Network;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.Observer;
@@ -129,8 +132,10 @@ public class MulticastService extends Thread {
             while(running) {
                 byte[] buf = new byte[62*1024];
                 packet = new DatagramPacket(buf, buf.length);
+                ByteArrayOutputStream writer = new ByteArrayOutputStream();
                 socket.receive(packet);
-                received = new String(packet.getData());
+                writer.write(packet.getData(), 0, packet.getLength());
+                received = writer.toString();
                 observer.setChanged();
                 observer.notifyObservers(received);
             }

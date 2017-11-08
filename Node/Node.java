@@ -1,5 +1,6 @@
 package Node;
 
+import NameServer.AlreadyExistsException;
 import NameServer.NamingInterface;
 import Network.MulticastObserverable;
 import Network.MulticastService;
@@ -38,7 +39,7 @@ public class Node implements NodeInterface, Observer {
             ip = multicast.getIpAddress();
             multicast.addObserver(this);
             multicast.start();
-            //startRMI();
+            startRMI();
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
             Scanner input = new Scanner(System.in);
@@ -49,17 +50,20 @@ public class Node implements NodeInterface, Observer {
                     if (parts.length != 1) {
                         multicast.sendMulticast(parts[1]);
                     } else {
-                        System.out.println("Please enter a message to multicast.");
+                        System.err.println("Please enter a message to multicast.");
                     }
-                } else {
-                    System.out.println("Command not found.");
+                } else if(parts[0].toLowerCase().equals("print")) {
+                    System.out.println("Previous: "+previous.toString());
+                    System.out.println("Next: "+next.toString());
+                    System.out.println("#nodes in network: "+numberOfNodesInNetwork);
+                }else {
+                    System.err.println("Command not found.");
                 }
             }
         }
         catch (IOException e) {
-            System.out.println("IOException: multicast failed.");
+            System.err.println("IOException: multicast failed.");
         }
-
     }
 
     /**
@@ -70,11 +74,31 @@ public class Node implements NodeInterface, Observer {
     @Override
     public void update(Observable observable, Object o) {
         String message = o.toString();
-        System.out.println(message);
+        String parts[] = message.split(";");
+        if(parts[0].equals("00")) {
+            System.out.println("New node detected.");
+            System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
+        } else if(parts[0].equals("01")) {
+            System.out.println("Nameserver message recieved. #hosts: "+parts[1]);
+            setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
+            if(!name.equals(parts[2])) {
+                try {
+                    updateNeighbors(parts[2], parts[3]);
+                } catch (NodeAlreadyExistsException e) {
+                    System.err.println("New node hash is the same as my hash. Node rejected.");
+                    // Handle error?
+                }
+            } else {
+                if(numberOfNodesInNetwork < 1) {
+                    Neighbour self = new Neighbour(name, ip);
+                    updateNode(self, self);
+                }
+            }
+        }
     }
 
-    /*
-    * Starts the RMI server
+    /**
+     * Starts the RMI server
      */
     private void startRMI() {
         try {
@@ -167,7 +191,7 @@ public class Node implements NodeInterface, Observer {
                 stub.updateNode(new Neighbour(name,ip), next);
             }
             catch (Exception e) {
-                System.out.println("RMI to node failed.");
+                System.err.println("RMI to node failed.");
             }
             // update next with new node
             next = new Neighbour(new_ip, new_name);
@@ -177,6 +201,11 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
+    /**
+     * Method gets called my the updateNeighbors method, via RMI, method updates neighbors of remote node
+     * @param previous, Neighbor object
+     * @param next, Neighbor object
+     */
     public void updateNode(Neighbour previous, Neighbour next) {
         if(numberOfNodesInNetwork < 1) {
             this.next = new Neighbour(name, ip);

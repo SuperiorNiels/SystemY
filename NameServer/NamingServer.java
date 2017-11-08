@@ -18,10 +18,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.TreeMap;
-import java.util.ArrayList;
+import java.util.*;
 
 import Network.MulticastObserverable;
 import Network.MulticastService;
@@ -35,30 +32,54 @@ public class NamingServer implements NamingInterface, Observer {
 
     private TreeMap<Integer, Node> map = new TreeMap<>();
     private String ip = null;
+    MulticastService multicast;
 
     public NamingServer() { }
 
     public void start() {
         try {
-            MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
-            MulticastObserverable observer = new MulticastObserverable();
-            observer.addObserver(this);
+            multicast.addObserver(this);
             multicast.start();
+            //startRMI();
+            System.out.println("Nameserver started. IP: "+ip);
+            Scanner input = new Scanner(System.in);
+            while(true) {
+                String command = input.nextLine();
+                String parts[] = command.split(" ");
+                if(parts[0].toLowerCase().equals("save")) {
+                    try {
+                        createXML("./data/output.xml");
+                    }
+                    catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                } else {
+                    System.out.println(command);
+                }
+            }
         }
         catch (IOException e) {
-            System.err.println("IOException: multicast failed.");
-        }
-        System.out.println("Node started.");
-        // Node loop
-        while(true) {
-            // Parse commands and execute
+            System.out.println("IOException: multicast failed.");
         }
     }
 
     @Override
     public void update(Observable observable, Object o) {
-
+        String message = o.toString();
+        String parts[] = message.split(";");
+        if(parts[0].equals("00")) {
+            System.out.println("New node detected.");
+            System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
+            try {
+                addNode(parts[2],parts[1]);
+                multicast.sendMulticast("01;"+map.size()+";"+parts[1]+";"+parts[2]);
+            }
+            catch (AlreadyExistsException e) {
+                System.out.println("Node name taken, node rejected.");
+            }
+        }
     }
 
     /**
