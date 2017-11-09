@@ -196,17 +196,18 @@ public class Node implements NodeInterface, Observer {
             } else if(calculateHash(previous.getName()) < new_hash) {
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
-            } else {
-                // only 1 node in network, new node is next and previous.
-                Neighbour new_neighbour = new Neighbour(new_name, new_ip);
-                Neighbour self = new Neighbour(name, ip);
-                updateNode(new_neighbour, new_neighbour);
-                try {
-                    NodeInterface stub = (NodeInterface) Naming.lookup("//" + new_ip + "/Node");
-                    stub.updateNode(self, self);
-                } catch (Exception e) {
-                    System.err.println("RMI to node failed.");
-                }
+            }
+        } else {
+            // only 1 node in network, new node is next and previous.
+            Neighbour new_neighbour = new Neighbour(new_name, new_ip);
+            Neighbour self = new Neighbour(name, ip);
+            updateNode(new_neighbour, new_neighbour);
+            try {
+                NodeInterface stub = (NodeInterface) Naming.lookup("//" + new_ip + "/Node");
+                stub.updateNode(self, self);
+            } catch (Exception e) {
+                System.err.println("RMI to node failed.");
+                e.printStackTrace();
             }
         }
     }
