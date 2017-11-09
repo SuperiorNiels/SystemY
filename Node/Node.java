@@ -177,25 +177,35 @@ public class Node implements NodeInterface, Observer {
      * @param new_ip, String ip address of the new node
      */
     public void updateNeighbors(String new_name, String new_ip) throws NodeAlreadyExistsException {
-        int my_hash = calculateHash(name);
-        int new_hash = calculateHash(new_name);
-
-        if(my_hash == new_hash) throw new NodeAlreadyExistsException();
-
-        if(new_hash < calculateHash(next.getName())) {
-            // Update new node neighbours previous = self and next = self next
-            try {
-                NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
-                stub.updateNode(new Neighbour(name,ip), next);
+        if(numberOfNodesInNetwork > 1) {
+            int my_hash = calculateHash(name);
+            int new_hash = calculateHash(new_name);
+            if (my_hash == new_hash) throw new NodeAlreadyExistsException();
+            if (new_hash < calculateHash(next.getName())) {
+                // Update new node neighbours previous = self and next = self next
+                try {
+                    NodeInterface stub = (NodeInterface) Naming.lookup("//" + new_ip + "/Node");
+                    stub.updateNode(new Neighbour(name, ip), next);
+                } catch (Exception e) {
+                    System.err.println("RMI to node failed.");
+                }
+                // update next with new node
+                next = new Neighbour(new_name, new_ip);
+            } else if (calculateHash(previous.getName()) < new_hash) {
+                // update previous with new node
+                previous = new Neighbour(new_name, new_ip);
             }
-            catch (Exception e) {
+        } else {
+            // only 1 node in network, new node is next and previous.
+            Neighbour new_neighbour = new Neighbour(new_name, new_ip);
+            Neighbour self= new Neighbour(name, ip);
+            updateNode(new_neighbour,new_neighbour);
+            try {
+                NodeInterface stub = (NodeInterface) Naming.lookup("//" + new_ip + "/Node");
+                stub.updateNode(self, self);
+            } catch (Exception e) {
                 System.err.println("RMI to node failed.");
             }
-            // update next with new node
-            next = new Neighbour(new_name, new_ip);
-        } else if(calculateHash(previous.getName()) < new_hash) {
-            // update previous with new node
-            previous = new Neighbour(new_name, new_ip);
         }
     }
 
@@ -205,13 +215,8 @@ public class Node implements NodeInterface, Observer {
      * @param next, Neighbor object
      */
     public void updateNode(Neighbour previous, Neighbour next) {
-        if(numberOfNodesInNetwork < 1) {
-            this.next = new Neighbour(name, ip);
-            this.previous = new Neighbour(name, ip);
-        } else {
-            this.next = next;
-            this.previous = previous;
-        }
+        this.next = next;
+        this.previous = previous;
     }
 
     /**
