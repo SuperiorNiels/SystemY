@@ -186,6 +186,7 @@ public class Node implements NodeInterface, Observer {
 
             if(new_hash < calculateHash(next.getName())) {
                 // Update new node neighbours previous = self and next = self next
+                System.out.printf("New node is my new next: RMI to "+new_ip);
                 try {
                     NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
                     stub.updateNode(new Neighbour(name,ip), next);
@@ -204,13 +205,13 @@ public class Node implements NodeInterface, Observer {
             Neighbour new_neighbour = new Neighbour(new_name, new_ip);
             Neighbour self = new Neighbour(name, ip);
             updateNode(new_neighbour, new_neighbour);
-            System.out.println("RMI to "+new_ip);
+            System.out.println("I am the only node, new node added: RMI to "+new_ip);
             try {
                 NodeInterface stub = (NodeInterface) Naming.lookup("//" + new_ip + "/Node");
                 stub.updateNode(self, self);
             } catch (Exception e) {
                 System.err.println("RMI to node failed.");
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
