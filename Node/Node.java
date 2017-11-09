@@ -105,8 +105,6 @@ public class Node implements NodeInterface, Observer {
             NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(this,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("Node", stub);
-
-            //System.out.println("Server ready!");
         } catch (RemoteException e) {
             System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {
