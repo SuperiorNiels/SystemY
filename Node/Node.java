@@ -204,6 +204,7 @@ public class Node implements NodeInterface, Observer {
             Neighbour new_neighbour = new Neighbour(new_name, new_ip);
             Neighbour self = new Neighbour(name, ip);
             updateNode(new_neighbour, new_neighbour);
+            System.out.println("RMI to "+new_ip);
             try {
                 NodeInterface stub = (NodeInterface) Naming.lookup("//" + new_ip + "/Node");
                 stub.updateNode(self, self);

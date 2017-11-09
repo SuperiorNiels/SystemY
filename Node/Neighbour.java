@@ -1,6 +1,8 @@
 package Node;
 
-public class Neighbour {
+import java.io.Serializable;
+
+public class Neighbour implements Serializable {
     private String ip;
     private String name;
 
