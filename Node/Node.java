@@ -101,8 +101,7 @@ public class Node implements NodeInterface, Observer {
     private void startRMI() {
         try {
             //Start the RMI-server
-            Node node = this;
-            NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(node,0);
+            NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(this,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("Node", stub);
             //System.out.println("Server ready!");
@@ -189,7 +188,8 @@ public class Node implements NodeInterface, Observer {
                 stub.updateNode(new Neighbour(name,ip), next);
             }
             catch (Exception e) {
-                System.err.println("RMI to node failed.");
+                //System.err.println("RMI to node failed.");
+                e.printStackTrace();
             }
             // update next with new node
             next = new Neighbour(new_name, new_ip);
