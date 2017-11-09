@@ -182,20 +182,20 @@ public class Node implements NodeInterface, Observer {
 
         if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
-        if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
+        if(new_hash < calculateHash(next.getName())) {
             // Update new node neighbours previous = self and next = self next
             try {
-                NodeInterface stub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
+                NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
                 stub.updateNode(new Neighbour(name,ip), next);
             }
             catch (Exception e) {
                 System.err.println("RMI to node failed.");
             }
             // update next with new node
-            next = new Neighbour(new_ip, new_name);
-        } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
+            next = new Neighbour(new_name, new_ip);
+        } else if(calculateHash(previous.getName()) < new_hash) {
             // update previous with new node
-            previous = new Neighbour(new_ip, new_name);
+            previous = new Neighbour(new_name, new_ip);
         }
     }
 
