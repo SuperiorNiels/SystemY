@@ -243,7 +243,7 @@ public class Node implements NodeInterface, Observer {
     public void shutDown(){
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            if(next.getName().equals(previous.getName())){
+            if(next.equals(previous)){
                 //only one node
                 namingStub.removeNode(name);
 
