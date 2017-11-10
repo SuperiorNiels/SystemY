@@ -65,6 +65,8 @@ public class Node implements NodeInterface, Observer {
                     System.err.println("Command not found.");
                 }
             }
+            multicast.interrupt();
+
         }
         catch (IOException e) {
             System.err.println("IOException: multicast failed.");
