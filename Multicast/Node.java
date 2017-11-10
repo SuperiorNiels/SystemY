@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class Node extends Thread{
     String nodeName;
@@ -38,7 +39,9 @@ public class Node extends Thread{
 class NodeMain {
 
     public static void main(String[] args) throws IOException {
-        new Node("client 1").run();
+        new Node("1").run();
+        new Node("2").run();
+        new Node("3").run();
     }
 
 }

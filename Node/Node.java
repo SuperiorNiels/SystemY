@@ -60,6 +60,7 @@ public class Node implements NodeInterface, Observer {
                     System.out.println("Next: "+next.toString());
                     System.out.println("#nodes in network: "+numberOfNodesInNetwork);
                 } else if(parts[0].toLowerCase().equals("shutdown")) {
+                    System.out.println("shutting down.");
                     shutDown();
                 } else {
                     System.err.println("Command not found.");
@@ -248,7 +249,7 @@ public class Node implements NodeInterface, Observer {
             if(next.equals(previous)){
                 //only one node
                 namingStub.removeNode(name);
-
+                running = false;
             }else{
                 //sends the neighbour of the next Node to the previous Node
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
