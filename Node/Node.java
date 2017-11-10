@@ -84,7 +84,7 @@ public class Node implements NodeInterface, Observer {
             System.out.println("New node detected.");
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
-            System.out.println("Nameserver message recieved. #hosts: "+parts[1]);
+            System.out.println("Nameserver message received. #hosts: "+parts[1]);
             namingServerIp = parts[4];
             setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
             if(!name.equals(parts[2])) {
@@ -242,17 +242,24 @@ public class Node implements NodeInterface, Observer {
      */
     public void shutDown(){
         try {
-            //sends the neighbour of the next Node to the previous Node
-            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
-            nodeStub.setNext(next);
-            //sends the neighbour of the previous node to the next Node
-            nodeStub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
-            nodeStub.setPrevious(previous);
-            //Deletes itself by the naming server
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            namingStub.removeNode(name);
-            //stops the SystemY process
-            running = false;
+            if(next.getName().equals(previous.getName())){
+                //only one node
+                namingStub.removeNode(name);
+
+            }else{
+                //sends the neighbour of the next Node to the previous Node
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
+                nodeStub.setNext(next);
+                //sends the neighbour of the previous node to the next Node
+                nodeStub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
+                nodeStub.setPrevious(previous);
+                //Deletes itself by the naming server
+
+                namingStub.removeNode(name);
+                //stops the SystemY process
+                running = false;
+            }
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
