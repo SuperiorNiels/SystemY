@@ -59,7 +59,9 @@ public class Node implements NodeInterface, Observer {
                     System.out.println("Previous: "+previous.toString());
                     System.out.println("Next: "+next.toString());
                     System.out.println("#nodes in network: "+numberOfNodesInNetwork);
-                }else {
+                } else if(parts[0].toLowerCase().equals("shutdown")) {
+                    shutDown();
+                } else {
                     System.err.println("Command not found.");
                 }
             }
@@ -83,6 +85,7 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
             System.out.println("Nameserver message recieved. #hosts: "+parts[1]);
+            namingServerIp = parts[4];
             setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
             if(!name.equals(parts[2])) {
                 try {

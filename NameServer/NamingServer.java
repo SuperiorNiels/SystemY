@@ -42,7 +42,7 @@ public class NamingServer implements NamingInterface, Observer {
             ip = multicast.getIpAddress();
             multicast.addObserver(this);
             multicast.start();
-            //startRMI();
+            startRMI();
             System.out.println("Nameserver started. IP: "+ip);
             Scanner input = new Scanner(System.in);
             while(true) {
@@ -74,7 +74,7 @@ public class NamingServer implements NamingInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
             try {
                 addNode(parts[2],parts[1]);
-                multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]);
+                multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]+";"+ip);
             }
             catch (AlreadyExistsException e) {
                 System.out.println("Node name taken, node rejected.");
@@ -87,12 +87,13 @@ public class NamingServer implements NamingInterface, Observer {
      */
     private void startRMI() {
         try {
+            System.setProperty("java.rmi.server.hostname",ip);
             //Start the RMI-server
             NamingServer server = this;
             NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("NamingServer", stub);
-            System.out.println("Server ready!");
+            //System.out.println("Server ready!");
         } catch (RemoteException e) {
             System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {
