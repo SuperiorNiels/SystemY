@@ -17,12 +17,12 @@ public class MulticastTest implements Observer{
 
     public static void main(String[] args) {
         try {
-            MulticastService service = new MulticastService("224.0.0.1", "10.0.1.14",4446);
+            MulticastService service = new MulticastService("224.0.0.1", 4446);
             MulticastObserverable observer = new MulticastObserverable();
             MulticastTest ob = new MulticastTest(observer);
             observer.addObserver(ob);
-            service.run();
-            service.sendMulticast("Hello world!");
+            service.start();
+            //service.sendMulticast("Hello world!");
 
 
         } catch (IOException e) {

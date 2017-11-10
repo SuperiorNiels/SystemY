@@ -11,15 +11,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.TreeMap;
-import java.util.ArrayList;
+import java.util.*;
 
+import Network.MulticastObserverable;
 import Network.MulticastService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,18 +28,72 @@ import org.w3c.dom.Element;
 import Node.Node;
 import Node.NodeInterface;
 
-public class NamingServer implements NamingInterface{
+public class NamingServer implements NamingInterface, Observer {
 
     private TreeMap<Integer, Node> map = new TreeMap<>();
+    private String ip = null;
+    MulticastService multicast;
 
-    public NamingServer() {
+    public NamingServer() { }
+
+    public void start() {
         try {
+            multicast = new MulticastService("224.0.0.1", 4446);
+            ip = multicast.getIpAddress();
+            multicast.addObserver(this);
+            multicast.start();
+            startRMI();
+            System.out.println("Nameserver started. IP: "+ip);
+            Scanner input = new Scanner(System.in);
+            while(true) {
+                String command = input.nextLine();
+                String parts[] = command.split(" ");
+                if(parts[0].toLowerCase().equals("save")) {
+                    try {
+                        createXML("./data/output.xml");
+                    }
+                    catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                } else {
+                    System.out.println(command);
+                }
+            }
+        }
+        catch (IOException e) {
+            System.out.println("IOException: multicast failed.");
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        String message = o.toString();
+        String parts[] = message.split(";");
+        if(parts[0].equals("00")) {
+            System.out.println("New node detected.");
+            System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
+            try {
+                addNode(parts[2],parts[1]);
+                multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]+";"+ip);
+            }
+            catch (AlreadyExistsException e) {
+                System.out.println("Node name taken, node rejected.");
+            }
+        }
+    }
+
+    /**
+     * Create RMI registry
+     */
+    private void startRMI() {
+        try {
+            System.setProperty("java.rmi.server.hostname",ip);
             //Start the RMI-server
             NamingServer server = this;
             NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("NamingServer", stub);
-            System.out.println("Server ready!");
+            //System.out.println("Server ready!");
         } catch (RemoteException e) {
             System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {
@@ -55,10 +110,10 @@ public class NamingServer implements NamingInterface{
     public void addNode(String ip, String name) throws AlreadyExistsException {
         Integer hash = getHash(name);
         if (map.containsKey(hash)) {
-            System.out.println("Hash already exists.");
+            System.err.println("Hash already exists.");
             throw new AlreadyExistsException();
         } else {
-            Node node = new Node(ip, name);
+            Node node = new Node(name);
             if(!map.containsValue(node)) {
                 map.put(hash, node);
             }
@@ -172,10 +227,10 @@ public class NamingServer implements NamingInterface{
         try {
             NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
             stub.setNumberOfNodesInNetwork(map.size());
-            stub = null;
+            stub.setNameServerIp(ip);
         }
         catch (Exception e) {
-            System.out.println("RMI to node failed.");
+            System.err.println("RMI to node failed.");
         }
     }
 
@@ -199,9 +254,9 @@ public class NamingServer implements NamingInterface{
      * @param nameFailedNode
      * @return
      */
-    public Node findNextNode(String nameFailedNode){
-        int hashFailedNode  = getHash(nameFailedNode);
-        int hashNextNode    = map.higherKey(hashFailedNode);
+    public Node findNextNode(String nameFailedNode) {
+        int hashFailedNode = getHash(nameFailedNode);
+        int hashNextNode = map.higherKey(hashFailedNode);
         return map.get(hashNextNode);
 
     }

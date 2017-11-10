@@ -9,4 +9,6 @@ public interface NodeInterface extends Remote {
     public void setNext(Neighbour nextNode) throws RemoteException;
     public void setPrevious(Neighbour previousNode) throws RemoteException;
     public void setNumberOfNodesInNetwork(int number) throws RemoteException;
+    public void updateNode(Neighbour previous, Neighbour next) throws RemoteException;
+    public void setNameServerIp(String ip) throws RemoteException;
 }

@@ -1,6 +1,8 @@
 package Node;
 
-public class Neighbour {
+import java.io.Serializable;
+
+public class Neighbour implements Serializable {
     private String ip;
     private String name;
 
@@ -23,5 +25,9 @@ public class Neighbour {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String toString() {
+        return "Name: "+name+" IP: "+ip;
     }
 }
