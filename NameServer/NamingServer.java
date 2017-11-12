@@ -244,8 +244,8 @@ public class NamingServer implements NamingInterface, Observer {
 
     public Node findPreviousNode(String nameFailedNode){
         int hashFailedNode      = getHash(nameFailedNode);
-        int hashPreviousNode    = map.lowerKey(hashFailedNode);
-        return map.get(hashPreviousNode);
+        Node previousNode       = map.get(map.lowerKey(hashFailedNode));
+        return (previousNode == null) ? map.get(map.lastKey()) : previousNode;
     }
 
     /**
@@ -255,9 +255,16 @@ public class NamingServer implements NamingInterface, Observer {
      * @return
      */
     public Node findNextNode(String nameFailedNode) {
-        int hashFailedNode = getHash(nameFailedNode);
-        int hashNextNode = map.higherKey(hashFailedNode);
-        return map.get(hashNextNode);
+        int hashFailedNode  = getHash(nameFailedNode);
+        Node nextNode    = map.get(map.higherKey(hashFailedNode));
+        return (nextNode == null) ? map.get(map.firstKey()) : nextNode;
 
     }
+
+    /**
+     * this method asks for the number of nodes.
+     * different from sendNumberOfNodes() because in this method a node is pulling data
+     * @return map.size()
+     */
+    public int getNumberOfNodes() {return map.size();}
 }

@@ -287,20 +287,43 @@ public class Node implements NodeInterface, Observer {
         NamingInterface nameServer = null;
         try {
             nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            int numberOfNodes = nameServer.getNumberOfNodes();
 
-            //ask the nameServer for the previous and next node from the failedNode
+            /*
+            the procedure to handel failure is different depending on how many nodes there are in the network.
+            the min numberOfNodes is 2 ( in the case when there is only 1 node failure cannot be summoned)
+            */
+            if(numberOfNodes == 2){
+                //in the case where there are 2 nodes and one fails the remaning node
+                //gets updated, the nodes previous and next is the node itself.
+                setPrevious(new Neighbour(name,ip));
+                setNext(new Neighbour(name,ip));
 
-            //not sure if getName would work because failedNode cannot be accesed
-            String nameFailed = failedNode.getName();
+                //not sure if getName would work because failedNode cannot be accesed
+                String nameFailed = failedNode.getName();
+                //Remove the node at the nameserver
+                nameServer.removeNode(nameFailed);
+            }
+            else if(numberOfNodes > 2) {
+                //ask the nameServer for the previous and next node from the failedNode
 
-            Node previous = nameServer.findPreviousNode(nameFailed);
-            Node next     = nameServer.findNextNode(nameFailed);
-            //Update the previous node, next node address with the next node
-            previous.setNext(new Neighbour(next.getName(),next.getIp()));
-            //Update the next node, previous next node address with the previous node
-            next.setPrevious(new Neighbour(previous.getName(),previous.getIp()));
-            //Verwijder de node bij de nameserver.
-            nameServer.removeNode(nameFailed);
+                //not sure if getName would work because failedNode cannot be accesed
+                String nameFailed = failedNode.getName();
+
+                Node previous = nameServer.findPreviousNode(nameFailed);
+                Node next = nameServer.findNextNode(nameFailed);
+
+                //make communication with these nodes
+                NodeInterface previouscom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
+                NodeInterface nextcom = (NodeInterface) Naming.lookup("//" + namingServerIp + "/Node");
+
+                //Update the previous node, next node address with the next node
+                previouscom.setNext(new Neighbour(next.getName(), next.getIp()));
+                //Update the next node, previous next node address with the previous node
+                nextcom.setPrevious(new Neighbour(previous.getName(), previous.getIp()));
+                //Remove the node at the nameserver
+                nameServer.removeNode(nameFailed);
+            }
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {

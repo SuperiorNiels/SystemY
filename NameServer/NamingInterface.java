@@ -12,4 +12,5 @@ public interface NamingInterface extends Remote {
     public String getOwner(String fileName) throws RemoteException;
     public Node findNextNode(String nameFailedNode) throws RemoteException;
     public Node findPreviousNode(String nameFailedNode) throws RemoteException;
+    public int getNumberOfNodes() throws RemoteException;
 }
