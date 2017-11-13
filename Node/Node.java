@@ -253,11 +253,12 @@ public class Node implements NodeInterface, Observer {
     public void shutDown(){
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
             if(namingStub.getNumberOfNodes()==1){
                 //only one node
                 namingStub.removeNode(name);
             }else{
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
+
                 //sends the neighbour of the next Node to the previous Node
                 nodeStub.setNext(next);
                 //sends the neighbour of the previous node to the next Node
@@ -314,8 +315,8 @@ public class Node implements NodeInterface, Observer {
                 //not sure if getName would work because failedNode cannot be accesed
                 String nameFailed = failedNode.getName();
 
-                Neighbour previous = nameServer.findPreviousNode(nameFailed);
-                Neighbour next = nameServer.findNextNode(nameFailed);
+                Node previous = nameServer.findPreviousNode(nameFailed);
+                Node next = nameServer.findNextNode(nameFailed);
 
                 //make communication with these nodes
                 NodeInterface previouscom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
