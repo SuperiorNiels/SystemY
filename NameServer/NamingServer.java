@@ -224,21 +224,6 @@ public class NamingServer implements NamingInterface, Observer {
     }
 
     /**
-     * Send number of nodes in the network to the ip (paramater) via RMI
-     * @param node_ip, ip address of node (RMI server)
-     */
-    public void sendNumberOfNodes(String node_ip) {
-        try {
-            NodeInterface stub = (NodeInterface) Naming.lookup("//"+node_ip+"/Node");
-            stub.setNumberOfNodesInNetwork(map.size());
-            stub.setNameServerIp(ip);
-        }
-        catch (Exception e) {
-            System.err.println("RMI to node failed.");
-        }
-    }
-
-    /**
      * @param name
      * @return hash of the input string
      */
