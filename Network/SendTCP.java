@@ -3,7 +3,10 @@ package Network;
 import java.io.*;
 import java.net.Socket;
 
-public class ConnectionTCP extends Thread {
+/**
+ * Class that is used to send a file over a tcp connection
+ */
+public class SendTCP extends Thread {
     private Socket clientSocket;
     private DataInputStream in;
     private DataOutputStream out;
@@ -13,9 +16,9 @@ public class ConnectionTCP extends Thread {
      *
      * @param aClientSocket
      */
-    public ConnectionTCP(Socket aClientSocket) {
+    public SendTCP(Socket aClientSocket,String path) {
         try {
-            filePath = new File(".").getCanonicalPath();
+            filePath = path;
             clientSocket = aClientSocket;
             //We wrap everything in bufferedstream to fasten up the transaction
             //The reason for using datastream is because we can write/read primitive types straigth from/to the input/output
@@ -35,7 +38,7 @@ public class ConnectionTCP extends Thread {
         try {
             String data = in.readUTF();
             //array of bytes that holds the file bytes
-            byte[] file = readFile(data);
+            byte[] file = readFile(filePath);
             System.out.println("sending file :"+data);
             out.flush();        //flushes the buffer
             out.write(file,0,file.length);
@@ -56,7 +59,7 @@ public class ConnectionTCP extends Thread {
      * @return
      */
     private byte[] readFile(String fileName){
-        File myFile = new File(filePath+"\\"+fileName);
+        File myFile = new File(fileName);
         byte myByteArray[] = new byte[(int) myFile.length()];
         try {
             BufferedInputStream reader = new BufferedInputStream(new FileInputStream(myFile));
