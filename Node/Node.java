@@ -49,25 +49,24 @@ public class Node implements NodeInterface, Observer {
             while(running) {
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
-                if(parts[0].toLowerCase().equals("multicast")) {
+                if (parts[0].toLowerCase().equals("multicast")) {
                     if (parts.length != 1) {
                         multicast.sendMulticast(parts[1]);
                     } else {
                         System.err.println("Please enter a message to multicast.");
                     }
-                } else if(parts[0].toLowerCase().equals("print")) {
-                    System.out.println("Previous: "+previous.toString());
-                    System.out.println("Next: "+next.toString());
-                    System.out.println("#nodes in network: "+numberOfNodesInNetwork);
-                } else if(parts[0].toLowerCase().equals("shutdown")) {
+                } else if (parts[0].toLowerCase().equals("print")) {
+                    System.out.println("Previous: " + previous.toString());
+                    System.out.println("Next: " + next.toString());
+                    System.out.println("#nodes in network: " + numberOfNodesInNetwork);
+                } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
                     shutDown();
+                    multicast.interrupt();
                 } else {
                     System.err.println("Command not found.");
                 }
             }
-            multicast.interrupt();
-
         }
         catch (IOException e) {
             System.err.println("IOException: multicast failed.");

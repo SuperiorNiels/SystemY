@@ -55,6 +55,8 @@ public class NamingServer implements NamingInterface, Observer {
                     catch (Exception e) {
                         System.out.println(e.getMessage());
                     }
+                } else if(parts[0].toLowerCase().equals("print")) {
+                    System.out.println(map.size());
                 } else {
                     System.out.println(command);
                 }
@@ -79,6 +81,8 @@ public class NamingServer implements NamingInterface, Observer {
             catch (AlreadyExistsException e) {
                 System.out.println("Node name taken, node rejected.");
             }
+        } else {
+            System.out.printf(message);
         }
     }
 
