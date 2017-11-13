@@ -65,6 +65,8 @@ public class Node implements NodeInterface, Observer {
                     multicast.terminate();
                 } else if(parts[0].toLowerCase().equals("hash")) {
                     System.out.println(calculateHash(name));
+                } else if(parts[0].toLowerCase().equals("fail")) {
+                        failure(previous);
                 } else {
                     System.err.println("Command not found.");
                 }
@@ -283,7 +285,7 @@ public class Node implements NodeInterface, Observer {
      * and the communication cannot find place because their is a problem with the other node (failedNode)
      * @param failedNode
      */
-    public void failure(Node failedNode) {
+    public void failure(Neighbour failedNode) {
         //Start communication with the nameserver
         NamingInterface nameServer = null;
         try {
@@ -311,8 +313,8 @@ public class Node implements NodeInterface, Observer {
                 //not sure if getName would work because failedNode cannot be accesed
                 String nameFailed = failedNode.getName();
 
-                Node previous = nameServer.findPreviousNode(nameFailed);
-                Node next = nameServer.findNextNode(nameFailed);
+                Neighbour previous = nameServer.findPreviousNode(nameFailed);
+                Neighbour next = nameServer.findNextNode(nameFailed);
 
                 //make communication with these nodes
                 NodeInterface previouscom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
