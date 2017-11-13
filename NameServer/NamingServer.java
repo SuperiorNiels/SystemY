@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import Node.Node;
+import Node.Neighbour;
 import Node.NodeInterface;
 
 public class NamingServer implements NamingInterface, Observer {
@@ -231,10 +232,11 @@ public class NamingServer implements NamingInterface, Observer {
         return Math.abs(name.hashCode() % 32768);
     }
 
-    public Node findPreviousNode(String nameFailedNode){
+    public Neighbour findPreviousNode(String nameFailedNode){
         int hashFailedNode      = getHash(nameFailedNode);
         Node previousNode       = map.get(map.lowerKey(hashFailedNode));
-        return (previousNode == null) ? map.get(map.lastKey()) : previousNode;
+        Neighbour previousNeigbour = new Neighbour(previousNode.getName(), previousNode.getIp());
+        return (previousNeigbour == null) ? new Neighbour(map.get(map.lastKey()).getName(),map.get(map.lastKey()).getIp()) : previousNeigbour;
     }
 
     /**
@@ -243,10 +245,11 @@ public class NamingServer implements NamingInterface, Observer {
      * @param nameFailedNode
      * @return
      */
-    public Node findNextNode(String nameFailedNode) {
+    public Neighbour findNextNode(String nameFailedNode) {
         int hashFailedNode  = getHash(nameFailedNode);
         Node nextNode    = map.get(map.higherKey(hashFailedNode));
-        return (nextNode == null) ? map.get(map.firstKey()) : nextNode;
+        Neighbour nextNeighbour = new Neighbour(nextNode.getName(), nextNode.getIp());
+        return (nextNeighbour == null) ? new Neighbour(map.get(map.firstKey()).getName(),map.get(map.lastKey()).getIp()) : nextNeighbour;
 
     }
 

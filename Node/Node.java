@@ -4,6 +4,7 @@ import NameServer.AlreadyExistsException;
 import NameServer.NamingInterface;
 import Network.MulticastObserverable;
 import Network.MulticastService;
+import Node.Neighbour;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
