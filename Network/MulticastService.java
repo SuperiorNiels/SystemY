@@ -48,7 +48,7 @@ public class MulticastService extends Thread {
                     InetAddress addr = addresses.nextElement();
                     if(addr instanceof Inet4Address )
                         ip = addr.getHostAddress();
-                    System.out.println(iface.getDisplayName() + " " + ip);
+                    //System.out.println(iface.getDisplayName() + " " + ip);
                 }
             }
         } catch (SocketException e) {
@@ -98,8 +98,9 @@ public class MulticastService extends Thread {
     /**
      * closes the socket and stop the receiving thread
      */
-    public void stopService(){
+    public void terminate(){
         running = false;
+        this.interrupt();
         if(socket!=null){
             socket.close();
         }

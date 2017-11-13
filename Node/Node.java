@@ -62,7 +62,7 @@ public class Node implements NodeInterface, Observer {
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
                     shutDown();
-                    multicast.interrupt();
+                    multicast.terminate();
                 } else if(parts[0].toLowerCase().equals("hash")) {
                     System.out.println(calculateHash(name));
                 } else {
