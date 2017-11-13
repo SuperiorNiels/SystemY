@@ -6,6 +6,7 @@ import Network.MulticastObserverable;
 import Network.MulticastService;
 import Node.Neighbour;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -340,6 +341,41 @@ public class Node implements NodeInterface, Observer {
             e.printStackTrace();
         } catch (RemoteException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Function that gets all the files from a given directory and puts them into an array
+     * @param path = path of the file folder
+     */
+    private void replicate(String path){
+        //first checks all the files that are in the folder
+        File folder = new File(path);
+        File [] fileList = folder.listFiles();
+        if(fileList == null){
+            System.out.println("Something went wrong, most likely wrong path");
+        }else if(fileList.length == 0){
+            System.out.println("No files were found");
+        }else{
+            try {
+                //start RMI
+                NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+                //get the owner of each file
+                for(File file : fileList){
+                    String ownerIp = namingStub.getOwner(file.getName());
+                    if(ownerIp.equals(ip)){
+                        //This node is the owner of the file = replicate it in the previous node
+                    }else{
+                        //replicate it to the owner of the file
+                    }
+                }
+            } catch (NotBoundException e) {
+                System.err.println("The stub is not bound");
+            } catch (MalformedURLException e) {
+                System.err.println("Malformed URL");
+            } catch (RemoteException e) {
+                System.err.println("Problem with RMI connection");
+            }
         }
     }
 }
