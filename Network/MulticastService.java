@@ -138,7 +138,7 @@ public class MulticastService extends Thread {
                 observer.notifyObservers(received);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Closing socket");
         }
 
     }
