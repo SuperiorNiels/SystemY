@@ -62,7 +62,10 @@ public class Node implements NodeInterface, Observer {
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
                     shutDown();
+                    //closes the socket
                     multicast.terminate();
+                    //stops SystemY process
+                    System.exit(0);
                 } else if(parts[0].toLowerCase().equals("hash")) {
                     System.out.println(calculateHash(name));
                 } else {
@@ -251,7 +254,6 @@ public class Node implements NodeInterface, Observer {
             if(namingStub.getNumberOfNodes()==1){
                 //only one node
                 namingStub.removeNode(name);
-                running = false;
             }else{
                 //sends the neighbour of the next Node to the previous Node
                 nodeStub.setNext(next);
@@ -261,8 +263,6 @@ public class Node implements NodeInterface, Observer {
                 //Deletes itself by the naming server
 
                 namingStub.removeNode(name);
-                //stops the SystemY process
-                running = false;
             }
         } catch (NotBoundException e) {
             e.printStackTrace();

@@ -99,12 +99,9 @@ public class MulticastService extends Thread {
      * closes the socket and stop the receiving thread
      */
     public void terminate(){
-        running = false;
-        this.interrupt();
         if(socket!=null){
             socket.close();
         }
-
     }
 
     public void addObserver(Observer o) {
