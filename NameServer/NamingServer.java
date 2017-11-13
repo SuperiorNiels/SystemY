@@ -82,7 +82,7 @@ public class NamingServer implements NamingInterface, Observer {
                 System.out.println("Node name taken, node rejected.");
             }
         } else {
-            System.out.printf(message);
+            System.out.println(message);
         }
     }
 
