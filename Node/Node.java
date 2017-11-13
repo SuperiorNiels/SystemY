@@ -25,6 +25,7 @@ public class Node implements NodeInterface, Observer {
     private String ip = null;
     private String name = null;
     private String namingServerIp = null;
+    //Amout of nodes in the network, is only actual when the node is added to the network!
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
     public Node(String name) {
@@ -264,20 +265,24 @@ public class Node implements NodeInterface, Observer {
                 //sends the neighbour of the previous node to the next Node
                 nodeStub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
                 nodeStub.setPrevious(previous);
-                //Deletes itself by the naming server
-
+                //Deletes itself in the naming server
                 namingStub.removeNode(name);
             }
         } catch (NotBoundException e) {
-            e.printStackTrace();
+            System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            System.err.println("Malformed URL");
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.err.println("Problem with RMI connection");
         }
 
     }
 
+    /**
+     * Calculates the hash of a given String
+     * @param name
+     * @return
+     */
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
     }
@@ -315,8 +320,8 @@ public class Node implements NodeInterface, Observer {
                 //not sure if getName would work because failedNode cannot be accesed
                 String nameFailed = failedNode.getName();
 
-                Node previous = nameServer.findPreviousNode(nameFailed);
-                Node next = nameServer.findNextNode(nameFailed);
+                Neighbour previous = nameServer.findPreviousNode(nameFailed);
+                Neighbour next = nameServer.findNextNode(nameFailed);
 
                 //make communication with these nodes
                 NodeInterface previouscom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
