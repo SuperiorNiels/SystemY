@@ -245,13 +245,13 @@ public class Node implements NodeInterface, Observer {
     public void shutDown(){
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            if(next.equals(previous)){
+            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
+            if(namingStub.getNumberOfNodes()==1){
                 //only one node
                 namingStub.removeNode(name);
                 running = false;
             }else{
                 //sends the neighbour of the next Node to the previous Node
-                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+previous.getIp()+"/Node");
                 nodeStub.setNext(next);
                 //sends the neighbour of the previous node to the next Node
                 nodeStub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
