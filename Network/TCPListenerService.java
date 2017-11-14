@@ -23,14 +23,14 @@ public class TCPListenerService extends Thread{
             System.err.println("Problem opening serverSocket");        }
     }
     public void run(){
-        try {
-            Socket connection = listeningSocket.accept();
-            receiveTCP receiveHandler = new receiveTCP(connection,filePath);
-        } catch (IOException e) {
-            System.err.println("Error opening the connection");
+        while(true){
+            try {
+                Socket connection = listeningSocket.accept();
+                receiveTCP receiveHandler = new receiveTCP(connection,filePath);
+            } catch (IOException e) {
+                System.err.println("Error opening the connection");
+            }
         }
-
-
     }
     private void listen(){
 
