@@ -7,12 +7,12 @@ import java.net.Socket;
  * This class is used to receive a tcp packet
  * The receiving happens in a thread that runs parallel with the main process
  */
-public class receiveTCP extends Thread {
+public class ReceiveTCP extends Thread {
     private DataInputStream in;
     private String filePath;
     private Socket clientSocket;
 
-    public receiveTCP(Socket aClientSocket,String filePath){
+    public ReceiveTCP(Socket aClientSocket, String filePath){
         try {
             clientSocket = aClientSocket;
             this.filePath = filePath;

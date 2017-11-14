@@ -26,7 +26,7 @@ public class TCPListenerService extends Thread{
         while(true){
             try {
                 Socket connection = listeningSocket.accept();
-                receiveTCP receiveHandler = new receiveTCP(connection,filePath);
+                ReceiveTCP receiveHandler = new ReceiveTCP(connection,filePath);
             } catch (IOException e) {
                 System.err.println("Error opening the connection");
             }

@@ -348,10 +348,15 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * Function that gets all the files from a given directory and puts them into an array
+     * Method that gets all the files from a given directory and puts them into an array
+     * After that the node checks who the owner is of each file, if another node is the owner, the file gets replicated
+     * if this node is the owner, the file get replicated to the previous node.
+     * This node will remain the owner in the latter case.
+     *
      * @param folderPath = path of the file folder
      */
     private void replicate(String folderPath){
+        int destPort = 8000;
         //first checks all the files that are in the folder
         File folder = new File(folderPath);
         File [] fileList = folder.listFiles();
@@ -367,9 +372,13 @@ public class Node implements NodeInterface, Observer {
                 for(File file : fileList){
                     String ownerIp = namingStub.getOwner(file.getName());
                     if(ownerIp.equals(ip)){
-                        //This node is the owner of the file = replicate it in the previous node
+                        //This node is the owner of the file = replicate it to the previous node
+                        sendFile(previous.getIp(),destPort,folderPath,file.getName());
+
                     }else{
                         //replicate it to the owner of the file
+                        sendFile(ownerIp,destPort,folderPath,file.getName());
+                        
                     }
                 }
             } catch (NotBoundException e) {
@@ -392,8 +401,9 @@ public class Node implements NodeInterface, Observer {
      */
     public void sendFile(String ip,int destPort, String filePath,String fileName){
         try {
-            //opens a send socket with a given destination ip and port
+            //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
+            //sends the given file to the given ip
             SendTCP send = new SendTCP(sendSocket,filePath,fileName);
         } catch (IOException e) {
             System.err.println("Problem opening port "+destPort);
