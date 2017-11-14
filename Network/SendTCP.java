@@ -5,24 +5,27 @@ import java.net.Socket;
 
 /**
  * Class that is used to send a file over a tcp connection
+ *
  */
 public class SendTCP extends Thread {
     private Socket clientSocket;
-    private DataInputStream in;
     private DataOutputStream out;
     private String filePath;
+    private String fileName;
 
     /**
      *
-     * @param aClientSocket
+     * @param aClientSocket socket to send to
+     * @param filePath path of the file
+     * @param fileName name of the file
      */
-    public SendTCP(Socket aClientSocket,String path) {
+    public SendTCP(Socket aClientSocket,String filePath, String fileName) {
         try {
-            filePath = path;
+            this.filePath = filePath;
+            this.fileName = fileName;
             clientSocket = aClientSocket;
             //We wrap everything in bufferedstream to fasten up the transaction
             //The reason for using datastream is because we can write/read primitive types straigth from/to the input/output
-            in = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
             out = new DataOutputStream(new BufferedOutputStream(clientSocket.getOutputStream()));
             //starts the thread
             this.start();
@@ -32,20 +35,24 @@ public class SendTCP extends Thread {
     }
 
     /**
-     *
+     * First sends the name of the file and then the file over a tcp connection
      */
     public void run() {
         try {
-            String data = in.readUTF();
+            //first send the file name to the receiver
+            out.flush();
+            out.writeChars(fileName);
             //array of bytes that holds the file bytes
-            byte[] file = readFile(filePath);
-            System.out.println("sending file :"+data);
+            byte[] file = readFile(filePath+"/"+fileName);
+            System.out.println("Sending file:"+filePath);
             out.flush();        //flushes the buffer
+            //sends the file
             out.write(file,0,file.length);
         } catch (IOException e) {
             System.out.println("readline:" + e.getMessage());
         }finally{
             try{
+                //closes the socket
                 clientSocket.close();
             }catch(IOException e){
                 System.out.println("problem closing the socket: "+e.getMessage());
@@ -56,7 +63,7 @@ public class SendTCP extends Thread {
     /**
      * reads a file into a byte array and returns that array
      * @param fileName
-     * @return
+     * @return array of bytes
      */
     private byte[] readFile(String fileName){
         File myFile = new File(fileName);

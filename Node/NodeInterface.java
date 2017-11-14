@@ -1,5 +1,7 @@
 package Node;
 
+
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
@@ -11,4 +13,5 @@ public interface NodeInterface extends Remote {
     public void setNumberOfNodesInNetwork(int number) throws RemoteException;
     public void updateNode(Neighbour previous, Neighbour next) throws RemoteException;
     public void setNameServerIp(String ip) throws RemoteException;
+    public void sendFile(String ip,int destPort, String filePath,String fileName) throws RemoteException;
 }

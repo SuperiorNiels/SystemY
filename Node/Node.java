@@ -4,11 +4,14 @@ import NameServer.AlreadyExistsException;
 import NameServer.NamingInterface;
 import Network.MulticastObserverable;
 import Network.MulticastService;
+import Network.SendTCP;
 import Node.Neighbour;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -346,11 +349,11 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Function that gets all the files from a given directory and puts them into an array
-     * @param path = path of the file folder
+     * @param folderPath = path of the file folder
      */
-    private void replicate(String path){
+    private void replicate(String folderPath){
         //first checks all the files that are in the folder
-        File folder = new File(path);
+        File folder = new File(folderPath);
         File [] fileList = folder.listFiles();
         if(fileList == null){
             System.out.println("Something went wrong, most likely wrong path");
@@ -377,5 +380,24 @@ public class Node implements NodeInterface, Observer {
                 System.err.println("Problem with RMI connection");
             }
         }
+    }
+
+    /**
+     * Function that is used to send a file over tcp connection
+     * This function can be called using RMI!
+     * @param ip ip of destination
+     * @param destPort port of destination
+     * @param filePath path of the file
+     * @param fileName name of the file
+     */
+    public void sendFile(String ip,int destPort, String filePath,String fileName){
+        try {
+            //opens a send socket with a given destination ip and port
+            Socket sendSocket = new Socket(ip,destPort);
+            SendTCP send = new SendTCP(sendSocket,filePath,fileName);
+        } catch (IOException e) {
+            System.err.println("Problem opening port "+destPort);
+        }
+
     }
 }
