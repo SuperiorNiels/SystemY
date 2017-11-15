@@ -61,7 +61,7 @@ public class MulticastService extends Thread {
      * Sets the socket on the specified port
      * @return true when succeeded, false when socket not available
      */
-    public Boolean setupService(){
+    public Boolean setupService() {
         try {
             this.socket = new MulticastSocket(multicast_port);
             return true;
@@ -76,7 +76,7 @@ public class MulticastService extends Thread {
      * @param message the message of the packet
      * @return true when success, false when not send
      */
-    public Boolean sendMulticast(String message){
+    public Boolean sendMulticast(String message) {
         if(socket==null) {
             if (!this.setupService()) {
                 return false;
@@ -98,7 +98,8 @@ public class MulticastService extends Thread {
     /**
      * closes the socket and stop the receiving thread
      */
-    public void terminate(){
+    public void terminate() {
+        running = false;
         if(socket!=null){
             socket.close();
         }
@@ -138,8 +139,7 @@ public class MulticastService extends Thread {
                 observer.notifyObservers(received);
             }
         } catch (IOException e) {
-            System.err.println("Closing socket");
+            e.printStackTrace();
         }
-
     }
 }
