@@ -1,24 +1,23 @@
 package Test;
 
-import Network.MulticastObserverable;
+import Network.MulticastObservable;
 import Network.MulticastService;
 
 import java.io.IOException;
-import java.net.NetworkInterface;
 import java.util.Observable;
 import java.util.Observer;
 
 public class MulticastTest implements Observer{
 
-    MulticastObserverable ob;
-    public MulticastTest(MulticastObserverable ob){
+    MulticastObservable ob;
+    public MulticastTest(MulticastObservable ob){
         this.ob = ob;
     }
 
     public static void main(String[] args) {
         try {
             MulticastService service = new MulticastService("224.0.0.1", 4446);
-            MulticastObserverable observer = new MulticastObserverable();
+            MulticastObservable observer = new MulticastObservable();
             MulticastTest ob = new MulticastTest(observer);
             observer.addObserver(ob);
             service.start();

@@ -13,21 +13,18 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-import Network.MulticastObserverable;
 import Network.MulticastService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import Node.Node;
 import Node.Neighbour;
-import Node.NodeInterface;
 
 public class NamingServer implements NamingInterface, Observer {
 
@@ -80,7 +77,7 @@ public class NamingServer implements NamingInterface, Observer {
                 multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]+";"+ip);
             }
             catch (AlreadyExistsException e) {
-                System.out.println("Node name taken, node rejected.");
+                System.out.println("Node name already in use, won't add the node");
             }
         } else {
             System.out.println(message);

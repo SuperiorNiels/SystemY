@@ -1,16 +1,12 @@
 package Node;
 
-import NameServer.AlreadyExistsException;
 import NameServer.NamingInterface;
-import Network.MulticastObserverable;
 import Network.MulticastService;
 import Network.SendTCP;
-import Node.Neighbour;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
@@ -42,16 +38,23 @@ public class Node implements NodeInterface, Observer {
     public void start() {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
-            // update ip, and set self as neighbours
+            // update ip
             ip = multicast.getIpAddress();
             Neighbour self = new Neighbour(name, ip);
+            //set your neighbours as yourself
             updateNode(self, self);
+            //adds this node to the observers of the multicast
             multicast.addObserver(this);
+            //starts the multicast thread
             multicast.start();
             startRMI();
+            //sends the multicast to the network
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
             Scanner input = new Scanner(System.in);
+            /*
+            * This part is used to test and debug
+             */
             while(running) {
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
@@ -87,7 +90,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * Method when a multicast message is recieved
+     * Method when a multicast message is received
      * @param observable
      * @param o
      */
@@ -106,7 +109,7 @@ public class Node implements NodeInterface, Observer {
                 try {
                     updateNeighbors(parts[2], parts[3]);
                 } catch (NodeAlreadyExistsException e) {
-                    System.err.println("New node hash is the same as my hash. Node rejected.");
+                    System.err.println("The has of the new node is the same as mine!");
                     // Handle error?
                 }
             }
@@ -378,7 +381,7 @@ public class Node implements NodeInterface, Observer {
                     }else{
                         //replicate it to the owner of the file
                         sendFile(ownerIp,destPort,folderPath,file.getName());
-                        
+
                     }
                 }
             } catch (NotBoundException e) {

@@ -1,9 +1,7 @@
 package Network;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.Observer;
@@ -15,14 +13,14 @@ public class MulticastService extends Thread {
     private MulticastSocket socket;
     private Boolean running;
     private String received;
-    private MulticastObserverable observer;
+    private MulticastObservable observer;
 
     public MulticastService(String multicast_ip,int port) throws IOException {
         this.multicast_ip = multicast_ip;
         this.interface_ip = getIpAddress();
         this.multicast_port = port;
         received = "";
-        observer = new MulticastObserverable();
+        observer = new MulticastObservable();
     }
 
     /**
