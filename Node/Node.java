@@ -192,11 +192,12 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * This method updates the nodes next en previous ip addresses
-     * @param new_name, String name of the new node (recieved via multicast)
+     * This method updates the nodes next and previous neighbours
+     * @param new_name, String name of the new node (received via multicast)
      * @param new_ip, String ip address of the new node
      */
     public void updateNeighbors(String new_name, String new_ip) throws NodeAlreadyExistsException {
+        //multiple nodes in the network
         if(numberOfNodesInNetwork > 1) {
             int my_hash = calculateHash(name);
             int new_hash = calculateHash(new_name);
@@ -204,8 +205,11 @@ public class Node implements NodeInterface, Observer {
             if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
             if(new_hash < calculateHash(next.getName()) && new_hash > my_hash) {
-                // Update new node neighbours previous = self and next = self next
-                System.out.printf("New node is my new next: RMI to "+new_ip);
+                //I'm the previous node
+                //The new node becomes your next
+                //The new node will have your next as next
+                //The new node will have you as previous
+                System.out.println("New node is my new next: RMI to "+new_ip);
                 try {
                     NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
                     stub.updateNode(new Neighbour(name,ip), next);
@@ -213,14 +217,18 @@ public class Node implements NodeInterface, Observer {
                 catch (Exception e) {
                     System.err.println("RMI to node failed.");
                 }
-                // update next with new node
+                //Update next with new node
                 next = new Neighbour(new_name, new_ip);
             } else if(calculateHash(previous.getName()) > new_hash && new_hash < my_hash) {
+                //I'm the next node
+                //The new node becomes your previous
+                //The new node will have your previous as previous
+                //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
             }
         } else {
-            // only 1 node in network, new node is next and previous.
+            //Only 1 node in network, new node is next and previous.
             Neighbour new_neighbour = new Neighbour(new_name, new_ip);
             Neighbour self = new Neighbour(name, ip);
             updateNode(new_neighbour, new_neighbour);

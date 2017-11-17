@@ -59,12 +59,12 @@ public class MulticastService extends Thread {
      * Sets the socket on the specified port
      * @return true when succeeded, false when socket not available
      */
-    public Boolean setupService() {
+    private Boolean setupService() {
         try {
             this.socket = new MulticastSocket(multicast_port);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Couldn't open port:"+e.getMessage());
             return false;
         }
     }
