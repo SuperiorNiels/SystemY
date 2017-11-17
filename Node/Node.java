@@ -200,7 +200,7 @@ public class Node implements NodeInterface, Observer {
 
             if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
-            if(new_hash > calculateHash(next.getName())) {
+            if(new_hash < calculateHash(next.getName()) && new_hash > my_hash) {
                 // Update new node neighbours previous = self and next = self next
                 System.out.printf("New node is my new next: RMI to "+new_ip);
                 try {
@@ -212,7 +212,7 @@ public class Node implements NodeInterface, Observer {
                 }
                 // update next with new node
                 next = new Neighbour(new_name, new_ip);
-            } else if(calculateHash(previous.getName()) > new_hash) {
+            } else if(calculateHash(previous.getName()) > new_hash && new_hash < my_hash) {
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
             }
