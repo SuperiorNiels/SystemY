@@ -212,7 +212,7 @@ public class Node implements NodeInterface, Observer {
                 }
                 // update next with new node
                 next = new Neighbour(new_name, new_ip);
-            } else if(calculateHash(previous.getName()) < new_hash) {
+            } else if(calculateHash(previous.getName()) > new_hash) {
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
             }
