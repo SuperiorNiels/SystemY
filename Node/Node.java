@@ -222,7 +222,7 @@ public class Node implements NodeInterface, Observer {
                 next = new Neighbour(new_name, new_ip);
                 //after updating the neighbours update the files.
                 //updateFilesNewNode(next);.
-            } else if(calculateHash(previous.getName()) > new_hash && new_hash < my_hash) {
+            } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
                 //I'm the next node
                 //The new node becomes your previous
                 //The new node will have your previous as previous
