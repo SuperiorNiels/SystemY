@@ -242,6 +242,8 @@ public class Node implements NodeInterface, Observer {
                 catch (Exception e) {
                     System.err.println("RMI to node failed.");
                 }
+                //Update next with new node
+                next = new Neighbour(new_name, new_ip);
             }
         } else {
             //Only 1 node in network, new node is next and previous.
