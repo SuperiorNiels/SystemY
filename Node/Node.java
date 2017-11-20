@@ -229,6 +229,19 @@ public class Node implements NodeInterface, Observer {
                 //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
+            } else if(calculateHash(previous.getName()) > my_hash && calculateHash(previous.getName()) < new_hash){
+                //You are the lowest hash, a new higher node joins update your previous
+                previous = new Neighbour(new_name, new_ip);
+            } else if(calculateHash(next.getName()) < my_hash && my_hash < new_hash){
+                //You are currently the highest hash, but a higher joins.
+                //Update him to to have you as previous and the lowest as next ( the lowest is your current next)
+                try {
+                    NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
+                    stub.updateNode(new Neighbour(name,ip), next);
+                }
+                catch (Exception e) {
+                    System.err.println("RMI to node failed.");
+                }
             }
         } else {
             //Only 1 node in network, new node is next and previous.
