@@ -229,10 +229,10 @@ public class Node implements NodeInterface, Observer {
                 //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
-            } else if(calculateHash(previous.getName()) > my_hash && calculateHash(previous.getName()) < new_hash){
+            } else if(calculateHash(previous.getName()) > my_hash && (calculateHash(previous.getName()) < new_hash || new_hash < my_hash)){
                 //You are the lowest hash, a new higher node joins update your previous
                 previous = new Neighbour(new_name, new_ip);
-            } else if(calculateHash(next.getName()) < my_hash && my_hash < new_hash){
+            } else if(calculateHash(next.getName()) < my_hash && (my_hash < new_hash || calculateHash(next.getName()) < my_hash)){
                 //You are currently the highest hash, but a higher joins.
                 //Update him to to have you as previous and the lowest as next ( the lowest is your current next)
                 try {
