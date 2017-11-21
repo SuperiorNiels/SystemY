@@ -107,7 +107,7 @@ public class Node implements NodeInterface, Observer {
             setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
             if(!name.equals(parts[2])) {
                 try {
-                    updateNeighbors(parts[2], parts[3]);
+                    updateNeighbours(parts[2], parts[3]);
                 } catch (NodeAlreadyExistsException e) {
                     System.err.println("The has of the new node is the same as mine!");
                     // Handle error?
@@ -197,15 +197,17 @@ public class Node implements NodeInterface, Observer {
      * @param new_name, String name of the new node (received via multicast)
      * @param new_ip, String ip address of the new node
      */
-    public void updateNeighbors(String new_name, String new_ip) throws NodeAlreadyExistsException {
+    public void updateNeighbours(String new_name, String new_ip) throws NodeAlreadyExistsException {
         //multiple nodes in the network
         if(numberOfNodesInNetwork > 1) {
             int my_hash = calculateHash(name);
+            int myNext = calculateHash(next.getName());
+            int myPrevious = calculateHash(previous.getName());
             int new_hash = calculateHash(new_name);
 
             if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
-            if(new_hash < calculateHash(next.getName()) && new_hash > my_hash) {
+            if(new_hash < myNext  && new_hash > my_hash) {
                 //I'm the previous node
                 //The new node becomes your next
                 //The new node will have your next as next
@@ -222,17 +224,17 @@ public class Node implements NodeInterface, Observer {
                 next = new Neighbour(new_name, new_ip);
                 //after updating the neighbours update the files.
                 //updateFilesNewNode(next);.
-            } else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
+            } else if( myPrevious < new_hash && new_hash < my_hash) {
                 //I'm the next node
                 //The new node becomes your previous
                 //The new node will have your previous as previous
                 //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
-            } else if(calculateHash(previous.getName()) > my_hash && (calculateHash(previous.getName()) < new_hash || new_hash < my_hash)){
+            } else if(myPrevious > my_hash && (myPrevious < new_hash || new_hash < my_hash)){
                 //You are the lowest hash, a new higher node joins update your previous
                 previous = new Neighbour(new_name, new_ip);
-            } else if(calculateHash(next.getName()) < my_hash && (my_hash < new_hash || calculateHash(next.getName()) < my_hash)){
+            } else if(myNext < my_hash && (my_hash < new_hash || myNext < my_hash)){
                 //You are currently the highest hash, but a higher joins.
                 //Update him to to have you as previous and the lowest as next ( the lowest is your current next)
                 try {
@@ -262,7 +264,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * Method gets called my the updateNeighbors method, via RMI, method updates neighbors of remote node
+     * Method gets called my the updateNeighbours method, via RMI, method updates neighbors of remote node
      * @param previous, Neighbor object
      * @param next, Neighbor object
      */
