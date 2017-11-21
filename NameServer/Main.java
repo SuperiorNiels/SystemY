@@ -7,7 +7,7 @@ public class Main {
             if (args[0].toLowerCase().equals("server")) {
                 NamingServer server = new NamingServer();
             } else if (args[0].toLowerCase().equals("client")) {
-                Client client = new Client();
+                NameServerTest client = new NameServerTest();
                 client.communication();
             } else {
                 System.out.println("Please use parameter server/client.");

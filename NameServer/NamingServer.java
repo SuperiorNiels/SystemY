@@ -12,7 +12,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import Node.Node;
+import Node.NodeInterface;
 import Node.Neighbour;
 
 public class NamingServer implements NamingInterface, Observer {
@@ -78,6 +82,18 @@ public class NamingServer implements NamingInterface, Observer {
             }
             catch (AlreadyExistsException e) {
                 System.out.println("Node name already in use, won't add the node");
+                try {
+                    NodeInterface wrongNode = (NodeInterface) Naming.lookup("//" + parts[2] + "/Node");
+                    wrongNode.failedToAddNode(e);
+                    System.out.println("Succesfully notified and shutdown the wrong node");
+                } catch (NotBoundException e1) {
+                    e1.printStackTrace();
+                } catch (MalformedURLException e1) {
+                    e1.printStackTrace();
+                } catch (RemoteException e1) {
+                    e1.printStackTrace();
+                }
+
             }
         } else {
             System.out.println(message);

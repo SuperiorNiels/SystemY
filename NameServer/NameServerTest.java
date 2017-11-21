@@ -6,11 +6,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
-public class Client {
+public class NameServerTest {
     private NamingInterface NamingServer;
     private Scanner scanner;
 
-    public Client(){
+    public NameServerTest(){
         try {
             //Gets the bank object
             Registry registry = LocateRegistry.getRegistry("127.0.0.1");
