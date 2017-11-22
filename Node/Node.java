@@ -28,8 +28,12 @@ public class Node implements NodeInterface, Observer {
     //Amout of nodes in the network, is only actual when the node is added to the network!
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
+    private FileManager manager = new FileManager("./files/");
+
     public Node(String name) {
         this.name = name;
+        manager.initialize();
+        manager.run();
     }
 
     /**

@@ -1,15 +1,14 @@
-if(my_hash < new_hash && new_hash < calculateHash(next.getName())) {
-    // Update new node neighbours previous = self and next = self next
-    try {
-        NodeInterface stub = (NodeInterface) Naming.lookup("//"+next.getIp()+"/Node");
-        stub.updateNode(new Neighbour(name,ip), next);
-    }
-    catch (Exception e) {
-        System.err.println("RMI to node failed.");
-    }
-    // update next with new node
-    next = new Neighbour(new_ip, new_name);
-} else if(calculateHash(previous.getName()) < new_hash && new_hash < my_hash) {
-    // update previous with new node
-    previous = new Neighbour(new_ip, new_name);
-}
+ Path new_file = (Path) event.context();
+                            File local = new File(root+"/local/"+new_file.toString());
+                            File replicated = new File(root+"/replicated/"+new_file.toString());
+
+                            if(local.isFile()) {
+                                System.out.println("New file in local: "+new_file.toString());
+                            } else if(replicated.isFile()) {
+                                System.out.println("New file in replicated: "+new_file.toString());
+                            }
+                            
+                            
+                            
+                            
+                            FileEntry file = new FileEntry()

@@ -1,8 +1,10 @@
 package Node;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.TreeMap;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -12,6 +14,9 @@ public class FileManager extends Thread {
     private Path root;
     private WatchService watcher;
     private WatchKey key;
+
+    private TreeMap<Integer, FileEntry> map;
+
     public FileManager(String root) {
         this.root = Paths.get(root);
     }
@@ -59,6 +64,15 @@ public class FileManager extends Thread {
         catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Calculates the hash of a given String
+     * @param name
+     * @return
+     */
+    private int calculateHash(String name) {
+        return Math.abs(name.hashCode() % 32768);
     }
 
 }
