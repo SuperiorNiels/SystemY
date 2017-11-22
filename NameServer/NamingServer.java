@@ -32,7 +32,7 @@ import Node.Neighbour;
 
 public class NamingServer implements NamingInterface, Observer {
 
-    private TreeMap<Integer, Node> map = new TreeMap<>();
+    private TreeMap<Integer, Neighbour> map = new TreeMap<>();
     private String ip = null;
     MulticastService multicast;
 
@@ -131,9 +131,9 @@ public class NamingServer implements NamingInterface, Observer {
             System.err.println("Hash already exists.");
             throw new AlreadyExistsException();
         } else {
-            Node node = new Node(name);
-            if(!map.containsValue(node)) {
-                map.put(hash, node);
+            Neighbour newNeighbour = new Neighbour(name,ip);
+            if(!map.containsValue(newNeighbour)) {
+                map.put(hash, newNeighbour);
             }
         }
     }
@@ -246,8 +246,14 @@ public class NamingServer implements NamingInterface, Observer {
     }
 
     public Neighbour findPreviousNode(String nameFailedNode){
-        int hashFailedNode = getHash(nameFailedNode);
-        return map.get(hashFailedNode).getPrevious();
+        int key;
+        try{
+            key = map.lowerKey(getHash(nameFailedNode));
+        }catch (NullPointerException e){
+            key = map.lastKey();
+        }
+        Neighbour previous = new Neighbour(map.get(key).getName(),map.get(key).getIp());
+        return previous;
     }
 
     /**
@@ -257,8 +263,14 @@ public class NamingServer implements NamingInterface, Observer {
      * @return
      */
     public Neighbour findNextNode(String nameFailedNode) {
-        int hashFailedNode = getHash(nameFailedNode);
-        return map.get(hashFailedNode).getNext();
+        int key;
+        try{
+            key = map.higherKey(getHash(nameFailedNode));
+        }catch (NullPointerException e){
+            key = map.firstKey();
+        }
+        Neighbour next = new Neighbour(map.get(key).getName(),map.get(key).getIp());
+        return next;
     }
 
     /**

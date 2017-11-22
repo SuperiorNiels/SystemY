@@ -28,7 +28,7 @@ public class Node implements NodeInterface, Observer {
     //Amout of nodes in the network, is only actual when the node is added to the network!
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
-    private FileManager manager = new FileManager("./files/");
+    //private FileManager manager = new FileManager("./files/");
 
     public Node(String name) {
         this.name = name;
@@ -348,7 +348,7 @@ public class Node implements NodeInterface, Observer {
 
                 //make communication with these nodes
                 NodeInterface previouscom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
-                NodeInterface nextcom = (NodeInterface) Naming.lookup("//" + namingServerIp + "/Node");
+                NodeInterface nextcom = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
 
                 //Update the previous node, next node address with the next node
                 previouscom.setNext(new Neighbour(next.getName(), next.getIp()));
