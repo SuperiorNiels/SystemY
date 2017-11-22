@@ -207,7 +207,7 @@ public class Node implements NodeInterface, Observer {
 
             if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
-            if(new_hash < myNext  && new_hash > my_hash) {
+            if((new_hash < myNext  && new_hash > my_hash) || myNext < my_hash && (my_hash < new_hash || myNext < my_hash)) {
                 //I'm the previous node
                 //The new node becomes your next
                 //The new node will have your next as next
@@ -224,28 +224,13 @@ public class Node implements NodeInterface, Observer {
                 next = new Neighbour(new_name, new_ip);
                 //after updating the neighbours update the files.
                 //updateFilesNewNode(next);.
-            } else if( myPrevious < new_hash && new_hash < my_hash) {
+            } else if((myPrevious < new_hash && new_hash < my_hash) || (myPrevious > my_hash && (myPrevious < new_hash || new_hash < my_hash))) {
                 //I'm the next node
                 //The new node becomes your previous
                 //The new node will have your previous as previous
                 //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
-            } else if(myPrevious > my_hash && (myPrevious < new_hash || new_hash < my_hash)){
-                //You are the lowest hash, a new higher node joins update your previous
-                previous = new Neighbour(new_name, new_ip);
-            } else if(myNext < my_hash && (my_hash < new_hash || myNext < my_hash)){
-                //You are currently the highest hash, but a higher joins.
-                //Update him to to have you as previous and the lowest as next ( the lowest is your current next)
-                try {
-                    NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
-                    stub.updateNode(new Neighbour(name,ip), next);
-                }
-                catch (Exception e) {
-                    System.err.println("RMI to node failed.");
-                }
-                //Update next with new node
-                next = new Neighbour(new_name, new_ip);
             }
         } else {
             //Only 1 node in network, new node is next and previous.
