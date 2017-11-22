@@ -1,5 +1,6 @@
 package Network;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
@@ -137,7 +138,7 @@ public class MulticastService extends Thread {
                 observer.notifyObservers(received);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Socket closed!");
         }
     }
 }

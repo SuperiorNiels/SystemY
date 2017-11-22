@@ -246,7 +246,7 @@ public class NamingServer implements NamingInterface, Observer {
     }
 
     public Neighbour findPreviousNode(String nameFailedNode){
-        int hashFailedNode      = getHash(nameFailedNode);
+        int hashFailedNode = getHash(nameFailedNode);
         return map.get(hashFailedNode).getPrevious();
     }
 
@@ -257,7 +257,7 @@ public class NamingServer implements NamingInterface, Observer {
      * @return
      */
     public Neighbour findNextNode(String nameFailedNode) {
-        int hashFailedNode  = getHash(nameFailedNode);
+        int hashFailedNode = getHash(nameFailedNode);
         return map.get(hashFailedNode).getNext();
     }
 

@@ -32,8 +32,8 @@ public class Node implements NodeInterface, Observer {
 
     public Node(String name) {
         this.name = name;
-        manager.initialize();
-        manager.run();
+      //  manager.initialize();
+     //   manager.run();
     }
 
     /**
@@ -137,43 +137,43 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
-    public void setNext(Neighbour next) {
+    public synchronized void setNext(Neighbour next) {
         this.next = next;
     }
 
-    public void setPrevious(Neighbour previous) {
+    public synchronized void setPrevious(Neighbour previous) {
         this.previous = previous;
     }
 
-    public Neighbour getNext() {
+    public synchronized Neighbour getNext() {
         return this.next;
     }
 
-    public Neighbour getPrevious() {
+    public synchronized Neighbour getPrevious() {
         return this.previous;
     }
 
-    public String getIp() {
+    public synchronized String getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
+    public synchronized void setIp(String ip) {
         this.ip = ip;
     }
 
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public synchronized void setName(String name) {
         this.name = name;
     }
 
-    public void setNumberOfNodesInNetwork(int number) {
+    public synchronized void setNumberOfNodesInNetwork(int number) {
         this.numberOfNodesInNetwork = number;
     }
 
-    public int getNumberOfNodesInNetwork() {
+    public synchronized int getNumberOfNodesInNetwork() {
         return numberOfNodesInNetwork;
     }
 
@@ -251,13 +251,12 @@ public class Node implements NodeInterface, Observer {
             }
         }
     }
-
     /**
      * Method gets called my the updateNeighbours method, via RMI, method updates neighbors of remote node
      * @param previous, Neighbor object
      * @param next, Neighbor object
      */
-    public void updateNode(Neighbour previous, Neighbour next) {
+    public synchronized void updateNode(Neighbour previous, Neighbour next) {
         this.next = next;
         this.previous = previous;
     }
@@ -267,7 +266,7 @@ public class Node implements NodeInterface, Observer {
      * @param ip
      * sets the ip of the nameServer
      */
-    public void setNameServerIp(String ip){
+    public synchronized void setNameServerIp(String ip){
         namingServerIp = ip;
     }
 
@@ -451,7 +450,7 @@ public class Node implements NodeInterface, Observer {
                 //calculate hash
                 int hashFile = calculateHash(listOfFiles[i].getName());
                 //if hash file >= hash next
-                if(hashFile >= hashNext ){
+                if(hashFile >= hashNext){
                     //sent via tcp to next
                     sendFile(next.getIp(),destPort,listOfFiles[i].getPath(),listOfFiles[i].getName());
                     //notify nameserver that next is now owner of file
