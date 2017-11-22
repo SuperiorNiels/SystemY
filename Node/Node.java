@@ -207,7 +207,7 @@ public class Node implements NodeInterface, Observer {
 
             if(my_hash == new_hash) throw new NodeAlreadyExistsException();
 
-            if((new_hash < myNext  && new_hash > my_hash) || myNext < my_hash && (my_hash < new_hash || myNext < my_hash)) {
+            if((new_hash < myNext  && new_hash > my_hash) || (myNext < my_hash && (my_hash < new_hash || myNext > new_hash))) {
                 //I'm the previous node
                 //The new node becomes your next
                 //The new node will have your next as next
