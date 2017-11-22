@@ -28,12 +28,12 @@ public class Node implements NodeInterface, Observer {
     //Amout of nodes in the network, is only actual when the node is added to the network!
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
-    private FileManager manager = new FileManager("./files/");
+    //private FileManager manager = new FileManager("./files/");
 
     public Node(String name) {
         this.name = name;
-      //  manager.initialize();
-     //   manager.run();
+       // manager.initialize();
+       // manager.run();
     }
 
     /**
@@ -137,43 +137,43 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
-    public synchronized void setNext(Neighbour next) {
+    public void setNext(Neighbour next) {
         this.next = next;
     }
 
-    public synchronized void setPrevious(Neighbour previous) {
+    public void setPrevious(Neighbour previous) {
         this.previous = previous;
     }
 
-    public synchronized Neighbour getNext() {
+    public Neighbour getNext() {
         return this.next;
     }
 
-    public synchronized Neighbour getPrevious() {
+    public Neighbour getPrevious() {
         return this.previous;
     }
 
-    public synchronized String getIp() {
+    public String getIp() {
         return ip;
     }
 
-    public synchronized void setIp(String ip) {
+    public void setIp(String ip) {
         this.ip = ip;
     }
 
-    public synchronized String getName() {
+    public String getName() {
         return name;
     }
 
-    public synchronized void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public synchronized void setNumberOfNodesInNetwork(int number) {
+    public void setNumberOfNodesInNetwork(int number) {
         this.numberOfNodesInNetwork = number;
     }
 
-    public synchronized int getNumberOfNodesInNetwork() {
+    public int getNumberOfNodesInNetwork() {
         return numberOfNodesInNetwork;
     }
 
@@ -251,12 +251,13 @@ public class Node implements NodeInterface, Observer {
             }
         }
     }
+
     /**
      * Method gets called my the updateNeighbours method, via RMI, method updates neighbors of remote node
      * @param previous, Neighbor object
      * @param next, Neighbor object
      */
-    public synchronized void updateNode(Neighbour previous, Neighbour next) {
+    public void updateNode(Neighbour previous, Neighbour next) {
         this.next = next;
         this.previous = previous;
     }
@@ -266,7 +267,7 @@ public class Node implements NodeInterface, Observer {
      * @param ip
      * sets the ip of the nameServer
      */
-    public synchronized void setNameServerIp(String ip){
+    public void setNameServerIp(String ip){
         namingServerIp = ip;
     }
 
@@ -292,11 +293,11 @@ public class Node implements NodeInterface, Observer {
                 namingStub.removeNode(name);
             }
         } catch (NotBoundException e) {
-            System.err.println("The stub is not bound");
+            System.err.println("The stub is not bound "+e.getMessage());
         } catch (MalformedURLException e) {
-            System.err.println("Malformed URL");
+            System.err.println("Malformed URL: "+e.getMessage());
         } catch (RemoteException e) {
-            System.err.println("Problem with RMI connection");
+            System.err.println("Problem with RMI connection: "+e.getMessage());
         }
 
     }
@@ -374,8 +375,7 @@ public class Node implements NodeInterface, Observer {
      *
      * @param folderPath = path of the file folder
      */
-    private void replicate(String folderPath){
-        int destPort = 8000;
+    private void replicate(String folderPath,int destPort){
         //first checks all the files that are in the folder
         File folder = new File(folderPath);
         File [] fileList = folder.listFiles();
@@ -450,7 +450,7 @@ public class Node implements NodeInterface, Observer {
                 //calculate hash
                 int hashFile = calculateHash(listOfFiles[i].getName());
                 //if hash file >= hash next
-                if(hashFile >= hashNext){
+                if(hashFile >= hashNext ){
                     //sent via tcp to next
                     sendFile(next.getIp(),destPort,listOfFiles[i].getPath(),listOfFiles[i].getName());
                     //notify nameserver that next is now owner of file
