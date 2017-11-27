@@ -14,20 +14,40 @@ public class FileManager extends Thread {
     private Path root;
     private WatchService watcher;
     private WatchKey key;
+    private Neighbour root_node; // Root node is node name that created the filemanager
 
     private TreeMap<Integer, FileEntry> map;
 
-    public FileManager(String root) {
+    public FileManager(String root, Neighbour root_node) {
         this.root = Paths.get(root);
+        this.root_node = root_node;
+        this.map = new TreeMap<Integer, FileEntry>();
     }
 
     public void initialize() {
         try {
             watcher = FileSystems.getDefault().newWatchService();
             registerRecursive(root);
+            File folder = new File(root+"/local");
+            File [] fileList = folder.listFiles();
+            for(File file : fileList) {
+                FileEntry new_entry = new FileEntry(root_node);
+                map.put(calculateHash(file.getName()), new_entry);
+            }
         }
         catch(IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void printMap() {
+        System.out.println("FileManager Map of node: "+root_node.toString());
+        for(Integer i : map.keySet()) {
+            System.out.println("Hash: "+i+" ; \nReplicated nodes: ");
+            FileEntry entry = map.get(i);
+            for(Neighbour node : entry.getReplicatedNodes()) {
+                System.out.println(node.getName());
+            }
         }
     }
 
@@ -48,6 +68,7 @@ public class FileManager extends Thread {
                 for (WatchEvent<?> event : key.pollEvents()) {
                     switch (event.kind().toString()) {
                         case "ENTRY_CREATE":
+
                             System.out.println("File created.");
                             break;
                         case "ENTRY_MODIFY":

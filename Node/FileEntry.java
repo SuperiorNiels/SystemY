@@ -3,27 +3,35 @@ package Node;
 import java.util.ArrayList;
 
 public class FileEntry {
-    private String saves_local; // Name of node that has the file locally saved
-    private ArrayList<String> nodes; //Map of nodes (name) that have replicated the file
+    private Neighbour owner;
+    private ArrayList<Neighbour> nodes; 
 
-    public FileEntry(String owner) {
-        this.saves_local = owner;
-        nodes = new ArrayList<String>();
+    public FileEntry(Neighbour owner) {
+        this.owner = owner;
+        nodes = new ArrayList<Neighbour>();
     }
 
-    public void addNode(String name) {
-        nodes.add(name);
+    public ArrayList<Neighbour> getReplicatedNodes() {
+        return nodes;
     }
 
-    public void removeNode(String name) {
-        nodes.remove(name);
+    public void addNode(Neighbour node) {
+        nodes.add(node);
     }
 
-    public void setOwner(String owner) {
-        this.saves_local = owner;
+    public void removeNode(Node node) {
+        nodes.remove(node);
     }
 
-    public String getOwner() {
-        return saves_local;
+    public void setOwner(Neighbour owner) {
+        this.owner = owner;
+    }
+
+    public void equals() {
+        System.out.println("test");
+    }
+
+    public Neighbour getOwner() {
+        return owner;
     }
 }
