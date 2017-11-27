@@ -200,7 +200,7 @@ public class NamingServer implements NamingInterface, Observer {
      * returns 0 if map is empty
      * @param fileName = name of the file
      */
-    public String getOwner(String fileName) {
+    public Neighbour getOwner(String fileName) {
         int ownerHash = 0;
         int fileHash = getHash(fileName);
         if(!map.isEmpty()) {
@@ -234,7 +234,7 @@ public class NamingServer implements NamingInterface, Observer {
                 ownerHash = big;
             }
         }
-        return (ownerHash!=0) ? map.get(ownerHash).getIp(): null;
+        return (ownerHash!=0) ? map.get(ownerHash): null;
     }
 
     /**

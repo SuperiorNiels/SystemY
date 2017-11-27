@@ -4,34 +4,50 @@ import java.util.ArrayList;
 
 public class FileEntry {
     private Neighbour owner;
-    private ArrayList<Neighbour> nodes; 
+    private Neighbour replicated;
+    private Neighbour local;
+    private ArrayList<Neighbour> downloads;
 
-    public FileEntry(Neighbour owner) {
+    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local) {
         this.owner = owner;
-        nodes = new ArrayList<Neighbour>();
+        this.replicated = replicated;
+        this.local = local;
+        downloads = new ArrayList<Neighbour>();
     }
 
-    public ArrayList<Neighbour> getReplicatedNodes() {
-        return nodes;
+    public ArrayList<Neighbour> getDownloads() {
+        return downloads;
     }
 
     public void addNode(Neighbour node) {
-        nodes.add(node);
+        downloads.add(node);
     }
 
-    public void removeNode(Node node) {
-        nodes.remove(node);
+    public void removeNode(Neighbour node) {
+        downloads.remove(node);
     }
 
     public void setOwner(Neighbour owner) {
         this.owner = owner;
     }
 
-    public void equals() {
-        System.out.println("test");
-    }
-
     public Neighbour getOwner() {
         return owner;
+    }
+
+    public Neighbour getReplicated() {
+        return replicated;
+    }
+
+    public void setReplicated(Neighbour replicated) {
+        this.replicated = replicated;
+    }
+
+    public Neighbour getLocal() {
+        return local;
+    }
+
+    public void setLocal(Neighbour local) {
+        this.local = local;
     }
 }

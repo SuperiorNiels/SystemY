@@ -368,76 +368,13 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * Method that gets all the files from a given directory and puts them into an array
-     * After that the node checks who the owner is of each file, if another node is the owner, the file gets replicated
-     * if this node is the owner, the file get replicated to the previous node.
-     * This node will remain the owner in the latter case.
-     *
-     * @param folderPath = path of the file folder
-     */
-    private void replicate(String folderPath,int destPort){
-        //first checks all the files that are in the folder
-        File folder = new File(folderPath);
-        File [] fileList = folder.listFiles();
-        if(fileList == null){
-            System.out.println("Something went wrong, most likely wrong path");
-        }else if(fileList.length == 0){
-            System.out.println("No files were found");
-        }else{
-            try {
-                //start RMI
-                NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-                //get the owner of each file
-                for(File file : fileList){
-                    String ownerIp = namingStub.getOwner(file.getName());
-                    if(ownerIp.equals(ip)){
-                        //This node is the owner of the file = replicate it to the previous node
-                        sendFile(previous.getIp(),destPort,folderPath,file.getName());
-
-                    }else{
-                        //replicate it to the owner of the file
-                        sendFile(ownerIp,destPort,folderPath,file.getName());
-
-                    }
-                }
-            } catch (NotBoundException e) {
-                System.err.println("The stub is not bound");
-            } catch (MalformedURLException e) {
-                System.err.println("Malformed URL");
-            } catch (RemoteException e) {
-                System.err.println("Problem with RMI connection");
-            }
-        }
-    }
-
-    /**
-     * Function that is used to send a file over tcp connection
-     * This function can be called using RMI!
-     * @param ip ip of destination
-     * @param destPort port of destination
-     * @param filePath path of the file
-     * @param fileName name of the file
-     */
-    public void sendFile(String ip,int destPort, String filePath,String fileName){
-        try {
-            //opens a send socket with a given destination ip and destination port
-            Socket sendSocket = new Socket(ip,destPort);
-            //sends the given file to the given ip
-            SendTCP send = new SendTCP(sendSocket,filePath,fileName);
-        } catch (IOException e) {
-            System.err.println("Problem opening port "+destPort);
-        }
-
-    }
-
-    /**
      * node checks all files he owns (via hash)
      * compares hash with new node (next)
      * if hash(file) is closer to hash next
      * send file to next, update nameserver about owner
      * @param next
      */
-    public void updateFilesNewNode(Neighbour next, int destPort){
+    /*public void updateFilesNewNode(Neighbour next, int destPort){
 
         int hashNext = calculateHash(next.getName());
         String pathFilesReplication = "\\filesReplication";
@@ -456,7 +393,7 @@ public class Node implements NodeInterface, Observer {
                     //this node is now download location of file
                 }
             }
-    }
+    }*/
 
     /**
      * Function that gets called by the name server through RMI when the node can't be added
