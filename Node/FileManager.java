@@ -12,6 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.Map;
 import java.util.TreeMap;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
@@ -167,6 +168,21 @@ public class FileManager extends Thread {
      */
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
+    }
+
+    public void shutdown(Neighbour prev) {
+        for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
+            Integer key = entry.getKey();
+            FileEntry value = entry.getValue();
+
+            if (calculateHash(value.getLocal().getName()) == calculateHash(prev.getName())) {
+                //send replicate to prev of prev
+            }else{
+                //send replicate to prev
+            }
+
+            //Update file fiche at owner node
+        }
     }
 
 }
