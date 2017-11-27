@@ -437,10 +437,9 @@ public class Node implements NodeInterface, Observer {
      * send file to next, update nameserver about owner
      * @param next
      */
-    public void updateFilesNewNode(Neighbour next){
+    public void updateFilesNewNode(Neighbour next, int destPort){
 
         int hashNext = calculateHash(next.getName());
-        int destPort = 8000;
         String pathFilesReplication = "\\filesReplication";
         //get file of all files this node owns
         File folder = new File(pathFilesReplication);
