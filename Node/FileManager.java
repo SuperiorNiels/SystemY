@@ -58,11 +58,11 @@ public class FileManager extends Thread {
             Neighbour replicated;
             if (owner.getIp().equals(root_node.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(root_node.getPrevious().getIp(), 6000, "/local", file.getName());
+                sendFile(root_node.getPrevious().getIp(), 6000, "/replicted", file.getName());
                 replicated = root_node.getPrevious();
             } else {
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), 6000, "/local", file.getName());
+                sendFile(owner.getIp(), 6000, "/replicted", file.getName());
                 replicated = owner;
             }
             FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()));
