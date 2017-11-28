@@ -13,7 +13,7 @@ import java.net.Socket;
 public class TCPListenerService extends Thread{
     private ServerSocket listeningSocket;
     private String filePath;
-    private int port = 8000;
+    private static final int port = 6000;
     public TCPListenerService(String filePath){
         try {
             this.filePath = filePath;
