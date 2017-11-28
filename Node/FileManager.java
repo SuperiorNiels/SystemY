@@ -26,9 +26,9 @@ public class FileManager extends Thread {
     private WatchKey key;
     private Node root_node; // Root node is node name that created the filemanager
 
-    private static String REPLICATED_PATH = "/replicated";
-    private static String LOCAL_PATH = "/local";
-    private static String DOWNLOAD_PATH = "/download";
+    private static final String REPLICATED_PATH = "/replicated";
+    private static final String LOCAL_PATH = "/local";
+    private static final String DOWNLOAD_PATH = "/download";
 
     private TreeMap<Integer, FileEntry> map;
 
@@ -174,6 +174,15 @@ public class FileManager extends Thread {
         return Math.abs(name.hashCode() % 32768);
     }
 
+    private void receiveFileEntry(int fileHash,FileEntry entry){
+        this.map.put(fileHash,entry);
+    }
+
+    /**
+     * Shutdown send all replicated files on this node to the previous node
+     * And check if the previous node had the file locally, if so send to the previous of the previous
+     * @param prev the previous node
+     */
     public void shutdown(Neighbour prev) {
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             Integer key = entry.getKey();
@@ -191,6 +200,7 @@ public class FileManager extends Thread {
                 Neighbour owner = fiche.getOwner();
 
                 //Send file entry to node
+
 
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
