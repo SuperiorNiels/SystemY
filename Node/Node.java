@@ -398,6 +398,11 @@ public class Node implements NodeInterface, Observer {
             }
     }*/
 
+    @Override
+    public void receiveFileEntry(int fileHash,FileEntry entry){
+        manager.receiveFileEntry(fileHash,entry);
+    }
+
     /**
      * Function that gets called by the name server through RMI when the node can't be added
      */

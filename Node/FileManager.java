@@ -53,9 +53,6 @@ public class FileManager extends Thread {
             e.printStackTrace();
         }
     }
-    public  void addMapEntry(){
-
-    }
 
     public void replicate(File file) {
         try {
@@ -177,7 +174,7 @@ public class FileManager extends Thread {
         return Math.abs(name.hashCode() % 32768);
     }
 
-    private void receiveFileEntry(int fileHash,FileEntry entry){
+    public void receiveFileEntry(int fileHash,FileEntry entry) {
         this.map.put(fileHash,entry);
     }
 
@@ -190,21 +187,28 @@ public class FileManager extends Thread {
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             Integer key = entry.getKey();
             FileEntry fiche = entry.getValue();
+            Neighbour replicated = null;
             try {
+                //Get RMI to the previous node
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                 if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                     //send replicate to prev of prev
                     sendFile(nodeStub.getPrevious().getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                    replicated = nodeStub.getPrevious();
                 }else{
                     //send replicate to prev
                     sendFile(prev.getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                    replicated = prev;
                 }
 
                 Neighbour owner = fiche.getOwner();
 
-                //Send file entry to node
-
-
+                //Send file entry to new owner node
+                //the new owner node is always your previous node
+                //the replicated node can be one of 2 options:
+                //  - your previous
+                //  - the previous of the previous
+                nodeStub.receiveFileEntry(key,new FileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName()));
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
             }
