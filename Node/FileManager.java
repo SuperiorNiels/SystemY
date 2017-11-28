@@ -107,7 +107,7 @@ public class FileManager extends Thread {
         }
     }
 
-    public void addLocalNodeToFileEntry(int hash, Neighbour node) {
+    public void addDownloadNodeToFileEntry(int hash, Neighbour node) {
         try {
             FileEntry entry = map.get(hash);
             entry.addNode(node);
@@ -116,7 +116,7 @@ public class FileManager extends Thread {
         }
     }
 
-    public void removeLocalNodeFromFileEntry(int hash, Neighbour node) {
+    public void removeDownloadNodeFromFileEntry(int hash, Neighbour node) {
         try {
             FileEntry entry = map.get(hash);
             entry.removeNode(node);
