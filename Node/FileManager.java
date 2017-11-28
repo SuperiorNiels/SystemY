@@ -21,6 +21,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class FileManager extends Thread {
     private Path root;
+    private static final int PORT = 6000;
     private String nameServerIp;
     private WatchService watcher;
     private WatchKey key;
@@ -52,6 +53,9 @@ public class FileManager extends Thread {
             e.printStackTrace();
         }
     }
+    public  void addMapEntry(){
+
+    }
 
     public void replicate(File file) {
         try {
@@ -62,11 +66,11 @@ public class FileManager extends Thread {
             Neighbour replicated;
             if (owner.getIp().equals(root_node.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(root_node.getPrevious().getIp(), 6000, REPLICATED_PATH, file.getName());
+                sendFile(root_node.getPrevious().getIp(), PORT, REPLICATED_PATH, file.getName());
                 replicated = root_node.getPrevious();
             } else {
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), 6000, REPLICATED_PATH, file.getName());
+                sendFile(owner.getIp(), PORT, REPLICATED_PATH, file.getName());
                 replicated = owner;
             }
             FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()),file.getName());
@@ -194,7 +198,7 @@ public class FileManager extends Thread {
                     sendFile(nodeStub.getPrevious().getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
                 }else{
                     //send replicate to prev
-                    sendFile(prev.getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                    sendFile(prev.getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
                 }
 
                 Neighbour owner = fiche.getOwner();
