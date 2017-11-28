@@ -178,15 +178,24 @@ public class FileManager extends Thread {
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             Integer key = entry.getKey();
             FileEntry fiche = entry.getValue();
+            try {
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
+                    //send replicate to prev of prev
+                    sendFile(nodeStub.getPrevious().getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                }else{
+                    //send replicate to prev
+                    sendFile(prev.getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                }
 
-            if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
-                //send replicate to prev of prev
-                sendFile(root_node.getPrevious().getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
-            }else{
-                //send replicate to prev
+                Neighbour owner = fiche.getOwner();
+
+                //Send file entry to node
+
+            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                e.printStackTrace();
             }
 
-            //Update file fiche at owner node
         }
     }
 
