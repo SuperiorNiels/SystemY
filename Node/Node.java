@@ -271,6 +271,10 @@ public class Node implements NodeInterface, Observer {
         namingServerIp = ip;
     }
 
+    public String getNameServerIp(){
+        return namingServerIp;
+    }
+
     /**
      * Method that gets invoked when a graceful shutdown has to be processed.
      * Sends your next 
