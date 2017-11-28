@@ -216,4 +216,28 @@ public class FileManager extends Thread {
         }
     }
 
+    /**
+     * node checks all files he owns (via hash)
+     * compares hash with new node (next)
+     * if hash(file) is closer to hash next
+     * send file to next, update nameserver about owner
+     * @param next
+     */
+    public void updateFilesNewNode(Neighbour current,Neighbour next, int destPort){
+        int hashNext = calculateHash(next.getName());
+        //for every file
+        for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
+            FileEntry fiche = entry.getValue();
+            int hashFile = calculateHash(fiche.getLocal().getName());
+            if(hashFile > hashNext){
+                //sent via tcp to next
+                sendFile(next.getIp(),destPort,REPLICATED_PATH, new File(REPLICATED_PATH+fiche.getFileName()).getName());
+                //update fileEntry: new node becomes owner of the file
+                fiche.setOwner(next);
+                //this node is now download location of file
+                fiche.addNode(current);
+            }
+        }
+    }
+
 }

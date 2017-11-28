@@ -371,32 +371,7 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
-    /**
-     * node checks all files he owns (via hash)
-     * compares hash with new node (next)
-     * if hash(file) is closer to hash next
-     * send file to next, update nameserver about owner
-     * @param next
-     */
-    /*public void updateFilesNewNode(Neighbour next, int destPort){
-        int hashNext = calculateHash(next.getName());
-        String pathFilesReplication = "\\filesReplication";
-        //get file of all files this node owns
-        File folder = new File(pathFilesReplication);
-        File[] listOfFiles = folder.listFiles();
-        //for every file
-            for (int i = 0; i < listOfFiles.length; i++) {
-                //calculate hash
-                int hashFile = calculateHash(listOfFiles[i].getName());
-                //if hash file >= hash next
-                if(hashFile >= hashNext ){
-                    //sent via tcp to next
-                    sendFile(next.getIp(),destPort,listOfFiles[i].getPath(),listOfFiles[i].getName());
-                    //notify nameserver that next is now owner of file
-                    //this node is now download location of file
-                }
-            }
-    }*/
+
 
     @Override
     public void receiveFileEntry(int fileHash,FileEntry entry){
