@@ -33,9 +33,9 @@ public class FileManager extends Thread {
 
     private TreeMap<Integer, FileEntry> map;
 
-    public FileManager(String root, String nameServerIp, Node root_node) {
+    public FileManager(String root, Node root_node) {
         this.root = Paths.get(root);
-        this.nameServerIp = nameServerIp;
+        this.nameServerIp = root_node.getNameServerIp();
         this.root_node = root_node;
         this.map = new TreeMap<Integer, FileEntry>();
     }
@@ -150,7 +150,6 @@ public class FileManager extends Thread {
                 for (WatchEvent<?> event : key.pollEvents()) {
                     switch (event.kind().toString()) {
                         case "ENTRY_CREATE":
-
                             System.out.println("File created.");
                             break;
                         case "ENTRY_MODIFY":
