@@ -194,7 +194,7 @@ public class FileManager extends Thread {
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                 if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                     //send replicate to prev of prev
-                    sendFile(nodeStub.getPrevious().getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                    sendFile(nodeStub.getPrevious().getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
                 }else{
                     //send replicate to prev
                     sendFile(prev.getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
