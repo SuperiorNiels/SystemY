@@ -26,6 +26,10 @@ public class FileManager extends Thread {
     private WatchKey key;
     private Node root_node; // Root node is node name that created the filemanager
 
+    private static String REPLICATED_PATH = "/replicated";
+    private static String LOCAL_PATH = "/local";
+    private static String DOWNLOAD_PATH = "/download";
+
     private TreeMap<Integer, FileEntry> map;
 
     public FileManager(String root, String nameServerIp, Node root_node) {
@@ -39,7 +43,7 @@ public class FileManager extends Thread {
         try {
             watcher = FileSystems.getDefault().newWatchService();
             registerRecursive(root);
-            File folder = new File(root+"/local");
+            File folder = new File(root+LOCAL_PATH);
             File [] fileList = folder.listFiles();
             for(File file : fileList) {
                 replicate(file);
@@ -58,14 +62,14 @@ public class FileManager extends Thread {
             Neighbour replicated;
             if (owner.getIp().equals(root_node.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(root_node.getPrevious().getIp(), 6000, "/replicted", file.getName());
+                sendFile(root_node.getPrevious().getIp(), 6000, REPLICATED_PATH, file.getName());
                 replicated = root_node.getPrevious();
             } else {
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), 6000, "/replicted", file.getName());
+                sendFile(owner.getIp(), 6000, REPLICATED_PATH, file.getName());
                 replicated = owner;
             }
-            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()));
+            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()),file.getName());
             map.put(calculateHash(file.getName()), new_entry);
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
@@ -173,10 +177,11 @@ public class FileManager extends Thread {
     public void shutdown(Neighbour prev) {
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             Integer key = entry.getKey();
-            FileEntry value = entry.getValue();
+            FileEntry fiche = entry.getValue();
 
-            if (calculateHash(value.getLocal().getName()) == calculateHash(prev.getName())) {
+            if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                 //send replicate to prev of prev
+                sendFile(root_node.getPrevious().getIp(), 6000, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
             }else{
                 //send replicate to prev
             }

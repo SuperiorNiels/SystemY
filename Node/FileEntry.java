@@ -7,12 +7,14 @@ public class FileEntry {
     private Neighbour replicated;
     private Neighbour local;
     private ArrayList<Neighbour> downloads;
+    private String fileName;
 
-    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local) {
+    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName) {
         this.owner = owner;
         this.replicated = replicated;
         this.local = local;
         downloads = new ArrayList<Neighbour>();
+        this.fileName = fileName;
     }
 
     public ArrayList<Neighbour> getDownloads() {
@@ -49,5 +51,9 @@ public class FileEntry {
 
     public void setLocal(Neighbour local) {
         this.local = local;
+    }
+
+    public String getFileName(){
+        return fileName;
     }
 }
