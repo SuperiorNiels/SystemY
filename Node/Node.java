@@ -375,7 +375,6 @@ public class Node implements NodeInterface, Observer {
      * @param next
      */
     /*public void updateFilesNewNode(Neighbour next, int destPort){
-
         int hashNext = calculateHash(next.getName());
         String pathFilesReplication = "\\filesReplication";
         //get file of all files this node owns
