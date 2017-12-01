@@ -118,8 +118,9 @@ public class Node implements NodeInterface, Observer {
                     System.err.println("The has of the new node is the same as mine!");
                     // Handle error?
                 }
+            } else {
+                manager.initialize();
             }
-            manager.initialize();
         }
     }
 
