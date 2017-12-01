@@ -71,7 +71,6 @@ public class FileManager extends Thread {
      */
     public void replicate(File file) {
         try {
-
             System.out.println("Replicating file");
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             //start RMI
@@ -109,7 +108,7 @@ public class FileManager extends Thread {
      */
     public void sendFile(String ip,int destPort,String filePath,String fileName){
         try {
-            System.out.println("Sending file.");
+            System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
