@@ -35,8 +35,8 @@ public class FileManager extends Thread {
 
     public FileManager(String root, Node root_node) {
         this.root = Paths.get(root);
-        this.nameServerIp = root_node.getNameServerIp();
         this.root_node = root_node;
+        this.nameServerIp = this.root_node.getNameServerIp();
         this.map = new TreeMap<Integer, FileEntry>();
         try {
             watcher = FileSystems.getDefault().newWatchService();
@@ -71,6 +71,7 @@ public class FileManager extends Thread {
      */
     public void replicate(File file) {
         try {
+            System.out.println("Replicating file");
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             //start RMI
             //get the owner of each file
@@ -93,7 +94,7 @@ public class FileManager extends Thread {
         } catch (MalformedURLException e) {
             System.err.println("Malformed URL");
         } catch (RemoteException e) {
-            System.err.println("Problem with RMI connection");
+            System.err.println("Problem with RMI connection"+nameServerIp);
         }
     }
 
@@ -107,6 +108,7 @@ public class FileManager extends Thread {
      */
     public void sendFile(String ip,int destPort,String filePath,String fileName){
         try {
+            System.out.println("Sending file.");
             //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
