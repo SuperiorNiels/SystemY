@@ -39,8 +39,9 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Start the node, this method also starts a multicast service.
+     * Bootstraps the node
      */
-    public void start() {
+    public void bootstrap() {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             // update ip
@@ -97,7 +98,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * Method when a multicast message is received
+     * Method that gets executed when a multicast message is received
      * @param observable
      * @param o
      */
@@ -110,8 +111,10 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
+            //fills in the ip of the nameserver
             namingServerIp = parts[4];
             setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
+            //checks if you are the new node that just joined
             if(!name.equals(parts[2])) {
                 try {
                     updateNeighbours(parts[2], parts[3]);
@@ -120,7 +123,14 @@ public class Node implements NodeInterface, Observer {
                     // Handle error?
                 }
             } else {
+                //you are the new node that just joined
+                Neighbour self = new Neighbour(name, ip);
+                while(numberOfNodesInNetwork!=0 &&(previous.equals(self) || next.equals(self))){
+                    //wait till your neighbours are set
+                }
+                //initialize your filemanager
                 manager.initialize();
+
             }
         }
     }
@@ -202,7 +212,7 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * This method updates the nodes next and previous neighbours
-     * and starts the method to update the files when this nodes becomes the previous.
+     * and starts the method to update the replicated files when this nodes becomes the previous.
      * @param new_name, String name of the new node (received via multicast)
      * @param new_ip, String ip address of the new node
      */

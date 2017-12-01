@@ -13,7 +13,7 @@ public class Main {
             System.out.println("Hostname: ");
             String name = input.nextLine();
             Node node = new Node(name);
-            node.start();
+            node.bootstrap();
         }
     }
 }
