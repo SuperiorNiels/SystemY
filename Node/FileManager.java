@@ -38,6 +38,12 @@ public class FileManager extends Thread {
         this.nameServerIp = root_node.getNameServerIp();
         this.root_node = root_node;
         this.map = new TreeMap<Integer, FileEntry>();
+        try {
+            watcher = FileSystems.getDefault().newWatchService();
+            registerRecursive(this.root);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -46,18 +52,12 @@ public class FileManager extends Thread {
      * afterwards, it gets a list of local files and replicates all of them to the right destination
      */
     public void initialize() {
-        try {
-            watcher = FileSystems.getDefault().newWatchService();
-            registerRecursive(root);
-            if(root_node.getNumberOfNodesInNetwork() != 0) {
-                File folder = new File(root + LOCAL_PATH);
-                File[] fileList = folder.listFiles();
-                for (File file : fileList) {
-                    replicate(file);
-                }
+        if(root_node.getNumberOfNodesInNetwork() != 0) {
+            File folder = new File(root + LOCAL_PATH);
+            File[] fileList = folder.listFiles();
+            for (File file : fileList) {
+                replicate(file);
             }
-        } catch(IOException e) {
-            e.printStackTrace();
         }
     }
 
