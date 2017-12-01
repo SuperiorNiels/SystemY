@@ -119,7 +119,8 @@ public class FileManager extends Thread {
             //sends the given file to the given ip
             SendTCP send = new SendTCP(sendSocket,srcFilePath,fileName,destFolder);
         } catch (IOException e) {
-            System.err.println("Problem opening port "+destPort);
+            System.err.println("Problem opening port "+destPort+" ");
+            e.printStackTrace();
         }
 
     }
