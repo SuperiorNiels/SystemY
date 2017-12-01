@@ -12,12 +12,13 @@ import java.net.Socket;
  */
 public class TCPListenerService extends Thread{
     private ServerSocket listeningSocket;
-    private String filePath;
+    private String rootPath;
     private static final int port = 6000;
-    public TCPListenerService(String filePath){
+    public TCPListenerService(String rootPath){
         try {
-            this.filePath = filePath;
+            this.rootPath = rootPath;
             listeningSocket = new ServerSocket(port);
+            System.out.println("Opened port: "+port);
             this.start();
         } catch (IOException e) {
             System.err.println("Problem opening serverSocket");        }
@@ -25,8 +26,11 @@ public class TCPListenerService extends Thread{
     public void run(){
         while(true){
             try {
+                System.out.println("Listening for connections");
                 Socket connection = listeningSocket.accept();
-                ReceiveTCP receiveHandler = new ReceiveTCP(connection,filePath);
+                System.out.println("Connection has been accepeted");
+                ReceiveTCP receiveHandler = new ReceiveTCP(connection,rootPath);
+                System.out.println("Connection forwarded to receive thread");
             } catch (IOException e) {
                 System.err.println("Error opening the connection");
             }

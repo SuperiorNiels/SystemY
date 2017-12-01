@@ -2,6 +2,7 @@ package Node;
 
 import NameServer.NamingInterface;
 import Network.SendTCP;
+import Network.TCPListenerService;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,40 +21,43 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class FileManager extends Thread {
-    private Path root;
+    private Path rootPath;
     private static final int PORT = 6000;
     private WatchService watcher;
     private String nameServerIp;
     private WatchKey key;
-    private Node root_node; // Root node is node name that created the filemanager
+    private Node rootNode; // Root node is node that created the filemanager
+    private static final String REPLICATED_FOLDER = "replicated";
+    private static final String LOCAL_FOLDER = "local";
+    private static final String DOWNLOAD_FOLDER = "download";
+    private TCPListenerService TCPListener;
 
-    private static final String REPLICATED_PATH = "/replicated";
-    private static final String LOCAL_PATH = "/local";
-    private static final String DOWNLOAD_PATH = "/download";
 
     private TreeMap<Integer, FileEntry> map;
 
-    public FileManager(String root, Node root_node) {
-        this.root = Paths.get(root);
-        this.root_node = root_node;
+    public FileManager(String rootPath, Node rootNode) {
+        this.rootPath = Paths.get(rootPath);
+        this.rootNode = rootNode;
         this.map = new TreeMap<Integer, FileEntry>();
+        //starts a tcp listener that listens for tcp request
+        TCPListener = new TCPListenerService(rootPath);
+
         try {
             watcher = FileSystems.getDefault().newWatchService();
-            registerRecursive(this.root);
+            registerRecursive(this.rootPath);
         } catch(IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * initiliazes the file manager
-     * first it places a watcher on a given directory
-     * afterwards, it gets a list of local files and replicates all of them to the right destination
+     *Fills in the nameServerIp
+     *Gets a list of local files and replicates all of them to the right destination
      */
     public void initialize() {
-        nameServerIp = root_node.getNameServerIp();
-        if(root_node.getNumberOfNodesInNetwork() != 0) {
-            File folder = new File(root + LOCAL_PATH);
+        nameServerIp = rootNode.getNameServerIp();
+        if(rootNode.getNumberOfNodesInNetwork() != 0) {
+            File folder = new File(rootPath + LOCAL_FOLDER);
             File[] fileList = folder.listFiles();
             for (File file : fileList) {
                 replicate(file);
@@ -77,17 +81,17 @@ public class FileManager extends Thread {
             //get the owner of each file
             Neighbour owner = namingStub.getOwner(file.getName());
             Neighbour replicated = null;
-            if (owner.getIp().equals(root_node.getIp())) {
+            if (owner.getIp().equals(rootNode.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(root_node.getPrevious().getIp(), PORT, REPLICATED_PATH, file.getName());
-                replicated = root_node.getPrevious();
+                sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
+                replicated = rootNode.getPrevious();
             } else{
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), PORT, REPLICATED_PATH, file.getName());
+                sendFile(owner.getIp(), PORT, rootPath+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
                 replicated = owner;
             }
             //You are the first node in the system, the map is empty, don't replicate!
-            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()),file.getName());
+            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
             map.put(calculateHash(file.getName()), new_entry);
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
@@ -103,16 +107,17 @@ public class FileManager extends Thread {
      * This function can be called using RMI!
      * @param ip ip of destination
      * @param destPort port of destination
-     * @param filePath path of the file
+     * @param srcFilePath source path of the file that you want to send
      * @param fileName name of the file
+     * @param destFolder name of the folder where the file has to be saved at the destination
      */
-    public void sendFile(String ip,int destPort,String filePath,String fileName){
+    public void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
         try {
             System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
-            SendTCP send = new SendTCP(sendSocket,filePath,fileName);
+            SendTCP send = new SendTCP(sendSocket,srcFilePath,fileName,destFolder);
         } catch (IOException e) {
             System.err.println("Problem opening port "+destPort);
         }
@@ -123,7 +128,7 @@ public class FileManager extends Thread {
      * is mainly used for debugging purposes
      */
     public void printMap() {
-        System.out.println("FileManager Map of node: "+root_node.toString());
+        System.out.println("FileManager Map of node: "+ rootNode.toString());
         for(Integer i : map.keySet()) {
             System.out.println("Hash: "+i+" ; Downloads: ");
             FileEntry entry = map.get(i);
@@ -217,11 +222,11 @@ public class FileManager extends Thread {
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                 if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                     //send replicate to prev of prev
-                    sendFile(nodeStub.getPrevious().getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                    sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                     replicated = nodeStub.getPrevious();
                 }else{
                     //send replicate to prev
-                    sendFile(prev.getIp(), PORT, REPLICATED_PATH, new File("/replicated/"+fiche.getFileName()).getName());
+                    sendFile(prev.getIp(), PORT, rootPath+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                     replicated = prev;
                 }
 
@@ -255,7 +260,7 @@ public class FileManager extends Thread {
             int hashFile = calculateHash(fiche.getLocal().getName());
             if(hashFile > hashNext){
                 //sent via tcp to next
-                sendFile(next.getIp(),destPort,REPLICATED_PATH, new File(REPLICATED_PATH+fiche.getFileName()).getName());
+                sendFile(next.getIp(),destPort,rootPath+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                 //update fileEntry: new node becomes owner of the file
                 fiche.setOwner(next);
                 //this node is now download location of file

@@ -10,18 +10,20 @@ import java.net.Socket;
 public class SendTCP extends Thread {
     private Socket clientSocket;
     private DataOutputStream out;
-    private String filePath;
+    private String srcFilePath;
+    private String destFolder;
     private String fileName;
 
     /**
-     *
      * @param aClientSocket socket to send to
-     * @param filePath path of the file
+     * @param srcFilePath source path of the file
      * @param fileName name of the file
+     * @param destFolder name of the folder where the file has to be sent
      */
-    public SendTCP(Socket aClientSocket,String filePath, String fileName) {
+    public SendTCP(Socket aClientSocket, String srcFilePath, String fileName,String destFolder) {
         try {
-            this.filePath = filePath;
+            this.srcFilePath = srcFilePath;
+            this.destFolder = destFolder;
             this.fileName = fileName;
             clientSocket = aClientSocket;
             //We wrap everything in bufferedstream to fasten up the transaction
@@ -41,11 +43,14 @@ public class SendTCP extends Thread {
         try {
             //first send the file name to the receiver
             out.flush();
-            out.writeChars(fileName);
-            //array of bytes that holds the file bytes
-            byte[] file = readFile(filePath+"/"+fileName);
-            System.out.println("Sending file:"+filePath);
+            out.writeUTF(fileName);
+            out.flush();
+            //sends the destination folder name
+            out.writeUTF(destFolder);
             out.flush();        //flushes the buffer
+            //array of bytes that holds the file bytes
+            byte[] file = readFile(srcFilePath +"/"+fileName);
+            System.out.println("Sending file:"+fileName+" to folder:"+destFolder);
             //sends the file
             out.write(file,0,file.length);
         } catch (IOException e) {
@@ -62,10 +67,10 @@ public class SendTCP extends Thread {
 
     /**
      * reads a file into a byte array and returns that array
-     * @param fileName
+     * @param fileLocation whole location of the file(path + filename)
      * @return array of bytes
      */
-    private byte[] readFile(String fileName){
+    private byte[] readFile(String fileLocation){
         File myFile = new File(fileName);
         byte myByteArray[] = new byte[(int) myFile.length()];
         try {

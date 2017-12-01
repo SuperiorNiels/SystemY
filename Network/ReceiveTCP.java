@@ -9,13 +9,14 @@ import java.net.Socket;
  */
 public class ReceiveTCP extends Thread {
     private DataInputStream in;
-    private String filePath;
+    //root path is the static directory where everything will be saved
+    private String rootPath;
     private Socket clientSocket;
 
-    public ReceiveTCP(Socket aClientSocket, String filePath){
+    public ReceiveTCP(Socket aClientSocket, String rootPath){
         try {
             clientSocket = aClientSocket;
-            this.filePath = filePath;
+            this.rootPath = rootPath;
             //initializes the inputstream
             in = new DataInputStream(new BufferedInputStream(clientSocket.getInputStream()));
             //starts the thread
@@ -32,8 +33,12 @@ public class ReceiveTCP extends Thread {
             byte[] byteBuffer = new byte[8192];
             //first reads the name of the file
             String fileName = in.readUTF();
+            //reads the name of the folder the file needs to be saved
+            String folderName = in.readUTF();
+            System.out.println("getting file "+fileName+" to folder:"+folderName);
             //opens the stream to save the file to a filepath
-            OutputStream outputStream = new FileOutputStream(filePath+"/"+fileName);
+            System.out.println("Saving to :"+ rootPath+folderName+"/"+fileName);
+            OutputStream outputStream = new FileOutputStream(rootPath +folderName+"/"+fileName);
             //amount of bytes already read
             int bytesRead;
             while ((bytesRead = in.read(byteBuffer, 0, byteBuffer.length)) != -1) {
