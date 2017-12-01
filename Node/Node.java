@@ -82,7 +82,9 @@ public class Node implements NodeInterface, Observer {
                 } else if(parts[0].toLowerCase().equals("hash")) {
                     System.out.println(calculateHash(name));
                 } else if(parts[0].toLowerCase().equals("fail")) {
-                        failure(previous);
+                    failure(previous);
+                } else if(parts[0].toLowerCase().equals("printfm")) {
+                        manager.printMap();
                 } else {
                     System.err.println("Command not found.");
                 }
@@ -117,6 +119,7 @@ public class Node implements NodeInterface, Observer {
                     // Handle error?
                 }
             }
+            manager.initialize();
         }
     }
 
@@ -260,6 +263,10 @@ public class Node implements NodeInterface, Observer {
     public void updateNode(Neighbour previous, Neighbour next) {
         this.next = next;
         this.previous = previous;
+    }
+
+    public String toString() {
+        return "Name: "+name+" IP: "+ip;
     }
 
     /**
