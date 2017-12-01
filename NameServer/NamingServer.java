@@ -196,7 +196,7 @@ public class NamingServer implements NamingInterface, Observer {
     }
 
     /**
-     * @return ip of owner
+     * @return name and ip of owner (Neighbour object)
      * returns 0 if map is empty
      * @param fileName = name of the file
      */

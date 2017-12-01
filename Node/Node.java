@@ -32,8 +32,8 @@ public class Node implements NodeInterface, Observer {
 
     public Node(String name) {
         this.name = name;
-       // manager.initialize();
-       // manager.run();
+        //starts the watcher thread that watches the map with files
+        manager.start();
     }
 
     /**

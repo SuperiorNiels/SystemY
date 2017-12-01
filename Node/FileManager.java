@@ -38,8 +38,14 @@ public class FileManager extends Thread {
         this.nameServerIp = root_node.getNameServerIp();
         this.root_node = root_node;
         this.map = new TreeMap<Integer, FileEntry>();
+        initialize();
     }
 
+    /**
+     * initiliazes the file manager
+     * first it places a watcher on a given directory
+     * afterwards, it gets a list of local files and replicates all of them to the right destination
+     */
     public void initialize() {
         try {
             watcher = FileSystems.getDefault().newWatchService();
@@ -53,25 +59,41 @@ public class FileManager extends Thread {
             e.printStackTrace();
         }
     }
+    public  void addMapEntry(){
 
+    }
+    /**
+     * Function that replicates a given file to the owner of the file.
+     * If the owner of the file is the node itself, the file should be replicated to the previous node.
+     * This method uses the sendTCP class, which sends a file through tcp.
+     * Every other node has a tcp listener running that accepts the socket request, and handles the file receiving in
+     * the receiveTCP method.
+     * @param file file that has to be replicated
+     */
     public void replicate(File file) {
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             //start RMI
             //get the owner of each file
             Neighbour owner = namingStub.getOwner(file.getName());
-            Neighbour replicated;
-            if (owner.getIp().equals(root_node.getIp())) {
+            Neighbour replicated = null;
+            if(owner == null){
+                //You are the first node in the system, the map is empty
+                //don't replicate
+            }else if (owner.getIp().equals(root_node.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
                 sendFile(root_node.getPrevious().getIp(), PORT, REPLICATED_PATH, file.getName());
                 replicated = root_node.getPrevious();
-            } else {
+            } else{
                 //replicate it to the owner of the file
                 sendFile(owner.getIp(), PORT, REPLICATED_PATH, file.getName());
                 replicated = owner;
             }
-            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()),file.getName());
-            map.put(calculateHash(file.getName()), new_entry);
+            if(owner != null){
+                //You are the first node in the system, the map is empty, don't replicate!
+                FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(root_node.getName(), root_node.getIp()),file.getName());
+                map.put(calculateHash(file.getName()), new_entry);
+            }
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
@@ -100,7 +122,10 @@ public class FileManager extends Thread {
         }
 
     }
-
+    /**
+     * function that prints the content of the treemap
+     * is mainly used for debugging purposes
+     */
     public void printMap() {
         System.out.println("FileManager Map of node: "+root_node.toString());
         for(Integer i : map.keySet()) {
@@ -141,6 +166,9 @@ public class FileManager extends Thread {
         });
     }
 
+    /**
+     * watcher thread that watches the folders that contain
+     */
     public void run() {
         try {
             while ((key = watcher.take()) != null) {
@@ -174,7 +202,7 @@ public class FileManager extends Thread {
         return Math.abs(name.hashCode() % 32768);
     }
 
-    public void receiveFileEntry(int fileHash,FileEntry entry) {
+    public void receiveFileEntry(int fileHash,FileEntry entry){
         this.map.put(fileHash,entry);
     }
 
