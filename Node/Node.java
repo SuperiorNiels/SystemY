@@ -25,17 +25,19 @@ public class Node implements NodeInterface, Observer {
     private Neighbour next = null;
     private String ip = null;
     private String name = null;
+    private String rootPath = "./files/";
     private String namingServerIp = null;
     //Amout of nodes in the network, is only actual when the node is added to the network!
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
-    private FileManager manager = new FileManager("./files/",this);
+    private FileManager manager = new FileManager(rootPath,this);
 
     public Node(String name) {
         this.name = name;
         //starts the watcher thread that watches the map with files
         manager.start();
     }
+
 
     /**
      * Start the node, this method also starts a multicast service.

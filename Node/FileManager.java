@@ -13,6 +13,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -39,6 +40,9 @@ public class FileManager extends Thread {
         this.rootPath = Paths.get(rootPath);
         this.rootNode = rootNode;
         this.map = new TreeMap<Integer, FileEntry>();
+        //checks if all given subfolders are present
+        if(!initDirectories())
+            System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
         TCPListener = new TCPListenerService(rootPath);
 
@@ -268,6 +272,48 @@ public class FileManager extends Thread {
                 fiche.addNode(current);
             }
         }
+    }
+
+    /**
+     * This function checks if the subfolder replicated, downloaded and local are present.
+     * If these subfolders aren't present, they are created
+     * return true if the operation ended succesfully
+     * return false if there was an error creating on of the files
+     */
+    private boolean initDirectories(){
+        File folder = new File(rootPath.toString());
+        File[] fileList = folder.listFiles();
+        ArrayList <String> folderList = new ArrayList<String>();
+        folderList.add(REPLICATED_FOLDER);
+        folderList.add(DOWNLOAD_FOLDER);
+        folderList.add(LOCAL_FOLDER);
+
+        //first checks if all folders are present
+        for(File file : fileList){
+            switch(file.getName()){
+                case REPLICATED_FOLDER:
+                    folderList.remove(REPLICATED_FOLDER);
+                    break;
+                case LOCAL_FOLDER:
+                    folderList.remove(LOCAL_FOLDER);
+                    break;
+                case DOWNLOAD_FOLDER:
+                    folderList.remove(DOWNLOAD_FOLDER);
+                    break;
+                default:
+                    //do nothing
+            }
+        }
+        if(folderList.isEmpty()){
+            //all given folders are present
+        }else{
+            for(String folderName : folderList){
+                if(!new File(rootPath+"/"+folderName).mkdir())
+                    return false;
+                System.out.println("created "+folderName+" folder");
+            }
+        }
+        return true;
     }
 
 }
