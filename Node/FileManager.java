@@ -22,8 +22,8 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 public class FileManager extends Thread {
     private Path root;
     private static final int PORT = 6000;
-    private String nameServerIp;
     private WatchService watcher;
+    private String nameServerIp;
     private WatchKey key;
     private Node root_node; // Root node is node name that created the filemanager
 
@@ -36,7 +36,6 @@ public class FileManager extends Thread {
     public FileManager(String root, Node root_node) {
         this.root = Paths.get(root);
         this.root_node = root_node;
-        this.nameServerIp = this.root_node.getNameServerIp();
         this.map = new TreeMap<Integer, FileEntry>();
         try {
             watcher = FileSystems.getDefault().newWatchService();
@@ -52,6 +51,7 @@ public class FileManager extends Thread {
      * afterwards, it gets a list of local files and replicates all of them to the right destination
      */
     public void initialize() {
+        nameServerIp = root_node.getNameServerIp();
         if(root_node.getNumberOfNodesInNetwork() != 0) {
             File folder = new File(root + LOCAL_PATH);
             File[] fileList = folder.listFiles();
@@ -71,6 +71,7 @@ public class FileManager extends Thread {
      */
     public void replicate(File file) {
         try {
+
             System.out.println("Replicating file");
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             //start RMI
