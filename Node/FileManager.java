@@ -21,7 +21,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class FileManager extends Thread {
     private Path root;
-    private static final int PORT = 6000;
+    private static final int PORT = 8000;
     private WatchService watcher;
     private String nameServerIp;
     private WatchKey key;
@@ -79,11 +79,11 @@ public class FileManager extends Thread {
             Neighbour replicated = null;
             if (owner.getIp().equals(root_node.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(root_node.getPrevious().getIp(), PORT, REPLICATED_PATH, file.getName());
+                sendFile(root_node.getPrevious().getIp(), PORT, "."+root, LOCAL_PATH+"/"+file.getName());
                 replicated = root_node.getPrevious();
             } else{
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), PORT, REPLICATED_PATH, file.getName());
+                sendFile(owner.getIp(), PORT, "."+root, LOCAL_PATH+"/"+file.getName());
                 replicated = owner;
             }
             //You are the first node in the system, the map is empty, don't replicate!
@@ -114,7 +114,8 @@ public class FileManager extends Thread {
             //sends the given file to the given ip
             SendTCP send = new SendTCP(sendSocket,filePath,fileName);
         } catch (IOException e) {
-            System.err.println("Problem opening port "+destPort);
+            System.err.println("Problem opening port "+destPort+" ");
+            e.printStackTrace();
         }
 
     }
