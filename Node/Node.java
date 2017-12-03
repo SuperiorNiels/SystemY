@@ -64,6 +64,7 @@ public class Node implements NodeInterface, Observer {
             * This part is used to test and debug
              */
             while(running) {
+                System.out.print(">> ");
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
                 if (parts[0].toLowerCase().equals("multicast")) {
@@ -113,24 +114,28 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
-            //fills in the ip of the nameserver
+            // fills in the ip of the nameserver
             namingServerIp = parts[4];
             setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
-            //checks if you are the new node that just joined
+            // checks if you are the new node that just joined
             if(!name.equals(parts[2])) {
                 try {
                     updateNeighbours(parts[2], parts[3]);
                 } catch (NodeAlreadyExistsException e) {
-                    System.err.println("The has of the new node is the same as mine!");
+                    System.err.println("The hash of the new node is the same as mine!");
                     // Handle error?
                 }
             } else {
-                //you are the new node that just joined
+                // you are the new node that just joined
                 Neighbour self = new Neighbour(name, ip);
+                char p = '=';
                 while(numberOfNodesInNetwork!=0 &&(previous.equals(self) || next.equals(self))){
-                    //wait till your neighbours are set
+                    // wait till your neighbours are set
+                    System.out.write(p);
+                    p = (p == '=') ? '|' : '=';
+                    System.out.write('\r');
                 }
-                //initialize your filemanager
+                // initialize your filemanager
                 manager.initialize();
 
             }

@@ -61,10 +61,14 @@ public class FileManager extends Thread {
     public void initialize() {
         nameServerIp = rootNode.getNameServerIp();
         if(rootNode.getNumberOfNodesInNetwork() != 0) {
-            File folder = new File(rootPath + LOCAL_FOLDER);
+            File folder = new File(rootPath+"/"+LOCAL_FOLDER);
             File[] fileList = folder.listFiles();
-            for (File file : fileList) {
-                replicate(file);
+            try {
+                for (File file : fileList) {
+                    replicate(file);
+                }
+            } catch (NullPointerException e) {
+                System.out.println("No files in local folder. No replication needed.");
             }
         }
     }
@@ -87,11 +91,11 @@ public class FileManager extends Thread {
             Neighbour replicated = null;
             if (owner.getIp().equals(rootNode.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
+                sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
                 replicated = rootNode.getPrevious();
             } else{
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), PORT, rootPath+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
+                sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
                 replicated = owner;
             }
             //You are the first node in the system, the map is empty, don't replicate!

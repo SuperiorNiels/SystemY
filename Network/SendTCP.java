@@ -50,11 +50,11 @@ public class SendTCP extends Thread {
             out.flush();        //flushes the buffer
             //array of bytes that holds the file bytes
             byte[] file = readFile(srcFilePath +"/"+fileName);
-            System.out.println("Sending file:"+fileName+" to folder:"+destFolder);
+            System.out.println("Sending file: "+fileName+" to folder: "+destFolder);
             //sends the file
             out.write(file,0,file.length);
         } catch (IOException e) {
-            System.out.println("readline:" + e.getMessage());
+            System.out.println("readline: " + e.getMessage());
         }finally{
             try{
                 //closes the socket
@@ -71,7 +71,7 @@ public class SendTCP extends Thread {
      * @return array of bytes
      */
     private byte[] readFile(String fileLocation){
-        File myFile = new File(fileName);
+        File myFile = new File(fileLocation);
         byte myByteArray[] = new byte[(int) myFile.length()];
         try {
             BufferedInputStream reader = new BufferedInputStream(new FileInputStream(myFile));
