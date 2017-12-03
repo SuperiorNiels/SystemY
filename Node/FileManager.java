@@ -276,12 +276,17 @@ public class FileManager extends Thread {
 
     /**
      * This function checks if the subfolder replicated, downloaded and local are present.
-     * If these subfolders aren't present, they are created
+     * If these subfolders aren't prt, they are created
      * return true if the operation ended succesfully
      * return false if there was an error creating on of the files
      */
     private boolean initDirectories(){
         File folder = new File(rootPath.toString());
+        if(!folder.exists()) {
+            if(!new File(rootPath.toString()).mkdir())
+                return false;
+            System.out.println("Created root folder.");
+        }
         File[] fileList = folder.listFiles();
         ArrayList <String> folderList = new ArrayList<String>();
         folderList.add(REPLICATED_FOLDER);
