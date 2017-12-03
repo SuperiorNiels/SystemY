@@ -46,6 +46,7 @@ public class FileManager extends Thread {
         //starts a tcp listener that listens for tcp request
         TCPListener = new TCPListenerService(rootPath);
 
+
         try {
             watcher = FileSystems.getDefault().newWatchService();
             registerRecursive(this.rootPath);
@@ -231,11 +232,11 @@ public class FileManager extends Thread {
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                 if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                     //send replicate to prev of prev
-                    sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                    sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                     replicated = nodeStub.getPrevious();
                 }else{
                     //send replicate to prev
-                    sendFile(prev.getIp(), PORT, rootPath+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                    sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                     replicated = prev;
                 }
 
@@ -269,7 +270,7 @@ public class FileManager extends Thread {
             int hashFile = calculateHash(fiche.getLocal().getName());
             if(hashFile > hashNext){
                 //sent via tcp to next
-                sendFile(next.getIp(),destPort,rootPath+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                sendFile(next.getIp(),destPort,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                 //update fileEntry: new node becomes owner of the file
                 fiche.setOwner(next);
                 //this node is now download location of file
