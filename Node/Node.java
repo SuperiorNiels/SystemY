@@ -128,16 +128,17 @@ public class Node implements NodeInterface, Observer {
             } else {
                 // you are the new node that just joined
                 Neighbour self = new Neighbour(name, ip);
-                char p = '=';
+                char p = ' ';
                 while(numberOfNodesInNetwork!=0 &&(previous.equals(self) || next.equals(self))){
                     // wait till your neighbours are set
                     System.out.write(p);
-                    p = (p == '=') ? '|' : '=';
+                    System.out.write(p);
+                    System.out.write(p);
+                    p = (p == ' ') ? '=' : ' ';
                     System.out.write('\r');
                 }
                 // initialize your filemanager
                 manager.initialize();
-
             }
         }
     }
