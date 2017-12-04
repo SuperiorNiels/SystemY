@@ -15,4 +15,5 @@ public interface NodeInterface extends Remote {
     public void setNameServerIp(String ip) throws RemoteException;
     public void failedToAddNode(Exception e) throws RemoteException;
     public void receiveFileEntry(int fileHash,FileEntry entry) throws RemoteException;
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName) throws RemoteException;
 }
