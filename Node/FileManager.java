@@ -133,6 +133,7 @@ public class FileManager extends Thread {
         }
 
     }
+
     /**
      * function that prints the content of the treemap
      * is mainly used for debugging purposes
@@ -278,6 +279,7 @@ public class FileManager extends Thread {
                 fiche.setOwner(next);
                 //this node is now download location of file
                 fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
+                new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).delete();
             }
         }
     }
