@@ -13,6 +13,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -31,7 +32,6 @@ public class FileManager extends Thread {
     private static final String REPLICATED_FOLDER = "replicated";
     private static final String LOCAL_FOLDER = "local";
     private static final String DOWNLOAD_FOLDER = "download";
-    private TCPListenerService TCPListener;
 
 
     private TreeMap<Integer, FileEntry> map;
@@ -44,7 +44,7 @@ public class FileManager extends Thread {
         if(!initDirectories())
             System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
-        TCPListener = new TCPListenerService(rootPath);
+        TCPListenerService TCPListener = new TCPListenerService(rootPath);
 
 
         try {
@@ -120,7 +120,7 @@ public class FileManager extends Thread {
      * @param fileName name of the file
      * @param destFolder name of the folder where the file has to be saved at the destination
      */
-    public void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
+    public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
         try {
             System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
@@ -187,6 +187,9 @@ public class FileManager extends Thread {
                     switch (event.kind().toString()) {
                         case "ENTRY_CREATE":
                             System.out.println("File created.");
+                            if(new File(rootPath+"/"+ LOCAL_FOLDER+"/"+event.context().toString()).exists()) {
+                                replicate(new File(event.context().toString()));
+                            }
                             break;
                         case "ENTRY_MODIFY":
                             System.out.println("File modified.");
@@ -260,21 +263,21 @@ public class FileManager extends Thread {
      * compares hash with new node (next)
      * if hash(file) is closer to hash next
      * send file to next, update nameserver about owner
-     * @param next
      */
-    public void updateFilesNewNode(Neighbour current,Neighbour next, int destPort){
+    public void updateFilesNewNode(){
+        Neighbour next = rootNode.getNext();
         int hashNext = calculateHash(next.getName());
         //for every file
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             FileEntry fiche = entry.getValue();
             int hashFile = calculateHash(fiche.getLocal().getName());
-            if(hashFile > hashNext){
+            if(hashFile > hashNext) {
                 //sent via tcp to next
-                sendFile(next.getIp(),destPort,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                sendFile(next.getIp(),PORT,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                 //update fileEntry: new node becomes owner of the file
                 fiche.setOwner(next);
                 //this node is now download location of file
-                fiche.addNode(current);
+                fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
             }
         }
     }
