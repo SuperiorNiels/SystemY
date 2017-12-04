@@ -281,8 +281,13 @@ public class Node implements NodeInterface, Observer {
      * @param next, Neighbor object
      */
     public void updateNode(Neighbour previous, Neighbour next) {
-        this.next = next;
-        this.previous = previous;
+        if(!this.next.equals(next)) {
+            this.next = next;
+            manager.updateFilesNewNode();
+        }
+        if(!this.previous.equals(previous)) {
+            this.previous = previous;
+        }
     }
 
     public String toString() {
