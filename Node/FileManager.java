@@ -156,7 +156,7 @@ public class FileManager extends Thread {
      * is mainly used for debugging purposes
      */
     public void printMap() {
-        System.out.println("FileManager Map of node: "+ rootNode.toString());
+        System.out.println("FileEntries of node: "+ rootNode.toString());
         for(Integer i : map.keySet()) {
             FileEntry entry = map.get(i);
             System.out.println("File: "+entry.getFileName()+" Hash: "+i+" Downloads: ");
