@@ -340,6 +340,9 @@ public class Node implements NodeInterface, Observer {
             System.err.println("Malformed URL: "+e.getMessage());
         } catch (RemoteException e) {
             System.err.println("Problem with RMI connection: "+e.getMessage());
+        }finally {
+            //Execute the filemanager shutdown
+            manager.shutdown(previous);
         }
 
     }

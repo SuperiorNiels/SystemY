@@ -53,6 +53,7 @@ public class SendTCP extends Thread {
             System.out.println("Sending file: "+fileName+" to folder: "+destFolder);
             //sends the file
             out.write(file,0,file.length);
+            out.flush();
         } catch (IOException e) {
             System.out.println("readline: " + e.getMessage());
         }finally{
