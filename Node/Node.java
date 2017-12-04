@@ -285,6 +285,7 @@ public class Node implements NodeInterface, Observer {
             if(!this.next.equals(next)) {
                 this.next = next;
                 manager.updateFilesNewNode();
+                manager.initialize();
             }
             if(!this.previous.equals(previous)) {
                 this.previous = previous;

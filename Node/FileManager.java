@@ -279,7 +279,7 @@ public class FileManager extends Thread {
                 fiche.setOwner(next);
                 //this node is now download location of file
                 fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
-                new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).delete();
+                new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).renameTo(new File(rootPath+"/"+DOWNLOAD_FOLDER+"/"+fiche.getFileName()));
             }
         }
     }
