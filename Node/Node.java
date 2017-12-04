@@ -281,11 +281,17 @@ public class Node implements NodeInterface, Observer {
      * @param next, Neighbor object
      */
     public void updateNode(Neighbour previous, Neighbour next) {
-        if(!this.next.equals(next)) {
+        try {
+            if(!this.next.equals(next)) {
+                this.next = next;
+                manager.updateFilesNewNode();
+            }
+            if(!this.previous.equals(previous)) {
+                this.previous = previous;
+            }
+        } catch (NullPointerException e) {
+            // Neighbors are not set yet
             this.next = next;
-            manager.updateFilesNewNode();
-        }
-        if(!this.previous.equals(previous)) {
             this.previous = previous;
         }
     }
