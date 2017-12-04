@@ -33,8 +33,10 @@ public class FileManager extends Thread {
     private static final String LOCAL_FOLDER = "local";
     private static final String DOWNLOAD_FOLDER = "download";
 
-
+    //Map contains the file entries of your owned files!
     private TreeMap<Integer, FileEntry> map;
+    //Replicated contains file entries of all the files in the replicated map
+    private TreeMap<Integer, FileEntry> replicated;
 
     public FileManager(String rootPath, Node rootNode) {
         this.rootPath = Paths.get(rootPath);
@@ -191,6 +193,9 @@ public class FileManager extends Thread {
                             if(new File(rootPath+"/"+ LOCAL_FOLDER+"/"+event.context().toString()).exists()) {
                                 replicate(new File(event.context().toString()));
                             }
+                            if(new File(rootPath+"/"+ REPLICATED_FOLDER+"/"+event.context().toString()).exists()){
+                                //TODO: Add file to replicated list
+                            }
                             break;
                         case "ENTRY_MODIFY":
                             System.out.println("File modified.");
@@ -227,6 +232,7 @@ public class FileManager extends Thread {
      * @param prev the previous node
      */
     public void shutdown(Neighbour prev) {
+        //TODO: use the replicated treemap
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             Integer key = entry.getKey();
             FileEntry fiche = entry.getValue();
@@ -243,8 +249,6 @@ public class FileManager extends Thread {
                     sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                     replicated = prev;
                 }
-
-                Neighbour owner = fiche.getOwner();
 
                 //Send file entry to new owner node
                 //the new owner node is always your previous node
@@ -266,6 +270,7 @@ public class FileManager extends Thread {
      * send file to next, update nameserver about owner
      */
     public void updateFilesNewNode(){
+        //TODO use the replicated treemap
         Neighbour next = rootNode.getNext();
         int hashNext = calculateHash(next.getName());
         //for every file
@@ -321,6 +326,8 @@ public class FileManager extends Thread {
         }
         if(folderList.isEmpty()){
             //all given folders are present
+            //Remove all contents of the replicated folder
+            deleteFolder(new File(rootPath+"/"+REPLICATED_FOLDER+"/"));
         }else{
             for(String folderName : folderList){
                 if(!new File(rootPath+"/"+folderName).mkdir())
@@ -331,4 +338,17 @@ public class FileManager extends Thread {
         return true;
     }
 
+
+    private static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) { //if null the folder is empty
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+    }
 }
