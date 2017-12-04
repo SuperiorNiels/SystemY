@@ -120,7 +120,7 @@ public class FileManager extends Thread {
      * @param fileName name of the file
      * @param destFolder name of the folder where the file has to be saved at the destination
      */
-    public void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
+    public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
         try {
             System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
