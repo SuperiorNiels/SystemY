@@ -38,7 +38,6 @@ public class Node implements NodeInterface, Observer {
         manager.start();
     }
 
-
     /**
      * Start the node, this method also starts a multicast service.
      * Bootstraps the node
@@ -64,7 +63,6 @@ public class Node implements NodeInterface, Observer {
             * This part is used to test and debug
              */
             while(running) {
-                System.out.print(">> ");
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
                 if (parts[0].toLowerCase().equals("multicast")) {
@@ -131,11 +129,7 @@ public class Node implements NodeInterface, Observer {
                 char p = ' ';
                 while(numberOfNodesInNetwork!=0 &&(previous.equals(self) || next.equals(self))){
                     // wait till your neighbours are set
-                    System.out.write(p);
-                    System.out.write(p);
-                    System.out.write(p);
-                    p = (p == ' ') ? '=' : ' ';
-                    System.out.write('\r');
+                    System.out.print("Waiting for neighbors to change... \r");
                 }
                 // initialize your filemanager
                 manager.initialize();
@@ -250,7 +244,7 @@ public class Node implements NodeInterface, Observer {
                 //Update next with new node
                 next = new Neighbour(new_name, new_ip);
                 //after updating the neighbours update the files.
-                //updateFilesNewNode(next);.
+                manager.updateFilesNewNode();
             } else if((myPrevious < new_hash && new_hash < my_hash) || (myPrevious > my_hash && (myPrevious < new_hash || new_hash < my_hash))) {
                 //I'm the next node
                 //The new node becomes your previous
@@ -272,6 +266,8 @@ public class Node implements NodeInterface, Observer {
                 System.err.println("RMI to node failed.");
                 //e.printStackTrace();
             }
+            manager.updateFilesNewNode();
+            manager.initialize();
         }
     }
 
@@ -281,20 +277,8 @@ public class Node implements NodeInterface, Observer {
      * @param next, Neighbor object
      */
     public void updateNode(Neighbour previous, Neighbour next) {
-        try {
-            if(!this.next.equals(next)) {
-                this.next = next;
-                manager.updateFilesNewNode();
-                manager.initialize();
-            }
-            if(!this.previous.equals(previous)) {
-                this.previous = previous;
-            }
-        } catch (NullPointerException e) {
-            // Neighbors are not set yet
-            this.next = next;
-            this.previous = previous;
-        }
+        this.next = next;
+        this.previous = previous;
     }
 
     public String toString() {
@@ -427,5 +411,17 @@ public class Node implements NodeInterface, Observer {
         System.err.println("Failed to add the node to the Nameserver");
         System.err.println("Error is caused by the following exception: "+e.getMessage());
         System.exit(1);
+    }
+
+    /**
+     * RMI function to remotely create a file entry on a node
+     * @param owner
+     * @param replicated
+     * @param local
+     * @param fileName
+     */
+    @Override
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName) {
+        manager.createFileEntry(owner,replicated,local,fileName);
     }
 }

@@ -99,7 +99,6 @@ public class FileManager extends Thread {
                 sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
                 replicated = owner;
             }
-            //You are the first node in the system, the map is empty, don't replicate!
             FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
             map.put(calculateHash(file.getName()), new_entry);
         } catch (NotBoundException e) {
@@ -109,6 +108,18 @@ public class FileManager extends Thread {
         } catch (RemoteException e) {
             System.err.println("Problem with RMI connection"+nameServerIp);
         }
+    }
+
+    /**
+     * RMI function to remotely create a file entry on a node
+     * @param owner
+     * @param replicated
+     * @param local
+     * @param fileName
+     */
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName) {
+        FileEntry new_entry = new FileEntry(owner, replicated, local, fileName);
+        map.put(calculateHash(fileName), new_entry);
     }
 
     /**
@@ -287,6 +298,7 @@ public class FileManager extends Thread {
     /**
      * This function checks if the subfolder replicated, downloaded and local are present.
      * If these subfolders aren't prt, they are created
+     * Also clear download folder and replicated folder
      * return true if the operation ended succesfully
      * return false if there was an error creating on of the files
      */
@@ -304,24 +316,35 @@ public class FileManager extends Thread {
         folderList.add(LOCAL_FOLDER);
 
         //first checks if all folders are present
-        for(File file : fileList){
-            switch(file.getName()){
-                case REPLICATED_FOLDER:
-                    folderList.remove(REPLICATED_FOLDER);
-                    break;
-                case LOCAL_FOLDER:
-                    folderList.remove(LOCAL_FOLDER);
-                    break;
-                case DOWNLOAD_FOLDER:
-                    folderList.remove(DOWNLOAD_FOLDER);
-                    break;
-                default:
-                    //do nothing
+        try {
+            String[] files;
+            for (File file : fileList) {
+                switch (file.getName()) {
+                    case REPLICATED_FOLDER:
+                        files = file.list();
+                        for (String f : files) {
+                            new File(file.getPath(), f).delete();
+                        }
+                        folderList.remove(REPLICATED_FOLDER);
+                        break;
+                    case LOCAL_FOLDER:
+                        folderList.remove(LOCAL_FOLDER);
+                        break;
+                    case DOWNLOAD_FOLDER:
+                        files = file.list();
+                        for (String f : files) {
+                            new File(file.getPath(), f).delete();
+                        }
+                        folderList.remove(DOWNLOAD_FOLDER);
+                        break;
+                    default:
+                        //do nothing
+                }
             }
+        } catch (NullPointerException e) {
+            System.err.println("Directory initialization failed.");
         }
-        if(folderList.isEmpty()){
-            //all given folders are present
-        }else{
+        if(!folderList.isEmpty()){
             for(String folderName : folderList){
                 if(!new File(rootPath+"/"+folderName).mkdir())
                     return false;

@@ -1,8 +1,9 @@
 package Node;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FileEntry {
+public class FileEntry implements Serializable {
     private Neighbour owner;
     private Neighbour replicated;
     private Neighbour local;
