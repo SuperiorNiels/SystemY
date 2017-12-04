@@ -44,6 +44,8 @@ public class ReceiveTCP extends Thread {
             while ((bytesRead = in.read(byteBuffer, 0, byteBuffer.length)) != -1) {
                 outputStream.write(byteBuffer,0,bytesRead);
             }
+            //closes input stream
+            in.close();
             //close the outputstream
             outputStream.close();
         } catch (FileNotFoundException e) {
