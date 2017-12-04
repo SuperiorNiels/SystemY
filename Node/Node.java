@@ -397,13 +397,6 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
-
-
-    @Override
-    public void receiveFileEntry(int fileHash,FileEntry entry){
-        manager.receiveFileEntry(fileHash,entry);
-    }
-
     /**
      * Function that gets called by the name server through RMI when the node can't be added
      */
@@ -423,5 +416,16 @@ public class Node implements NodeInterface, Observer {
     @Override
     public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName) {
         manager.createFileEntry(owner,replicated,local,fileName);
+    }
+
+    /**
+     * Get file entry from node via RMI (if the entry exists)
+     * @param fileName
+     * @return
+     * @throws NullPointerException when fileEntry does not exist
+     */
+    @Override
+    public FileEntry getFileEntry(String fileName) throws NullPointerException {
+        return manager.getFileEntry(fileName);
     }
 }

@@ -48,7 +48,6 @@ public class FileManager extends Thread {
         //starts a tcp listener that listens for tcp request
         TCPListenerService TCPListener = new TCPListenerService(rootPath);
 
-
         try {
             watcher = FileSystems.getDefault().newWatchService();
             registerRecursive(this.rootPath);
@@ -86,7 +85,7 @@ public class FileManager extends Thread {
      */
     public void replicate(File file) {
         try {
-            System.out.println("Replicating file");
+            //System.out.println("Replicating file");
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             //start RMI
             //get the owner of each file
@@ -101,9 +100,9 @@ public class FileManager extends Thread {
                 sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
                 replicated = owner;
             }
-            //You are the first node in the system, the map is empty, don't replicate!
-            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
-            map.put(calculateHash(file.getName()), new_entry);
+
+            NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
+            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
@@ -125,6 +124,10 @@ public class FileManager extends Thread {
         map.put(calculateHash(fileName), new_entry);
     }
 
+    public FileEntry getFileEntry(String fileName) throws NullPointerException {
+        return map.get(calculateHash(fileName));
+    }
+
     /**
      * Function that is used to send a file over tcp connection
      * This function can be called using RMI!
@@ -136,7 +139,7 @@ public class FileManager extends Thread {
      */
     public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
         try {
-            System.out.println("Sending file: "+fileName);
+            //System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
@@ -155,8 +158,8 @@ public class FileManager extends Thread {
     public void printMap() {
         System.out.println("FileManager Map of node: "+ rootNode.toString());
         for(Integer i : map.keySet()) {
-            System.out.println("Hash: "+i+" ; Downloads: ");
             FileEntry entry = map.get(i);
+            System.out.println("File: "+entry.getFileName()+" Hash: "+i+" Downloads: ");
             for(Neighbour node : entry.getDownloads()) {
                 System.out.print("\t"+node.toString()+"\n");
             }
@@ -205,15 +208,12 @@ public class FileManager extends Thread {
                             if(new File(rootPath+"/"+ LOCAL_FOLDER+"/"+event.context().toString()).exists()) {
                                 replicate(new File(event.context().toString()));
                             }
-                            if(new File(rootPath+"/"+ REPLICATED_FOLDER+"/"+event.context().toString()).exists()){
-                                //TODO: Add file to replicated list
-                            }
                             break;
                         case "ENTRY_MODIFY":
-                            System.out.println("File modified.");
+                            //System.out.println("File modified.");
                             break;
                         case "ENTRY_DELETE":
-                            System.out.println("File deleted.");
+                            //System.out.println("File deleted.");
                             break;
                     }
                 }
@@ -234,17 +234,12 @@ public class FileManager extends Thread {
         return Math.abs(name.hashCode() % 32768);
     }
 
-    public void receiveFileEntry(int fileHash,FileEntry entry){
-        this.map.put(fileHash,entry);
-    }
-
     /**
      * Shutdown send all replicated files on this node to the previous node
      * And check if the previous node had the file locally, if so send to the previous of the previous
      * @param prev the previous node
      */
     public void shutdown(Neighbour prev) {
-        //TODO: use the replicated treemap
         for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
             Integer key = entry.getKey();
             FileEntry fiche = entry.getValue();
@@ -269,7 +264,7 @@ public class FileManager extends Thread {
                 //the replicated node can be one of 2 options:
                 //  - your previous
                 //  - the previous of the previous
-                nodeStub.receiveFileEntry(key,new FileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName()));
+                nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName());
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
             }
@@ -362,7 +357,10 @@ public class FileManager extends Thread {
         return true;
     }
 
-
+    /**
+     * Delete content of given folder
+     * @param folder
+     */
     private static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
         if(files!=null) { //if null the folder is empty
