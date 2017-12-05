@@ -35,8 +35,6 @@ public class FileManager extends Thread {
 
     //Map contains the file entries of your owned files!
     private TreeMap<Integer, FileEntry> map;
-    //Replicated contains file entries of all the files in the replicated map
-    private TreeMap<Integer, FileEntry> replicated;
 
     public FileManager(String rootPath, Node rootNode) {
         this.rootPath = Paths.get(rootPath);
@@ -240,36 +238,43 @@ public class FileManager extends Thread {
      * @param prev the previous node
      */
     public void shutdown(Neighbour prev) {
-        for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
-            Integer key = entry.getKey();
-            FileEntry fiche = entry.getValue();
-            Neighbour replicated = null;
-            try {
-                //Get RMI to the previous node
-                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
-                if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
-                    //send replicate to prev of prev
-                    sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
-                    replicated = nodeStub.getPrevious();
-                }else{
-                    //send replicate to prev
-                    sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
-                    replicated = prev;
+        try {
+            TreeMap<Integer,FileEntry> replicatedFiles = getReplicatedMapFiles();
+            if(replicatedFiles!=null){
+                for (Map.Entry<Integer, FileEntry> entry : replicatedFiles.entrySet()) {
+                    Integer key = entry.getKey();
+                    FileEntry fiche = entry.getValue();
+                    Neighbour replicated = null;
+                    try {
+                        //Get RMI to the previous node
+                        NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                        if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
+                            //send replicate to prev of prev
+                            sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                            replicated = nodeStub.getPrevious();
+                        }else{
+                            //send replicate to prev
+                            sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                            replicated = prev;
+                        }
+
+                        Neighbour owner = fiche.getOwner();
+
+                        //Send file entry to new owner node
+                        //the new owner node is always your previous node
+                        //the replicated node can be one of 2 options:
+                        //  - your previous
+                        //  - the previous of the previous
+                        nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName());
+                    } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                        System.err.println("RMI error in filemanager shutdown!");
+                    }
                 }
-
-                Neighbour owner = fiche.getOwner();
-
-                //Send file entry to new owner node
-                //the new owner node is always your previous node
-                //the replicated node can be one of 2 options:
-                //  - your previous
-                //  - the previous of the previous
-                nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName());
-            } catch (NotBoundException | MalformedURLException | RemoteException e) {
-                e.printStackTrace();
             }
-
+        } catch (RemoteException | NotBoundException | MalformedURLException e) {
+            System.err.println("Error shutting down your filemananger!");
         }
+
     }
 
     /**
@@ -279,23 +284,55 @@ public class FileManager extends Thread {
      * send file to next, update nameserver about owner
      */
     public void updateFilesNewNode(){
-        //TODO use the replicated treemap
         Neighbour next = rootNode.getNext();
         int hashNext = calculateHash(next.getName());
         //for every file
-        for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
-            FileEntry fiche = entry.getValue();
-            int hashFile = calculateHash(fiche.getLocal().getName());
-            if(hashFile > hashNext) {
-                //sent via tcp to next
-                sendFile(next.getIp(),PORT,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
-                //update fileEntry: new node becomes owner of the file
-                fiche.setOwner(next);
-                //this node is now download location of file
-                fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
-                new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).renameTo(new File(rootPath+"/"+DOWNLOAD_FOLDER+"/"+fiche.getFileName()));
+        try {
+            TreeMap<Integer,FileEntry> replicatedFiles = getReplicatedMapFiles();
+            if(replicatedFiles!=null){
+                for (Map.Entry<Integer, FileEntry> entry : replicatedFiles.entrySet()) {
+                    FileEntry fiche = entry.getValue();
+                    int hashFile = calculateHash(fiche.getLocal().getName());
+                    if(hashFile > hashNext) {
+                        //sent via tcp to next
+                        sendFile(next.getIp(),PORT,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                        //update fileEntry: new node becomes owner of the file
+                        fiche.setOwner(next);
+                        //this node is now download location of file
+                        fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
+                        new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).renameTo(new File(rootPath+"/"+DOWNLOAD_FOLDER+"/"+fiche.getFileName()));
+                    }
+                }
             }
+
+        } catch (RemoteException | NotBoundException | MalformedURLException e) {
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * This function return the contents of your replicated folder with all the fileEntries
+     * This funtion get the owner of each file from the namingserver
+     * Then requests the file entry from each owner for every file
+     * @return
+     * @throws RemoteException
+     * @throws NotBoundException
+     * @throws MalformedURLException
+     */
+    private TreeMap<Integer,FileEntry> getReplicatedMapFiles() throws RemoteException, NotBoundException, MalformedURLException {
+        File[] files = new File(rootPath+"/"+REPLICATED_FOLDER).listFiles();
+        TreeMap<Integer,FileEntry> replicatedFiles = new TreeMap<Integer, FileEntry>();
+        if(files!=null){
+            NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
+            for(File f: files){
+                Neighbour owner = namingStub.getOwner(f.getName());
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
+                replicatedFiles.put(calculateHash(f.getName()),nodeStub.getFileEntry(f.getName()));
+            }
+        }else{
+            return null; //Your replicated map is empty!
+        }
+        return replicatedFiles;
     }
 
     /**
