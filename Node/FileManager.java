@@ -33,8 +33,10 @@ public class FileManager extends Thread {
     private static final String LOCAL_FOLDER = "local";
     private static final String DOWNLOAD_FOLDER = "download";
 
-
+    //Map contains the file entries of your owned files!
     private TreeMap<Integer, FileEntry> map;
+    //Replicated contains file entries of all the files in the replicated map
+    private TreeMap<Integer, FileEntry> replicated;
 
     public FileManager(String rootPath, Node rootNode) {
         this.rootPath = Paths.get(rootPath);
@@ -45,7 +47,6 @@ public class FileManager extends Thread {
             System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
         TCPListenerService TCPListener = new TCPListenerService(rootPath);
-
 
         try {
             watcher = FileSystems.getDefault().newWatchService();
@@ -84,7 +85,7 @@ public class FileManager extends Thread {
      */
     public void replicate(File file) {
         try {
-            System.out.println("Replicating file");
+            //System.out.println("Replicating file");
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             //start RMI
             //get the owner of each file
@@ -99,9 +100,9 @@ public class FileManager extends Thread {
                 sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
                 replicated = owner;
             }
-            //You are the first node in the system, the map is empty, don't replicate!
-            FileEntry new_entry = new FileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
-            map.put(calculateHash(file.getName()), new_entry);
+
+            NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
+            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
@@ -109,6 +110,22 @@ public class FileManager extends Thread {
         } catch (RemoteException e) {
             System.err.println("Problem with RMI connection"+nameServerIp);
         }
+    }
+
+    /**
+     * RMI function to remotely create a file entry on a node
+     * @param owner
+     * @param replicated
+     * @param local
+     * @param fileName
+     */
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName) {
+        FileEntry new_entry = new FileEntry(owner, replicated, local, fileName);
+        map.put(calculateHash(fileName), new_entry);
+    }
+
+    public FileEntry getFileEntry(String fileName) throws NullPointerException {
+        return map.get(calculateHash(fileName));
     }
 
     /**
@@ -122,7 +139,7 @@ public class FileManager extends Thread {
      */
     public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
         try {
-            System.out.println("Sending file: "+fileName);
+            //System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
@@ -139,10 +156,10 @@ public class FileManager extends Thread {
      * is mainly used for debugging purposes
      */
     public void printMap() {
-        System.out.println("FileManager Map of node: "+ rootNode.toString());
+        System.out.println("FileEntries of node: "+ rootNode.toString());
         for(Integer i : map.keySet()) {
-            System.out.println("Hash: "+i+" ; Downloads: ");
             FileEntry entry = map.get(i);
+            System.out.println("File: "+entry.getFileName()+" Hash: "+i+" Downloads: ");
             for(Neighbour node : entry.getDownloads()) {
                 System.out.print("\t"+node.toString()+"\n");
             }
@@ -193,10 +210,10 @@ public class FileManager extends Thread {
                             }
                             break;
                         case "ENTRY_MODIFY":
-                            System.out.println("File modified.");
+                            //System.out.println("File modified.");
                             break;
                         case "ENTRY_DELETE":
-                            System.out.println("File deleted.");
+                            //System.out.println("File deleted.");
                             break;
                     }
                 }
@@ -215,10 +232,6 @@ public class FileManager extends Thread {
      */
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
-    }
-
-    public void receiveFileEntry(int fileHash,FileEntry entry){
-        this.map.put(fileHash,entry);
     }
 
     /**
@@ -251,7 +264,7 @@ public class FileManager extends Thread {
                 //the replicated node can be one of 2 options:
                 //  - your previous
                 //  - the previous of the previous
-                nodeStub.receiveFileEntry(key,new FileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName()));
+                nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName());
             } catch (NotBoundException | MalformedURLException | RemoteException e) {
                 e.printStackTrace();
             }
@@ -266,6 +279,7 @@ public class FileManager extends Thread {
      * send file to next, update nameserver about owner
      */
     public void updateFilesNewNode(){
+        //TODO use the replicated treemap
         Neighbour next = rootNode.getNext();
         int hashNext = calculateHash(next.getName());
         //for every file
@@ -287,6 +301,7 @@ public class FileManager extends Thread {
     /**
      * This function checks if the subfolder replicated, downloaded and local are present.
      * If these subfolders aren't prt, they are created
+     * Also clear download folder and replicated folder
      * return true if the operation ended succesfully
      * return false if there was an error creating on of the files
      */
@@ -304,24 +319,35 @@ public class FileManager extends Thread {
         folderList.add(LOCAL_FOLDER);
 
         //first checks if all folders are present
-        for(File file : fileList){
-            switch(file.getName()){
-                case REPLICATED_FOLDER:
-                    folderList.remove(REPLICATED_FOLDER);
-                    break;
-                case LOCAL_FOLDER:
-                    folderList.remove(LOCAL_FOLDER);
-                    break;
-                case DOWNLOAD_FOLDER:
-                    folderList.remove(DOWNLOAD_FOLDER);
-                    break;
-                default:
-                    //do nothing
+        try {
+            String[] files;
+            for (File file : fileList) {
+                switch (file.getName()) {
+                    case REPLICATED_FOLDER:
+                        files = file.list();
+                        for (String f : files) {
+                            new File(file.getPath(), f).delete();
+                        }
+                        folderList.remove(REPLICATED_FOLDER);
+                        break;
+                    case LOCAL_FOLDER:
+                        folderList.remove(LOCAL_FOLDER);
+                        break;
+                    case DOWNLOAD_FOLDER:
+                        files = file.list();
+                        for (String f : files) {
+                            new File(file.getPath(), f).delete();
+                        }
+                        folderList.remove(DOWNLOAD_FOLDER);
+                        break;
+                    default:
+                        //do nothing
+                }
             }
+        } catch (NullPointerException e) {
+            System.err.println("Directory initialization failed.");
         }
-        if(folderList.isEmpty()){
-            //all given folders are present
-        }else{
+        if(!folderList.isEmpty()){
             for(String folderName : folderList){
                 if(!new File(rootPath+"/"+folderName).mkdir())
                     return false;
@@ -331,4 +357,20 @@ public class FileManager extends Thread {
         return true;
     }
 
+    /**
+     * Delete content of given folder
+     * @param folder
+     */
+    private static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) { //if null the folder is empty
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+    }
 }

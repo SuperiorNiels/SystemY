@@ -1,14 +1,14 @@
- Path new_file = (Path) event.context();
-                            File local = new File(root+"/local/"+new_file.toString());
-                            File replicated = new File(root+"/replicated/"+new_file.toString());
-
-                            if(local.isFile()) {
-                                System.out.println("New file in local: "+new_file.toString());
-                            } else if(replicated.isFile()) {
-                                System.out.println("New file in replicated: "+new_file.toString());
-                            }
-                            
-                            
-                            
-                            
-                            FileEntry file = new FileEntry()
+try {
+            if(!this.next.equals(next)) {
+                this.next = next;
+                manager.updateFilesNewNode();
+                manager.initialize();
+            }
+            if(!this.previous.equals(previous)) {
+                this.previous = previous;
+            }
+        } catch (NullPointerException e) {
+            // Neighbors are not set yet
+            this.next = next;
+            this.previous = previous;
+        }

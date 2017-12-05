@@ -35,9 +35,9 @@ public class ReceiveTCP extends Thread {
             String fileName = in.readUTF();
             //reads the name of the folder the file needs to be saved
             String folderName = in.readUTF();
-            System.out.println("Getting file: "+fileName+" to folder: "+folderName);
+            System.out.println("Recieving file: "+fileName+" to folder: "+folderName);
             //opens the stream to save the file to a filepath
-            System.out.println("Saving to: "+rootPath+folderName+"/"+fileName);
+            //System.out.println("Saving to: "+rootPath+folderName+"/"+fileName);
             OutputStream outputStream = new FileOutputStream(rootPath +"/"+folderName+"/"+fileName);
             //amount of bytes already read
             int bytesRead;

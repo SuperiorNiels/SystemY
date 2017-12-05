@@ -26,11 +26,11 @@ public class TCPListenerService extends Thread{
     public void run(){
         while(true){
             try {
-                System.out.println("Listening for connections");
+                //System.out.println("Listening for connections");
                 Socket connection = listeningSocket.accept();
-                System.out.println("Connection has been accepeted");
+                //System.out.println("Connection has been accepeted");
                 ReceiveTCP receiveHandler = new ReceiveTCP(connection,rootPath);
-                System.out.println("Connection forwarded to receive thread");
+                //System.out.println("Connection forwarded to receive thread");
             } catch (IOException e) {
                 System.err.println("Error opening the connection");
             }
