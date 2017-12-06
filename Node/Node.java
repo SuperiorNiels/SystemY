@@ -243,13 +243,14 @@ public class Node implements NodeInterface, Observer {
                 //The new node will have your next as next
                 //The new node will have you as previous
                 //Update next with new node
+                Neighbour previous_next = next;
                 next = new Neighbour(new_name, new_ip);
                 // update the files.
                 manager.updateFilesNewNode();
                 System.out.println("New node is my new next: RMI to "+new_ip);
                 try {
                     NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
-                    stub.updateNode(new Neighbour(name,ip), next);
+                    stub.updateNode(new Neighbour(name,ip), previous_next);
                 }
                 catch (Exception e) {
                     System.err.println("RMI to node failed.");
