@@ -242,6 +242,8 @@ public class Node implements NodeInterface, Observer {
                 //The new node becomes your next
                 //The new node will have your next as next
                 //The new node will have you as previous
+                //first update the files.
+                manager.updateFilesNewNode();
                 System.out.println("New node is my new next: RMI to "+new_ip);
                 try {
                     NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
@@ -252,8 +254,6 @@ public class Node implements NodeInterface, Observer {
                 }
                 //Update next with new node
                 next = new Neighbour(new_name, new_ip);
-                //after updating the neighbours update the files.
-                manager.updateFilesNewNode();
             } else if((myPrevious < new_hash && new_hash < my_hash) || (myPrevious > my_hash && (myPrevious < new_hash || new_hash < my_hash))) {
                 //I'm the next node
                 //The new node becomes your previous
