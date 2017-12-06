@@ -15,6 +15,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -323,7 +324,8 @@ public class FileManager extends Thread {
         int hashNext = calculateHash(next.getName());
         //for every file
         try {
-            for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
+            for(Iterator<Map.Entry<Integer, FileEntry>> it = map.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<Integer, FileEntry> entry = it.next();
                 FileEntry fiche = entry.getValue();
                 int hashFile = calculateHash(fiche.getFileName());
                 int myhash = calculateHash(rootNode.getName());
@@ -354,7 +356,7 @@ public class FileManager extends Thread {
                     NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
                     NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node");
                     nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
-                    map.remove(hashFile);
+                    it.remove();
                 }
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
