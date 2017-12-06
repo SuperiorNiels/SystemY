@@ -74,7 +74,7 @@ public class Node implements NodeInterface, Observer {
                 } else if (parts[0].toLowerCase().equals("print")) {
                     System.out.println("Previous: " + previous.toString());
                     System.out.println("Next: " + next.toString());
-                    System.out.println("#nodes in network: " + numberOfNodesInNetwork);
+                    System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
                     shutDown();
@@ -114,6 +114,7 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
             // fills in the ip of the nameserver
             namingServerIp = parts[4];
+            //sets the number of nodes in network when initialiasing
             setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
             // checks if you are the new node that just joined
             if(!name.equals(parts[2])) {
@@ -191,7 +192,18 @@ public class Node implements NodeInterface, Observer {
     }
 
     public int getNumberOfNodesInNetwork() {
+        try {
+            NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            numberOfNodesInNetwork = namingStub.getNumberOfNodes();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
         return numberOfNodesInNetwork;
+
     }
 
     /**
