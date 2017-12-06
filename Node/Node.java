@@ -28,7 +28,6 @@ public class Node implements NodeInterface, Observer {
     private String rootPath = "./files/";
     private String namingServerIp = null;
     //Amout of nodes in the network, is only actual when the node is added to the network!
-    private int numberOfNodesInNetwork = 0;
     private boolean running = true;
     private FileManager manager = new FileManager(rootPath,this);
     public Node(String name) {
@@ -113,8 +112,6 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
             // fills in the ip of the nameserver
             namingServerIp = parts[4];
-            //sets the number of nodes in network when initialiasing
-            //setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
             // checks if you are the new node that just joined
             if(!name.equals(parts[2])) {
                 try {
@@ -187,18 +184,14 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * not used
-     * @param number
+     * gets the number of nodes
+     * @return
      */
-    public void setNumberOfNodesInNetwork(int number) {
-        this.numberOfNodesInNetwork = number;
-    }
-
     public int getNumberOfNodesInNetwork() {
         int Nodes = 0;
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            numberOfNodesInNetwork = namingStub.getNumberOfNodes();
+                Nodes = namingStub.getNumberOfNodes();
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
