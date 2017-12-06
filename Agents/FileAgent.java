@@ -2,13 +2,20 @@ package Agents;
 
 import java.io.Serializable;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
+
 import Node.Node;
 
-public class FileAgent implements Runnable, Serializable{
-    private TreeMap<String, Boolean> files = new TreeMap<String, Boolean>();
+public class FileAgent extends Agent {
 
+    private TreeMap<String, Semaphore> files = new TreeMap<String, Semaphore>();
 
     @Override
     public void run() {
+        
+    }
+
+    public void getFiles() {
+
     }
 }
