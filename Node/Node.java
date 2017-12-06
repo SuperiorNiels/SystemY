@@ -114,7 +114,7 @@ public class Node implements NodeInterface, Observer {
             // fills in the ip of the nameserver
             namingServerIp = parts[4];
             //sets the number of nodes in network when initialiasing
-            setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
+            //setNumberOfNodesInNetwork(Integer.parseInt(parts[1]));
             // checks if you are the new node that just joined
             if(!name.equals(parts[2])) {
                 try {
