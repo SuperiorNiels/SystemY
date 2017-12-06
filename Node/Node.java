@@ -16,6 +16,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Scanner;
@@ -425,8 +426,8 @@ public class Node implements NodeInterface, Observer {
      * @param fileName
      */
     @Override
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName) {
-        manager.createFileEntry(owner,replicated,local,fileName);
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, ArrayList downloads) {
+        manager.createFileEntry(owner,replicated,local,fileName,downloads);
     }
 
     /**

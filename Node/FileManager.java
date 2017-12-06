@@ -100,7 +100,7 @@ public class FileManager extends Thread {
             }
 
             NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
-            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName());
+            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),new ArrayList());
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
@@ -117,8 +117,8 @@ public class FileManager extends Thread {
      * @param local
      * @param fileName
      */
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName) {
-        FileEntry new_entry = new FileEntry(owner, replicated, local, fileName);
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName,ArrayList downloads) {
+        FileEntry new_entry = new FileEntry(owner, replicated, local, fileName,downloads);
         map.put(calculateHash(fileName), new_entry);
     }
 
@@ -272,7 +272,7 @@ public class FileManager extends Thread {
                         //the replicated node can be one of 2 options:
                         //  - your previous
                         //  - the previous of the previous
-                        nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName());
+                        nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                     } catch (NotBoundException | MalformedURLException | RemoteException e) {
                         System.err.println("RMI error in filemanager shutdown!");
                     }
@@ -311,6 +311,11 @@ public class FileManager extends Thread {
                         fiche.setOwner(next);
                         //this node is now download location of file
                         fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
+
+                        //Via RMI set update the file fiche on the owner
+                        NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
+                        NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
+                        nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()),next,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                     }
                 }
             }

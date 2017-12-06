@@ -10,12 +10,13 @@ public class FileEntry implements Serializable {
     private ArrayList<Neighbour> downloads;
     private String fileName;
 
-    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName) {
+    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName,ArrayList downloads) {
         this.owner = owner;
         this.replicated = replicated;
         this.local = local;
         downloads = new ArrayList<Neighbour>();
         this.fileName = fileName;
+        this.downloads = downloads;
     }
 
     public ArrayList<Neighbour> getDownloads() {
@@ -57,4 +58,5 @@ public class FileEntry implements Serializable {
     public String getFileName(){
         return fileName;
     }
+
 }
