@@ -310,7 +310,7 @@ public class FileManager extends Thread {
                 //File has been downloaded
                 FileEntry fiche = map.get(filehash);
                 fiche.setLocal(null);
-                fiche.getDownloads().remove(leavingNode);
+                fiche.getDownloads().remove(fiche.getDownloads().indexOf(leavingNode));
                 map.put(filehash,fiche);
             }
         }
