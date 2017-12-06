@@ -325,7 +325,7 @@ public class FileManager extends Thread {
         try {
             for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
                 FileEntry fiche = entry.getValue();
-                int hashFile = calculateHash(fiche.getLocal().getName());
+                int hashFile = calculateHash(fiche.getFileName());
                 int myhash = calculateHash(rootNode.getName());
                 int nextHash = calculateHash(rootNode.getNext().getName());
                 if (hashFile > hashNext && myhash < nextHash) {
