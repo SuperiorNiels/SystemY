@@ -295,9 +295,9 @@ public class FileManager extends Thread {
         int hashNext = calculateHash(next.getName());
         //for every file
         try {
-            TreeMap<Integer,FileEntry> replicatedFiles = getReplicatedMapFiles();
-            if(replicatedFiles!=null){
-                for (Map.Entry<Integer, FileEntry> entry : replicatedFiles.entrySet()) {
+            //TreeMap<Integer,FileEntry> replicatedFiles = getReplicatedMapFiles();
+            //if(replicatedFiles!=null){
+                for (Map.Entry<Integer, FileEntry> entry : map.entrySet()) {
                     FileEntry fiche = entry.getValue();
                     int hashFile = calculateHash(fiche.getLocal().getName());
                     int myhash = calculateHash(rootNode.getName());
@@ -318,7 +318,7 @@ public class FileManager extends Thread {
                         nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()),next,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                     }
                 }
-            }
+            //}
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
             e.printStackTrace();
         }
