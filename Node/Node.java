@@ -445,6 +445,11 @@ public class Node implements NodeInterface, Observer {
         manager.checkFileEntry(filename, leavingNode);
     }
 
+    @Override
+    public void remoteRemoveFromDownload(String filename,Neighbour leavingNode){
+        manager.removeFromDownload(filename,leavingNode);
+    }
+
     /**
      * Get file entry from node via RMI (if the entry exists)
      * @param fileName

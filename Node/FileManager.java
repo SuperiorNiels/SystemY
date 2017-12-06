@@ -289,7 +289,18 @@ public class FileManager extends Thread {
                         Integer key = entry.getKey();
                         FileEntry fiche = entry.getValue();
                         NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
-                        ownerStub.remoteCheckFileEntry(fiche.getFileName(), new Neighbour(rootNode.getName(),rootNode.getIp()));
+                        ownerStub.remoteCheckFileEntry(fiche.getFileName(),new Neighbour(rootNode.getName(),rootNode.getIp()));
+                    }
+                }
+
+                //third the download map
+                TreeMap<Integer,FileEntry> downloadFiles = getFilesMap(DOWNLOAD_FOLDER);
+                if(downloadFiles!=null){
+                    for (Map.Entry<Integer, FileEntry> entry : downloadFiles.entrySet()) {
+                        Integer key = entry.getKey();
+                        FileEntry fiche = entry.getValue();
+                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
+                        ownerStub.remoteRemoveFromDownload(fiche.getFileName(),new Neighbour(rootNode.getName(),rootNode.getIp()));
                     }
                 }
 
@@ -299,6 +310,13 @@ public class FileManager extends Thread {
         }
     }
 
+    /**
+     * This funtion check if a file has been downloaded before,
+     * if not it removes the file from the system
+     * else it removes the local field from the entry
+     * @param filename
+     * @param leavingNode
+     */
     public void checkFileEntry(String filename,Neighbour leavingNode) {
         int filehash = calculateHash(filename);
         if(map.containsKey(filehash)){ //Check if map contains the filename to be sure
@@ -310,9 +328,22 @@ public class FileManager extends Thread {
                 //File has been downloaded
                 FileEntry fiche = map.get(filehash);
                 fiche.setLocal(null);
-                fiche.getDownloads().remove(leavingNode);
                 map.put(filehash,fiche);
             }
+        }
+    }
+
+    /**
+     * This function removes a specific node from the download arraylist from a given file entry
+     * @param filename
+     * @param leavingNode
+     */
+    public void removeFromDownload(String filename,Neighbour leavingNode) {
+        int filehash = calculateHash(filename);
+        if(map.containsKey(filehash)){
+            FileEntry fiche = map.get(filehash);
+            fiche.getDownloads().remove(fiche.getDownloads().indexOf(leavingNode));
+            map.put(filehash,fiche);
         }
     }
 
