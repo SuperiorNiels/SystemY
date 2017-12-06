@@ -157,9 +157,12 @@ public class FileManager extends Thread {
         System.out.println("FileEntries of node: "+ rootNode.toString());
         for(Integer i : map.keySet()) {
             FileEntry entry = map.get(i);
-            System.out.println("File: "+entry.getFileName()+" Hash: "+i+" Downloads: ");
+            System.out.println("File: "+entry.getFileName()+" Hash: "+i);
+            System.out.println("\t Local: "+entry.getLocal().toString());
+            System.out.println("\t Replicated: "+entry.getReplicated().toString());
+            System.out.println("\t Downloads:");
             for(Neighbour node : entry.getDownloads()) {
-                System.out.print("\t"+node.toString()+"\n");
+                System.out.print("\t\t"+node.toString()+"\n");
             }
         }
     }
