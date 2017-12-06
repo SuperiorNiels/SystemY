@@ -127,7 +127,7 @@ public class Node implements NodeInterface, Observer {
                 // you are the new node that just joined
                 Neighbour self = new Neighbour(name, ip);
                 char p = ' ';
-                while(numberOfNodesInNetwork!=0 &&(previous.equals(self) || next.equals(self))){
+                while(getNumberOfNodesInNetwork()!=0 &&(previous.equals(self) || next.equals(self))){
                     // wait till your neighbours are set
                     System.out.print("Waiting for neighbors to change... \r");
                 }
@@ -186,11 +186,16 @@ public class Node implements NodeInterface, Observer {
         this.name = name;
     }
 
+    /**
+     * not used
+     * @param number
+     */
     public void setNumberOfNodesInNetwork(int number) {
         this.numberOfNodesInNetwork = number;
     }
 
     public int getNumberOfNodesInNetwork() {
+        int Nodes = 0;
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
             numberOfNodesInNetwork = namingStub.getNumberOfNodes();
@@ -201,7 +206,7 @@ public class Node implements NodeInterface, Observer {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        return numberOfNodesInNetwork-1;
+        return Nodes-1;
 
     }
 
@@ -231,7 +236,7 @@ public class Node implements NodeInterface, Observer {
      */
     public void updateNeighbours(String new_name, String new_ip) throws NodeAlreadyExistsException {
         //multiple nodes in the network
-        if(numberOfNodesInNetwork > 1) {
+        if(getNumberOfNodesInNetwork() > 1) {
             int my_hash = calculateHash(name);
             int myNext = calculateHash(next.getName());
             int myPrevious = calculateHash(previous.getName());
@@ -369,7 +374,7 @@ public class Node implements NodeInterface, Observer {
             the min numberOfNodes is 2 ( in the case when there is only 1 node failure cannot be summoned)
             */
             if(numberOfNodes == 2){
-                //in the case where there are 2 nodes and one fails the remaning node
+                //in the case where there are 2 nodes and one fails the remaining node
                 //gets updated, the nodes previous and next is the node itself.
                 setPrevious(new Neighbour(name,ip));
                 setNext(new Neighbour(name,ip));
