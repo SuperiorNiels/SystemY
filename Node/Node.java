@@ -201,7 +201,7 @@ public class Node implements NodeInterface, Observer {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        return numberOfNodesInNetwork;
+        return numberOfNodesInNetwork-1;
 
     }
 
