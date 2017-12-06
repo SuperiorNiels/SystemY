@@ -117,7 +117,7 @@ public class FileManager extends Thread {
      * @param local
      * @param fileName
      */
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName,ArrayList downloads) {
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName,ArrayList<Neighbour> downloads) {
         FileEntry new_entry = new FileEntry(owner, replicated, local, fileName,downloads);
         map.put(calculateHash(fileName), new_entry);
     }

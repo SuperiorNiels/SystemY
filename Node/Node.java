@@ -426,7 +426,7 @@ public class Node implements NodeInterface, Observer {
      * @param fileName
      */
     @Override
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, ArrayList downloads) {
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, ArrayList<Neighbour> downloads) {
         manager.createFileEntry(owner,replicated,local,fileName,downloads);
     }
 

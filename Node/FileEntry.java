@@ -10,7 +10,7 @@ public class FileEntry implements Serializable {
     private ArrayList<Neighbour> downloads;
     private String fileName;
 
-    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName,ArrayList downloads) {
+    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName,ArrayList<Neighbour> downloads) {
         this.owner = owner;
         this.replicated = replicated;
         this.local = local;
