@@ -334,7 +334,7 @@ public class FileManager extends Thread {
      * @throws MalformedURLException
      */
     private TreeMap<Integer,FileEntry> getReplicatedMapFiles() throws RemoteException, NotBoundException, MalformedURLException {
-        File[] files = new File(rootPath+"/"+REPLICATED_FOLDER+"/").listFiles();
+        File[] files = new File(rootPath+"/"+REPLICATED_FOLDER).listFiles();
         TreeMap<Integer,FileEntry> replicatedFiles = new TreeMap<Integer, FileEntry>();
         if(files!=null){
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
