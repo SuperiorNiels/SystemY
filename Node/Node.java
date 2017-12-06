@@ -430,6 +430,21 @@ public class Node implements NodeInterface, Observer {
         manager.createFileEntry(owner,replicated,local,fileName,downloads);
     }
 
+    @Override
+    public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
+        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder);
+    }
+
+    @Override
+    public void moveFile(String from,String to){
+        new File(from).renameTo(new File(to));
+    }
+
+    @Override
+    public void remoteCheckFileEntry(String filename) {
+        manager.checkFileEntry(filename);
+    }
+
     /**
      * Get file entry from node via RMI (if the entry exists)
      * @param fileName
