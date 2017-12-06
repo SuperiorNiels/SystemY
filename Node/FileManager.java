@@ -244,11 +244,12 @@ public class FileManager extends Thread {
      * @param prev the previous node
      */
     public void shutdown(Neighbour prev) {
-        if (rootNode.getNumberOfNodesInNetwork() > 1) {
+        int number = rootNode.getNumberOfNodesInNetwork();
+        if (rootNode.getNumberOfNodesInNetwork() > 0) {
             try {
                 //First all the replicated files
                 TreeMap<Integer,FileEntry> replicatedFiles = getFilesMap(REPLICATED_FOLDER);
-                if(replicatedFiles!=null){
+                if(replicatedFiles!=null) {
                     for (Map.Entry<Integer, FileEntry> entry : replicatedFiles.entrySet()) {
                         Integer key = entry.getKey();
                         FileEntry fiche = entry.getValue();
@@ -273,7 +274,8 @@ public class FileManager extends Thread {
                             //the replicated node can be one of 2 options:
                             //  - your previous
                             //  - the previous of the previous
-                            nodeStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
+                            NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
+                            ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                         } catch (NotBoundException | MalformedURLException | RemoteException e) {
                             System.err.println("RMI error in filemanager shutdown!");
                         }
@@ -286,18 +288,18 @@ public class FileManager extends Thread {
                     for (Map.Entry<Integer, FileEntry> entry : localFiles.entrySet()) {
                         Integer key = entry.getKey();
                         FileEntry fiche = entry.getValue();
-                        NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
-                        nodeStub.remoteCheckFileEntry(fiche.getFileName());
+                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
+                        ownerStub.remoteCheckFileEntry(fiche.getFileName(), new Neighbour(rootNode.getName(),rootNode.getIp()));
                     }
                 }
 
             } catch (RemoteException | NotBoundException | MalformedURLException e) {
-                System.err.println("Error shutting down your filemananger!");
+                System.err.println("Error shutting down your filemanager!");
             }
         }
     }
 
-    public void checkFileEntry(String filename) {
+    public void checkFileEntry(String filename,Neighbour leavingNode) {
         int filehash = calculateHash(filename);
         if(map.containsKey(filehash)){ //Check if map contains the filename to be sure
             if(map.get(filehash).getDownloads().size()==0){
@@ -308,6 +310,7 @@ public class FileManager extends Thread {
                 //File has been downloaded
                 FileEntry fiche = map.get(filehash);
                 fiche.setLocal(null);
+                fiche.getDownloads().remove(leavingNode);
                 map.put(filehash,fiche);
             }
         }

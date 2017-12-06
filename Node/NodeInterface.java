@@ -18,5 +18,5 @@ public interface NodeInterface extends Remote {
     public FileEntry getFileEntry(String fileName) throws RemoteException, NullPointerException;
     public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder) throws RemoteException;
     public void moveFile(String from,String to) throws RemoteException;
-    public void remoteCheckFileEntry(String filename) throws RemoteException;
+    public void remoteCheckFileEntry(String filename,Neighbour leavingNode) throws RemoteException;
 }

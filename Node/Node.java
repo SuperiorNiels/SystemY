@@ -441,8 +441,8 @@ public class Node implements NodeInterface, Observer {
     }
 
     @Override
-    public void remoteCheckFileEntry(String filename) {
-        manager.checkFileEntry(filename);
+    public void remoteCheckFileEntry(String filename,Neighbour leavingNode) {
+        manager.checkFileEntry(filename, leavingNode);
     }
 
     /**
