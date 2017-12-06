@@ -414,9 +414,15 @@ public class FileManager extends Thread {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+nameServerIp+"/NamingServer");
             for(File f: files){
                 Neighbour owner = namingStub.getOwner(f.getName());
-                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
-                String filename = f.getName();
-                map.put(calculateHash(f.getName()),nodeStub.getFileEntry(filename));
+                if(!owner.getName().equals(rootNode.getName())){
+                    //You are not the owner get it from the owner
+                    NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
+                    String filename = f.getName();
+                    map.put(calculateHash(f.getName()),nodeStub.getFileEntry(filename));
+                }else{
+                    //You are the owner put your file entry
+                    map.put(calculateHash(f.getName()),map.get(calculateHash(f.getName())));
+                }
             }
         }else{
             return null; //Your replicated map is empty!
