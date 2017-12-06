@@ -303,13 +303,14 @@ public class FileManager extends Thread {
                     int myhash = calculateHash(rootNode.getName());
                     int nextHash = calculateHash(rootNode.getNext().getName());
                     if(hashFile > hashNext && myhash<nextHash) {
+                        // First replace file
+                        new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).renameTo(new File(rootPath+"/"+DOWNLOAD_FOLDER+"/"+fiche.getFileName()));
                         //sent via tcp to next
-                        sendFile(next.getIp(),PORT,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                        sendFile(next.getIp(),PORT,rootPath+"/"+DOWNLOAD_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                         //update fileEntry: new node becomes owner of the file
                         fiche.setOwner(next);
                         //this node is now download location of file
                         fiche.addNode(new Neighbour(rootNode.getName(),rootNode.getIp()));
-                        new File(rootPath+"/"+REPLICATED_FOLDER+"/"+fiche.getFileName()).renameTo(new File(rootPath+"/"+DOWNLOAD_FOLDER+"/"+fiche.getFileName()));
                     }
                 }
             }
