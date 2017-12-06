@@ -300,7 +300,9 @@ public class FileManager extends Thread {
                 for (Map.Entry<Integer, FileEntry> entry : replicatedFiles.entrySet()) {
                     FileEntry fiche = entry.getValue();
                     int hashFile = calculateHash(fiche.getLocal().getName());
-                    if(hashFile > hashNext) {
+                    int myhash = calculateHash(rootNode.getName());
+                    int nextHash = calculateHash(rootNode.getNext().getName());
+                    if(hashFile > hashNext && myhash<nextHash) {
                         //sent via tcp to next
                         sendFile(next.getIp(),PORT,rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                         //update fileEntry: new node becomes owner of the file
