@@ -158,8 +158,10 @@ public class FileManager extends Thread {
         for(Integer i : map.keySet()) {
             FileEntry entry = map.get(i);
             System.out.println("File: "+entry.getFileName()+" Hash: "+i);
-            System.out.println("\t Local: "+entry.getLocal().toString());
-            System.out.println("\t Replicated: "+entry.getReplicated().toString());
+            try { System.out.println("\t Local: "+entry.getLocal().toString()); }
+            catch (NullPointerException e) { System.out.println("\t Local: NULL"); }
+            try { System.out.println("\t Replicated: "+entry.getReplicated().toString()); }
+            catch (NullPointerException e) { System.out.println("\t Replicated: NULL"); }
             System.out.println("\t Downloads:");
             for(Neighbour node : entry.getDownloads()) {
                 System.out.print("\t\t"+node.toString()+"\n");
