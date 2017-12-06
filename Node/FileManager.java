@@ -334,23 +334,27 @@ public class FileManager extends Thread {
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
                         //sent via tcp to next
                         sendFile(next.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                        //this node is now download location of file
+                        fiche.addNode(new Neighbour(rootNode.getName(), rootNode.getIp()));
                     } else {
                         NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + fiche.getReplicated().getIp() + "/Node");
                         // First remote replace file
                         nodeStub.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
                         //sent remote via tcp to next
                         nodeStub.remoteSendFile(next.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                        //the next node is now download location of file
+                        fiche.addNode(new Neighbour(fiche.getReplicated().getName(), fiche.getReplicated().getIp()));
                     }
+
 
                     //update fileEntry: new node becomes owner of the file
                     fiche.setOwner(next);
-                    //this node is now download location of file
-                    fiche.addNode(new Neighbour(rootNode.getName(), rootNode.getIp()));
 
                     //Via RMI set update the file fiche on the owner
                     NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
                     NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node");
                     nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
+                    map.remove(hashFile);
                 }
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
