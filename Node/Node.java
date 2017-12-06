@@ -22,6 +22,9 @@ import java.util.Observer;
 import java.util.Scanner;
 
 public class Node implements NodeInterface, Observer {
+    // Singleton
+    private static Node instance = null;
+
     private Neighbour previous = null;
     private Neighbour next = null;
     private String ip = null;
@@ -30,18 +33,32 @@ public class Node implements NodeInterface, Observer {
     private String namingServerIp = null;
     //Amout of nodes in the network, is only actual when the node is added to the network!
     private boolean running = true;
-    private FileManager manager = new FileManager(rootPath,this);
-    public Node(String name) {
+
+
+    public Node() {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Hostname: ");
+        String name = input.nextLine();
         this.name = name;
-        //starts the watcher thread that watches the map with files
-        manager.start();
     }
+
+    public static Node getInstance() {
+        if(instance == null) {
+            instance = new Node();
+        }
+        return instance;
+    }
+
+    private FileManager manager;
 
     /**
      * Start the node, this method also starts a multicast service.
      * Bootstraps the node
      */
     public void bootstrap() {
+        //starts the watcher thread that watches the map with files
+        manager = new FileManager(rootPath);
+        manager.start();
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             // update ip

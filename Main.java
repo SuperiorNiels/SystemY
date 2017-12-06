@@ -9,10 +9,7 @@ public class Main {
             NamingServer server = new NamingServer();
             server.start();
         } else if(args[0].toLowerCase().equals("client")) {
-            Scanner input = new Scanner(System.in);
-            System.out.println("Hostname: ");
-            String name = input.nextLine();
-            Node node = new Node(name);
+            Node node = new Node();
             node.bootstrap();
         }
     }

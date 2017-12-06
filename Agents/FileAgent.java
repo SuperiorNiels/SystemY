@@ -12,7 +12,7 @@ public class FileAgent extends Agent {
 
     @Override
     public void run() {
-        
+        Node node = Node.getInstance();
     }
 
     public void getFiles() {

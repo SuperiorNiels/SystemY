@@ -36,9 +36,9 @@ public class FileManager extends Thread {
     //Map contains the file entries of your owned files!
     private TreeMap<Integer, FileEntry> map;
 
-    public FileManager(String rootPath, Node rootNode) {
+    public FileManager(String rootPath) {
         this.rootPath = Paths.get(rootPath);
-        this.rootNode = rootNode;
+        this.rootNode = Node.getInstance();
         this.map = new TreeMap<Integer, FileEntry>();
         //checks if all given subfolders are present
         if(!initDirectories())
