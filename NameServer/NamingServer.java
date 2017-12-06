@@ -69,6 +69,14 @@ public class NamingServer implements NamingInterface, Observer {
         }
     }
 
+    /**
+     * New node sends multicast starting with 00, the name and ip of the new node are send in this message
+     * The nameserver checks if the new node can join, if the node is accepted the nameserver will send a multicast message:
+     * 01;size_of_map-1;name_of_new_node;ip_of_new_node;nameserver_ip
+     * When a node recieves this last message, the nessecary steps can be taken for the new node to join.
+     * @param observable
+     * @param o
+     */
     @Override
     public void update(Observable observable, Object o) {
         String message = o.toString();
