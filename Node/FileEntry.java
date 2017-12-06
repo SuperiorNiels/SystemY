@@ -14,9 +14,12 @@ public class FileEntry implements Serializable {
         this.owner = owner;
         this.replicated = replicated;
         this.local = local;
-        downloads = new ArrayList<Neighbour>();
+        if(downloads.size()!=0){
+            this.downloads = downloads;
+        }else{
+            this.downloads = new ArrayList<Neighbour>();
+        }
         this.fileName = fileName;
-        this.downloads = downloads;
     }
 
     public ArrayList<Neighbour> getDownloads() {
