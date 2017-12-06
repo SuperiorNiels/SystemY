@@ -255,8 +255,10 @@ public class FileManager extends Thread {
                         NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                         if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                             //send replicate to prev of prev
-                            sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
-                            replicated = nodeStub.getPrevious();
+                            if(!nodeStub.getPrevious().equals(fiche.getLocal())) { //Check if the prev has a prev
+                                sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath + "/" + REPLICATED_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                                replicated = nodeStub.getPrevious();
+                            }
                         }else{
                             //send replicate to prev
                             sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
@@ -309,7 +311,6 @@ public class FileManager extends Thread {
                     }
                 }
             }
-
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
             e.printStackTrace();
         }
@@ -332,7 +333,8 @@ public class FileManager extends Thread {
             for(File f: files){
                 Neighbour owner = namingStub.getOwner(f.getName());
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
-                replicatedFiles.put(calculateHash(f.getName()),nodeStub.getFileEntry(f.getName()));
+                String filename = f.getName();
+                replicatedFiles.put(calculateHash(f.getName()),nodeStub.getFileEntry(filename));
             }
         }else{
             return null; //Your replicated map is empty!
