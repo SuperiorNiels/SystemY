@@ -31,7 +31,6 @@ public class Node implements NodeInterface, Observer {
     private int numberOfNodesInNetwork = 0;
     private boolean running = true;
     private FileManager manager = new FileManager(rootPath,this);
-
     public Node(String name) {
         this.name = name;
         //starts the watcher thread that watches the map with files
