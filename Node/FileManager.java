@@ -328,7 +328,7 @@ public class FileManager extends Thread {
                 int hashFile = calculateHash(fiche.getFileName());
                 int myhash = calculateHash(rootNode.getName());
                 int nextHash = calculateHash(rootNode.getNext().getName());
-                if (hashFile > hashNext && myhash < nextHash) {
+                if ((hashFile > hashNext && myhash < nextHash) || (hashFile < hashNext && myhash < nextHash)) {
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
