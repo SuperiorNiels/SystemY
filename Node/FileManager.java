@@ -324,7 +324,7 @@ public class FileManager extends Thread {
             }else{
                 //File has been downloaded
                 FileEntry fiche = map.get(filehash);
-                fiche.setLocal(null);
+                fiche.setLocal(new Neighbour(leavingNode.getName(),"Out of System"));
                 map.put(filehash,fiche);
             }
         }
