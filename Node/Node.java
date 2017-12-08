@@ -315,6 +315,8 @@ public class Node implements NodeInterface, Observer {
      * Sends your next 
      */
     public void shutDown(){
+        //Execute the filemanager shutdown
+        manager.shutdown(previous);
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
             if(namingStub.getNumberOfNodes()==1){
@@ -337,11 +339,7 @@ public class Node implements NodeInterface, Observer {
             System.err.println("Malformed URL: "+e.getMessage());
         } catch (RemoteException e) {
             System.err.println("Problem with RMI connection: "+e.getMessage());
-        }finally {
-            //Execute the filemanager shutdown
-            manager.shutdown(previous);
         }
-
     }
 
     /**
