@@ -145,11 +145,6 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
-            if(Integer.parseInt(parts[1]) == 0) {
-                // I'm the first node in the network
-                // start a new fileAgent
-                agentHandler.runAgent(agentHandler.createNewFileAgent());
-            }
             // fills in the ip of the nameserver
             namingServerIp = parts[4];
             // checks if you are the new node that just joined
@@ -318,7 +313,8 @@ public class Node implements NodeInterface, Observer {
                 System.err.println("RMI to node failed.");
                 //e.printStackTrace();
             }
-
+            // Start a fileAgent
+            agentHandler.runAgent(agentHandler.createNewFileAgent());
         }
     }
 

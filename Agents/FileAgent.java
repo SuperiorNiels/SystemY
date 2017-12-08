@@ -8,8 +8,11 @@ import Node.Node;
 public class FileAgent extends Agent {
 
     private TreeMap<String, Semaphore> files = new TreeMap<String, Semaphore>();
-    private AgentType type = AgentType.FILE_AGENT;
     private Node node;
+
+    public FileAgent() {
+        super(AgentType.FILE_AGENT);
+    }
 
     public void setNode(Node node) {
         this.node = node;

@@ -38,8 +38,8 @@ public class AgentHandler implements AgentHandlerInterface {
     }
 
     public void runAgent(Agent agent) {
-
-        if(agent.getType() == AgentType.FILE_AGENT) {
+        AgentType type = agent.getType();
+        if (agent.getType().equals(AgentType.FILE_AGENT)) {
             FileAgent fileAgent = (FileAgent) agent;
             fileAgent.setNode(rootNode);
             // Not start() so we return here when run() is finished
@@ -48,19 +48,21 @@ public class AgentHandler implements AgentHandlerInterface {
 
             // Run agent on next node
             Neighbour next = rootNode.getNext();
-            try {
-                AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
-                agentStub.runAgent(agent);
-
-            } catch (NotBoundException e) {
-                e.printStackTrace();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (RemoteException e) {
-                e.printStackTrace();
+            if(!next.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
+                try {
+                    AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
+                    ((FileAgent) agent).setNode(null);
+                    agentStub.runAgent(agent);
+                } catch (NotBoundException e) {
+                    e.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
+        //System.out.println("Ended.");
     }
 
     public FileAgent createNewFileAgent() {
