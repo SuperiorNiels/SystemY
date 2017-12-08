@@ -2,27 +2,28 @@ package Node;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class FileEntry implements Serializable {
     private Neighbour owner;
     private Neighbour replicated;
     private Neighbour local;
-    private ArrayList<Neighbour> downloads;
+    private HashSet<Neighbour> downloads;
     private String fileName;
 
-    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName,ArrayList<Neighbour> downloads) {
+    public FileEntry(Neighbour owner, Neighbour replicated, Neighbour local,String fileName,HashSet<Neighbour> downloads) {
         this.owner = owner;
         this.replicated = replicated;
         this.local = local;
         if(downloads.size()!=0){
             this.downloads = downloads;
         }else{
-            this.downloads = new ArrayList<Neighbour>();
+            this.downloads = new HashSet<Neighbour>();
         }
         this.fileName = fileName;
     }
 
-    public ArrayList<Neighbour> getDownloads() {
+    public HashSet<Neighbour> getDownloads() {
         return downloads;
     }
 

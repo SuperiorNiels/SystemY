@@ -14,10 +14,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
@@ -101,7 +98,7 @@ public class FileManager extends Thread {
             }
 
             NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
-            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),new ArrayList());
+            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),new HashSet<Neighbour>());
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
@@ -118,7 +115,7 @@ public class FileManager extends Thread {
      * @param local
      * @param fileName
      */
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName,ArrayList<Neighbour> downloads) {
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName,HashSet<Neighbour> downloads) {
         FileEntry new_entry = new FileEntry(owner, replicated, local, fileName,downloads);
         map.put(calculateHash(fileName), new_entry);
     }
@@ -274,7 +271,7 @@ public class FileManager extends Thread {
                             //the replicated node can be one of 2 options:
                             //  - your previous
                             //  - the previous of the previous
-                            NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
+                            NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                             ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                         } catch (NotBoundException | MalformedURLException | RemoteException e) {
                             System.err.println("RMI error in filemanager shutdown!");
@@ -342,7 +339,7 @@ public class FileManager extends Thread {
         int filehash = calculateHash(filename);
         if(map.containsKey(filehash)){
             FileEntry fiche = map.get(filehash);
-            fiche.getDownloads().remove(fiche.getDownloads().indexOf(leavingNode));
+            fiche.getDownloads().remove(leavingNode);
             map.put(filehash,fiche);
         }
     }
@@ -421,11 +418,11 @@ public class FileManager extends Thread {
                     map.put(calculateHash(f.getName()),nodeStub.getFileEntry(filename));
                 }else{
                     //You are the owner put your file entry
-                    map.put(calculateHash(f.getName()),map.get(calculateHash(f.getName())));
+                    map.put(calculateHash(f.getName()),getFileEntry(f.getName()));
                 }
             }
         }else{
-            return null; //Your replicated map is empty!
+            return null; //The folder is empty!
         }
         return map;
     }
