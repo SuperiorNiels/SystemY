@@ -100,7 +100,7 @@ public class FileManager extends Thread {
             NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
             FileEntry entry = owner_stub.getFileEntry(file.getName());
 
-            if(entry != null) {
+            if(entry == null) {
                 // This file entry enters the system for the first time.
                 owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),new HashSet<Neighbour>());
             } else {
