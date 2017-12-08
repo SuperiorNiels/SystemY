@@ -1,11 +1,15 @@
 package Node;
 
+import Agents.AgentHandler;
 import NameServer.NamingInterface;
 import Network.MulticastService;
+import Network.SendTCP;
+import Network.TCPListenerService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -14,6 +18,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class Node implements NodeInterface, Observer {
     private Neighbour previous = null;
@@ -22,13 +27,41 @@ public class Node implements NodeInterface, Observer {
     private String name = null;
     private String rootPath = "./files/";
     private String namingServerIp = null;
-    //Amout of nodes in the network, is only actual when the node is added to the network!
-    private boolean running = true;
     private FileManager manager = new FileManager(rootPath,this);
-    public Node(String name) {
+    private boolean running = true;
+
+    // AgentHandler, handler for fileAgent and failureAgent
+    private AgentHandler agentHandler;
+    // Files map updates by file agent
+    TreeMap<String, Semaphore> files = new TreeMap<>();
+
+    public Node() {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Hostname: ");
+        String name = input.nextLine();
         this.name = name;
-        //starts the watcher thread that watches the map with files
-        manager.start();
+    }
+
+    public TreeMap<String, Semaphore> getFiles() {
+        return files;
+    }
+
+    public void setFiles(TreeMap<String, Semaphore> files) {
+        this.files = files;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void printFiles() {
+        if(files.size() != 0) {
+            for (String filename : files.keySet()) {
+                System.out.println(filename + " Locked: " + files.get(filename).toString());
+            }
+        } else {
+            System.out.println("No files found!");
+        }
     }
 
     /**
@@ -36,6 +69,7 @@ public class Node implements NodeInterface, Observer {
      * Bootstraps the node
      */
     public void bootstrap() {
+        //starts the watcher thread that watches the map with files
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             // update ip
@@ -48,6 +82,9 @@ public class Node implements NodeInterface, Observer {
             //starts the multicast thread
             multicast.start();
             startRMI();
+            // Start fileManger and agentHandler
+            agentHandler = new AgentHandler(this);
+            manager.start();
             //sends the multicast to the network
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
@@ -65,9 +102,19 @@ public class Node implements NodeInterface, Observer {
                         System.err.println("Please enter a message to multicast.");
                     }
                 } else if (parts[0].toLowerCase().equals("print")) {
-                    System.out.println("Previous: " + previous.toString());
-                    System.out.println("Next: " + next.toString());
-                    System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
+                    if(parts[1].toLowerCase().equals("nodes")) {
+                        System.out.println("Previous: " + previous.toString());
+                        System.out.println("Next: " + next.toString());
+                        System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
+                    } else if(parts[1].toLowerCase().equals("hash")) {
+                        System.out.println(calculateHash(name));
+                    } else if(parts[1].toLowerCase().equals("entries")) {
+                        manager.printMap();
+                    } else if(parts[1].toLowerCase().equals("files")) {
+                        printFiles();
+                    } else {
+                        System.out.println("Enter parameter for what to print.");
+                    }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
                     shutDown();
@@ -75,12 +122,8 @@ public class Node implements NodeInterface, Observer {
                     multicast.terminate();
                     //stops SystemY process
                     System.exit(0);
-                } else if(parts[0].toLowerCase().equals("hash")) {
-                    System.out.println(calculateHash(name));
                 } else if(parts[0].toLowerCase().equals("fail")) {
                     failure(previous);
-                } else if(parts[0].toLowerCase().equals("printfm")) {
-                        manager.printMap();
                 } else {
                     System.err.println("Command not found.");
                 }
@@ -105,6 +148,11 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
+            if(Integer.parseInt(parts[1]) == 0) {
+                // I'm the first node in the network
+                // start a new fileAgent
+                agentHandler.runAgent(agentHandler.createNewFileAgent());
+            }
             // fills in the ip of the nameserver
             namingServerIp = parts[4];
             // checks if you are the new node that just joined
@@ -419,7 +467,7 @@ public class Node implements NodeInterface, Observer {
      * @param downloads
      */
     @Override
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, HashSet<Neighbour> downloads) {
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, ArrayList<Neighbour> downloads) {
         manager.createFileEntry(owner,replicated,local,fileName,downloads);
     }
 
@@ -452,5 +500,19 @@ public class Node implements NodeInterface, Observer {
     @Override
     public FileEntry getFileEntry(String fileName) throws NullPointerException {
         return manager.getFileEntry(fileName);
+    }
+
+    /**
+     * Function returs a list of names of all owned files.
+     * @return
+     */
+    public ArrayList<String> getOwnedFiles() {
+        ArrayList<String> list = new ArrayList<>();
+        TreeMap<Integer, FileEntry> map = manager.getMap();
+        for(Integer entry_key : map.keySet()) {
+            FileEntry entry = map.get(entry_key);
+            list.add(entry.getFileName());
+        }
+        return list;
     }
 }
