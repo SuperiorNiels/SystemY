@@ -98,7 +98,15 @@ public class FileManager extends Thread {
             }
 
             NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
-            owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),new HashSet<Neighbour>());
+            FileEntry entry = owner_stub.getFileEntry(file.getName());
+
+            if(entry != null) {
+                // This file entry enters the system for the first time.
+                owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),new HashSet<Neighbour>());
+            } else {
+                // This file has already been in the system and probably has been downloaded
+                owner_stub.createFileEntry(owner, replicated, new Neighbour(rootNode.getName(), rootNode.getIp()),file.getName(),entry.getDownloads());
+            }
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound");
         } catch (MalformedURLException e) {
@@ -265,7 +273,6 @@ public class FileManager extends Thread {
                                 sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                                 replicated = prev;
                             }
-
                             //Send file entry to new owner node
                             //the new owner node is always your previous node
                             //the replicated node can be one of 2 options:
@@ -278,7 +285,6 @@ public class FileManager extends Thread {
                         }
                     }
                 }
-
                 //Second the local files
                 TreeMap<Integer,FileEntry> localFiles = getFilesMap(LOCAL_FOLDER);
                 if(localFiles!=null){
