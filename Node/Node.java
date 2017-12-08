@@ -3,13 +3,10 @@ package Node;
 import Agents.AgentHandler;
 import NameServer.NamingInterface;
 import Network.MulticastService;
-import Network.SendTCP;
-import Network.TCPListenerService;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.Socket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -467,7 +464,7 @@ public class Node implements NodeInterface, Observer {
      * @param downloads
      */
     @Override
-    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, ArrayList<Neighbour> downloads) {
+    public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, HashSet<Neighbour> downloads) {
         manager.createFileEntry(owner,replicated,local,fileName,downloads);
     }
 
