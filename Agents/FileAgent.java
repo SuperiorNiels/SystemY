@@ -10,6 +10,8 @@ public class FileAgent extends Agent {
     private TreeMap<String, Semaphore> files = new TreeMap<String, Semaphore>();
     private Node node;
 
+    private AgentHandler handler;
+
     public FileAgent() {
         super(AgentType.FILE_AGENT);
     }
@@ -18,17 +20,25 @@ public class FileAgent extends Agent {
         this.node = node;
     }
 
-    @Override
-    public void run() {
-        for(String filename : node.getOwnedFiles()) {
-            if(!files.containsKey(filename)) {
-                // Add file to list, add new semaphore with one slot and first-in first-out guarantee
-                files.put(filename, new Semaphore(1, true));
-            }
-        }
+    public AgentHandler getHandler() {
+        return handler;
     }
 
-    public TreeMap<String, Semaphore> getFiles() {
-        return files;
+    public void setHandler(AgentHandler handler) {
+        this.handler = handler;
+    }
+
+    @Override
+    public void run() {
+        if (node != null && handler != null) {
+            for (String filename : node.getOwnedFiles()) {
+                if (!files.containsKey(filename)) {
+                    // Add file to list, add new semaphore with one slot and first-in first-out guarantee
+                    files.put(filename, new Semaphore(1, true));
+                }
+            }
+            node.setFiles(files);
+            handler.startNextAgent(this);
+        }
     }
 }

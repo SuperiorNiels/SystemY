@@ -53,8 +53,12 @@ public class Node implements NodeInterface, Observer {
 
     public void printFiles() {
         if(files.size() != 0) {
+            int i = 0;
             for (String filename : files.keySet()) {
-                System.out.println(filename + " Locked: " + files.get(filename).toString());
+                System.out.println("File "+i+": ");
+                System.out.println("\tName: "+filename);
+                System.out.println("\tAvailable Slots: " + files.get(filename).availablePermits());
+                i++;
             }
         } else {
             System.out.println("No files found!");
@@ -314,7 +318,7 @@ public class Node implements NodeInterface, Observer {
                 //e.printStackTrace();
             }
             // Start a fileAgent
-            agentHandler.runAgent(agentHandler.createNewFileAgent());
+            agentHandler.startAgent(agentHandler.createNewFileAgent());
         }
     }
 

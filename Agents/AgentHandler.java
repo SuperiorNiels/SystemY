@@ -3,10 +3,8 @@ package Agents;
 import Node.Node;
 import Node.Neighbour;
 
-import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -37,32 +35,34 @@ public class AgentHandler implements AgentHandlerInterface {
         }
     }
 
-    public void runAgent(Agent agent) {
-        AgentType type = agent.getType();
+    public void startNextAgent(Agent agent) {
         if (agent.getType().equals(AgentType.FILE_AGENT)) {
             FileAgent fileAgent = (FileAgent) agent;
-            fileAgent.setNode(rootNode);
-            // Not start() so we return here when run() is finished
-            agent.run();
-            rootNode.setFiles(fileAgent.getFiles());
+            // Prepare agent for rmi transport
+            fileAgent.setNode(null);
+            fileAgent.setHandler(null);
 
             // Run agent on next node
             Neighbour next = rootNode.getNext();
             if(!next.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
                 try {
                     AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
-                    ((FileAgent) agent).setNode(null);
-                    agentStub.runAgent(agent);
-                } catch (NotBoundException e) {
-                    e.printStackTrace();
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (RemoteException e) {
+                    agentStub.startAgent(agent);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
         //System.out.println("Ended.");
+    }
+
+    public void startAgent(Agent agent) {
+        if (agent.getType().equals(AgentType.FILE_AGENT)) {
+            FileAgent fileAgent = (FileAgent) agent;
+            fileAgent.setNode(rootNode);
+            fileAgent.setHandler(this);
+            new Thread(agent).start();
+        }
     }
 
     public FileAgent createNewFileAgent() {
