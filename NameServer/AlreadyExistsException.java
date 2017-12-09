@@ -1,5 +1,7 @@
 package NameServer;
 
+import java.io.Serializable;
+
 public class AlreadyExistsException extends Exception {
     // Parameterless Constructor
     public AlreadyExistsException() {}

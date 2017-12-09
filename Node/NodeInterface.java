@@ -1,7 +1,5 @@
 package Node;
 
-
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashSet;
@@ -13,7 +11,7 @@ public interface NodeInterface extends Remote {
     public void setPrevious(Neighbour previousNode) throws RemoteException;
     public void updateNode(Neighbour previous, Neighbour next) throws RemoteException;
     public void setNameServerIp(String ip) throws RemoteException;
-    public void failedToAddNode(Exception e) throws RemoteException;
+    public void failedToAddNode() throws RemoteException;
     public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, HashSet<Neighbour> downloads) throws RemoteException;
     public FileEntry getFileEntry(String fileName) throws RemoteException, NullPointerException;
     public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder) throws RemoteException;

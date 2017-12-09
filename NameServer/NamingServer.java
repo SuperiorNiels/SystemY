@@ -26,7 +26,6 @@ import Network.MulticastService;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import Node.Node;
 import Node.NodeInterface;
 import Node.Neighbour;
 
@@ -58,9 +57,17 @@ public class NamingServer implements NamingInterface, Observer {
                         System.out.println(e.getMessage());
                     }
                 } else if(parts[0].toLowerCase().equals("print")) {
-                    System.out.println(map.size());
+                    System.out.println("# nodes in network: "+map.size());
+                } else if(parts[0].toLowerCase().equals("reload")) {
+                    map = new TreeMap<Integer, Neighbour>();
+                    System.out.println("Nameserver reload complete.");
+                } else if(parts[0].toLowerCase().equals("help")) {
+                    System.out.println("Commands: ");
+                    System.out.println("\t- save : saves the current map.");
+                    System.out.println("\t- print: print the current map size.");
+                    System.out.println("\t- reload: reload the nameserver, empty map.");
                 } else {
-                    System.out.println(command);
+                    System.out.println("Command not found, run 'help' to get a list of available commands.");
                 }
             }
         }
@@ -92,19 +99,17 @@ public class NamingServer implements NamingInterface, Observer {
                 System.out.println("Node name already in use, won't add the node");
                 try {
                     NodeInterface wrongNode = (NodeInterface) Naming.lookup("//" + parts[2] + "/Node");
-                    wrongNode.failedToAddNode(e);
+                    wrongNode.failedToAddNode();
                     System.out.println("Succesfully notified and shutdown the wrong node");
                 } catch (NotBoundException e1) {
                     e1.printStackTrace();
                 } catch (MalformedURLException e1) {
                     e1.printStackTrace();
                 } catch (RemoteException e1) {
-                    e1.printStackTrace();
+                    System.out.println("Succesfully notified and shutdown the wrong node");
                 }
 
             }
-        } else {
-            System.out.println(message);
         }
     }
 
@@ -155,6 +160,7 @@ public class NamingServer implements NamingInterface, Observer {
         if(map.remove(getHash(name))== null){
             throw new NullPointerException();
         }
+        System.out.println("Node: "+name+" successfully removed.");
     }
 
     /**
@@ -162,44 +168,46 @@ public class NamingServer implements NamingInterface, Observer {
      * @param path String, path of file to write xml to
      */
     public void createXML(String path) throws Exception {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
+        if(map.size() != 0) {
+            try {
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
 
-            Document xml = builder.newDocument();
-            Element root = xml.createElement("nodes");
-            xml.appendChild(root);
+                Document xml = builder.newDocument();
+                Element root = xml.createElement("nodes");
+                xml.appendChild(root);
 
-            for(Integer hash : map.keySet()) {
-                Element host = xml.createElement("host");
-                host.setAttribute("id", Integer.toString(hash)); // ID can be changed to "hash"
-                root.appendChild(host);
-                // Add IP address
-                Element address = xml.createElement("address");
-                address.appendChild(xml.createTextNode(map.get(hash).getIp()));
-                host.appendChild(address);
-                // Add hostname
-                Element hostname = xml.createElement("hostname");
-                hostname.appendChild(xml.createTextNode(map.get(hash).getName()));
-                host.appendChild(hostname);
+                for (Integer hash : map.keySet()) {
+                    Element host = xml.createElement("host");
+                    host.setAttribute("id", Integer.toString(hash)); // ID can be changed to "hash"
+                    root.appendChild(host);
+                    // Add IP address
+                    Element address = xml.createElement("address");
+                    address.appendChild(xml.createTextNode(map.get(hash).getIp()));
+                    host.appendChild(address);
+                    // Add hostname
+                    Element hostname = xml.createElement("hostname");
+                    hostname.appendChild(xml.createTextNode(map.get(hash).getName()));
+                    host.appendChild(hostname);
+                }
+
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(xml);
+                File file = new File(path);
+                StreamResult result = new StreamResult(file);
+
+                transformer.transform(source, result);
+            } catch (ParserConfigurationException e) {
+                throw e;
+            } catch (TransformerConfigurationException e) {
+                throw e;
+            } catch (TransformerException e) {
+                throw e;
             }
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(xml);
-            File file = new File(path);
-            StreamResult result = new StreamResult(file);
-
-            transformer.transform(source, result);
-        }
-        catch(ParserConfigurationException e) {
-            throw e;
-        }
-        catch(TransformerConfigurationException e) {
-            throw e;
-        }
-        catch(TransformerException e) {
-            throw e;
+            System.out.println("Map saved to ./data/output.xml");
+        } else {
+            System.out.println("Empty map (no nodes in network), map not saved.");
         }
     }
 

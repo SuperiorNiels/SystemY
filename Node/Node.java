@@ -449,9 +449,9 @@ public class Node implements NodeInterface, Observer {
     /**
      * Function that gets called by the name server through RMI when the node can't be added
      */
-    public void failedToAddNode(Exception e){
-        System.err.println("Failed to add the node to the Nameserver");
-        System.err.println("Error is caused by the following exception: "+e.getMessage());
+    public void failedToAddNode(){
+        System.err.println("Failed to add the node to the Nameserver.");
+        // Causes RMI problem
         System.exit(1);
     }
 
