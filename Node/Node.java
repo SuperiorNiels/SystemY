@@ -130,12 +130,38 @@ public class Node implements NodeInterface, Observer {
                     System.exit(0);
                 } else if(parts[0].toLowerCase().equals("fail")) {
                     failure(previous);
+                } else if(parts[0].toLowerCase().equals("owner")) {
+                    try {
+                        String filename = parts[1];
+                        if(filename != null) {
+                            NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+                            Neighbour node = namingStub.getOwner(filename);
+                            System.out.println("Owner: "+node.toString());                       }
+                    } catch (Exception e) {
+                        System.out.println("Enter filename as parameter.");
+                    }
+                } else if(parts[0].toLowerCase().equals("remove")) {
+                    try {
+                        String nodename = parts[1];
+                        NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + namingServerIp + "/NamingServer");
+                        namingStub.removeNode(nodename);
+                        System.out.println("Node removed from name server.");
+                    } catch (RemoteException e) {
+                        System.out.println("RMI to nameserver failed.");
+                    } catch (NullPointerException e) {
+                        System.out.println("Failed to remove node. Node not found.");
+                    } catch (MalformedURLException e) {
+                        System.out.println("Malformed URL");
+                    } catch (NotBoundException e) {
+                        System.out.println("Not bound");
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        System.out.println("Enter name of node to remove.");
+                    }
                 } else {
                     System.err.println("Command not found.");
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.err.println("IOException: multicast failed.");
         }
     }
@@ -235,7 +261,7 @@ public class Node implements NodeInterface, Observer {
         int Nodes = 0;
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-                Nodes = namingStub.getNumberOfNodes();
+            Nodes = namingStub.getNumberOfNodes();
         } catch (NotBoundException e) {
             e.printStackTrace();
         } catch (MalformedURLException e) {
