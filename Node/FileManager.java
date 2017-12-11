@@ -376,7 +376,7 @@ public class FileManager extends Thread {
                 int nextHash = calculateHash(rootNode.getNext().getName());
                 //Check for filehash bigger then your next's hash
                 //And the special case when a new highest node joins --> he needs all the lower then the lowest file entries
-                if ((fileHash > nextHash) || (fileHash < nextHash && nextOfNextHash < nextHash )){
+                if ((fileHash > nextHash) || (fileHash < myHash && nextOfNextHash < nextHash )){
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
