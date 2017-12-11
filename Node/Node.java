@@ -37,6 +37,7 @@ public class Node implements NodeInterface, Observer {
         System.out.println("Hostname: ");
         String name = input.nextLine();
         this.name = name;
+        bootstrap();
     }
 
     public TreeMap<String, Semaphore> getFiles() {
