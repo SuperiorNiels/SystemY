@@ -207,9 +207,10 @@ public class FileManager extends Thread {
     /**
      * This function removes all the entries from the entries map
      */
-    public void clearEntries(){
+    public void clearEntries() {
         map = new TreeMap<Integer, FileEntry>();
     }
+
     /**
      * watcher thread that watches the folders that contain
      */
@@ -373,7 +374,7 @@ public class FileManager extends Thread {
                 int fileHash = calculateHash(fiche.getFileName());
                 int myHash = calculateHash(rootNode.getName());
                 int nextHash = calculateHash(rootNode.getNext().getName());
-                if ((fileHash > nextHash) || (fileHash < nextHash && myHash > nextHash)) {
+                if ((fileHash > nextHash) || (fileHash > nextHash && myHash > nextHash)) {
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
