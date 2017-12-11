@@ -104,17 +104,21 @@ public class Node implements NodeInterface, Observer {
                         System.err.println("Please enter a message to multicast.");
                     }
                 } else if (parts[0].toLowerCase().equals("print")) {
-                    if(parts[1].toLowerCase().equals("nodes")) {
-                        System.out.println("Previous: " + previous.toString());
-                        System.out.println("Next: " + next.toString());
-                        System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
-                    } else if(parts[1].toLowerCase().equals("hash")) {
-                        System.out.println(calculateHash(name));
-                    } else if(parts[1].toLowerCase().equals("entries")) {
-                        manager.printMap();
-                    } else if(parts[1].toLowerCase().equals("files")) {
-                        printFiles();
-                    } else {
+                    try {
+                        if (parts[1].toLowerCase().equals("nodes")) {
+                            System.out.println("Previous: " + previous.toString());
+                            System.out.println("Next: " + next.toString());
+                            System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
+                        } else if (parts[1].toLowerCase().equals("hash")) {
+                            System.out.println(calculateHash(name));
+                        } else if (parts[1].toLowerCase().equals("entries")) {
+                            manager.printMap();
+                        } else if (parts[1].toLowerCase().equals("files")) {
+                            printFiles();
+                        } else {
+                            System.out.println("Enter correct parameter for what to print.");
+                        }
+                    } catch(NullPointerException e) {
                         System.out.println("Enter parameter for what to print.");
                     }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
