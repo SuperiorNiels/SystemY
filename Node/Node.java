@@ -290,7 +290,7 @@ public class Node implements NodeInterface, Observer {
                 Neighbour previous_next = next;
                 next = new Neighbour(new_name, new_ip);
                 // update the files.
-                manager.updateFilesNewNode();
+                manager.updateFilesNewNode(myNext);
                 System.out.println("New node is my new next: RMI to "+new_ip);
                 try {
                     NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
@@ -313,7 +313,7 @@ public class Node implements NodeInterface, Observer {
             Neighbour new_neighbour = new Neighbour(new_name, new_ip);
             Neighbour self = new Neighbour(name, ip);
             updateNode(new_neighbour, new_neighbour);
-            manager.updateFilesNewNode();
+            manager.updateFilesNewNode(Integer.MAX_VALUE); //Give max integer so the check for new highest node is always false
             manager.initialize();
             System.out.println("I am the only node, new node added: RMI to "+new_ip);
             try {

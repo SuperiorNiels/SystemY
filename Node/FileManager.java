@@ -365,7 +365,7 @@ public class FileManager extends Thread {
      * if hash(file) is closer to hash next
      * send file to next, update nameserver about owner
      */
-    public void updateFilesNewNode(){
+    public void updateFilesNewNode(int nextOfNextHash ){
         Neighbour next = rootNode.getNext();
         try {
             for(Iterator<Map.Entry<Integer, FileEntry>> it = map.entrySet().iterator(); it.hasNext(); ) {
@@ -374,7 +374,9 @@ public class FileManager extends Thread {
                 int fileHash = calculateHash(fiche.getFileName());
                 int myHash = calculateHash(rootNode.getName());
                 int nextHash = calculateHash(rootNode.getNext().getName());
-                if ((fileHash > nextHash) || (fileHash > nextHash && myHash > nextHash)) {
+                //Check for filehash bigger then your next's hash
+                //And the special case when a new highest node joins --> he needs all the lower then the lowest file entries
+                if ((fileHash > nextHash) || (fileHash < nextHash && nextOfNextHash < nextHash )){
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
