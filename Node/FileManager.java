@@ -261,7 +261,7 @@ public class FileManager extends Thread {
                     try {
                         //Get RMI to the previous node
                         NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
-                        if(number > 1){
+                        if(number > 1) {
                             if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                                 //send replicate to prev of prev
                                 if(!nodeStub.getPrevious().equals(fiche.getLocal())) { //Check if the prev has a prev
@@ -273,15 +273,15 @@ public class FileManager extends Thread {
                                 sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
                                 replicated = prev;
                             }
-                        }
 
-                        //Send file entry to new owner node
-                        //the new owner node is always your previous node
-                        //the replicated node can be one of 2 options:
-                        //  - your previous
-                        //  - the previous of the previous
-                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
-                        ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
+                            //Send file entry to new owner node
+                            //the new owner node is always your previous node
+                            //the replicated node can be one of 2 options:
+                            //  - your previous
+                            //  - the previous of the previous
+                            NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                            ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
+                        }
                     } catch (NotBoundException | MalformedURLException | RemoteException e) {
                         System.err.println("RMI error in filemanager shutdown!");
                     }
