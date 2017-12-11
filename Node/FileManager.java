@@ -287,7 +287,8 @@ public class FileManager extends Thread {
                                 //the replicated node can be one of 2 options:
                                 //  - your previous
                                 //  - the previous of the previous
-                                NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                                NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
+                                NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
                                 ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                             //}
                         } catch (NotBoundException | MalformedURLException | RemoteException e) {
