@@ -269,7 +269,6 @@ public class FileManager extends Thread {
                         try {
                             //Get RMI to the previous node
                             NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
-                           // if(number > 1) {
                                 if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                                     //send replicate to prev of prev
                                     if(!nodeStub.getPrevious().equals(fiche.getLocal())) { //Check if the prev has a prev
@@ -287,10 +286,16 @@ public class FileManager extends Thread {
                                 //the replicated node can be one of 2 options:
                                 //  - your previous
                                 //  - the previous of the previous
+
                                 NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
-                                NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
+                                 NodeInterface ownerStub = null;
+                                //Check if you own the the file entry so this can be moved to your previous node
+                                if(fiche.getOwner().getName().equals(rootNode.getName())){
+                                    ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                                }else{
+                                    ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
+                                }
                                 ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
-                            //}
                         } catch (NotBoundException | MalformedURLException | RemoteException e) {
                             System.err.println("RMI error in filemanager shutdown!");
                         }
