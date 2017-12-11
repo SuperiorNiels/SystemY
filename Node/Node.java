@@ -511,7 +511,7 @@ public class Node implements NodeInterface, Observer {
      */
     public ArrayList<String> getOwnedFiles() {
         ArrayList<String> list = new ArrayList<>();
-        TreeMap<Integer, FileEntry> map = manager.getMap();
+        TreeMap<Integer, FileEntry> map = (TreeMap<Integer, FileEntry>) manager.getMap().clone();
         for(Integer entry_key : map.keySet()) {
             FileEntry entry = map.get(entry_key);
             list.add(entry.getFileName());
