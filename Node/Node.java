@@ -118,7 +118,7 @@ public class Node implements NodeInterface, Observer {
                         } else {
                             System.out.println("Enter correct parameter for what to print.");
                         }
-                    } catch(NullPointerException e) {
+                    } catch(Exception e) {
                         System.out.println("Enter parameter for what to print.");
                     }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
