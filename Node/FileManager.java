@@ -400,7 +400,7 @@ public class FileManager extends Thread {
 
                     //Via RMI set update the file fiche on the owner
                     NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
-                    NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node");
+                    NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node"); //namingStub.getOwner(fiche.getFileName())
                     nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
                     it.remove();
                 }
