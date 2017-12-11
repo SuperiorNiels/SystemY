@@ -312,6 +312,7 @@ public class Node implements NodeInterface, Observer {
             Neighbour new_neighbour = new Neighbour(new_name, new_ip);
             Neighbour self = new Neighbour(name, ip);
             updateNode(new_neighbour, new_neighbour);
+            manager.clearEntries();
             manager.updateFilesNewNode();
             manager.initialize();
             System.out.println("I am the only node, new node added: RMI to "+new_ip);

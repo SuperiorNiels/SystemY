@@ -205,6 +205,12 @@ public class FileManager extends Thread {
     }
 
     /**
+     * This function removes all the entries from the entries map
+     */
+    public void clearEntries(){
+        map = new TreeMap<Integer, FileEntry>();
+    }
+    /**
      * watcher thread that watches the folders that contain
      */
     public void run() {
