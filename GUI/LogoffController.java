@@ -14,6 +14,14 @@ import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
+/**
+ * LogoffController is the controller for the LogOffview.
+ * LogOffview is created with JavaFXscenebuilder.
+ * LogOffView is opened when a user clicks on the button "log off" or when the user clicks on the exit button on the mainview.
+ * In the LogOffview the user is asked is it really wants to log off.
+ * When the users clicks the yes button the node is propely shutdown and the application stops.
+ * otherwise th logOffview closes and the mainview opens again.
+ */
 public class LogoffController {
 
     @FXML
@@ -41,10 +49,6 @@ public class LogoffController {
         System.exit(0);
     };
 
-    /**
-     * close current (logoff) window
-     * go back to mainview
-     */
     public void mainView(){
         headController.toMain();
     }

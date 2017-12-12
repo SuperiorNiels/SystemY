@@ -6,6 +6,12 @@ import javafx.scene.Parent;
 
 import java.io.IOException;
 
+
+/**
+ * this controller controls all the controllers for each view
+ * it creates a loader , controller and parent for each view
+ * afterwarts each viewcontroller can ask the HeadController to open another view
+ */
 public class HeadController {
 
     private FXMLLoader opening  = new FXMLLoader();

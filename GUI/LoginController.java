@@ -21,6 +21,14 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
 
+
+/**
+ * LoginController is the controller for the loginView.
+ * Loginview is created with JavaFx scenebuilder.
+ * Loginview is the view that the user gets when it choose for Client in the OpeningView.
+ * In the loginView you HAVE to enter a name and you can choose your interface.
+ * When the user clicks on the button login a new node is created, this view closes and the mainview opens.
+ */
 public class LoginController {
 
     private int viewWidth  = 333;

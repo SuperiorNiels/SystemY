@@ -6,6 +6,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * this Class starts when the user opens the application.
+ * The headcontroller is created and the openingview opens.
+ */
 
 public class Main extends Application {
 

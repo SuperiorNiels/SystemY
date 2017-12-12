@@ -15,6 +15,13 @@ import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
+
+/**
+ * NetworkController is the controller for the networkview.
+ * networkview is created by JavaFxScenebuilder.
+ * In the networkview the user can see how many nodes theire are in the network
+ * and who his previous and next node are.
+ */
 public class NetworkController {
 
     private int viewWidth  = 300;

@@ -11,6 +11,11 @@ import javafx.stage.StageStyle;
 
 import java.io.IOException;
 
+/**
+ * OpeningController is the controller for the openingView.
+ * OpeningView is created by JavaFXscenebuilder.
+ * In the openingView the user can choose if it starts as a client or a server.
+ */
 public class OpeningController {
 
     private int viewWidth  = 346;

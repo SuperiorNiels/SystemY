@@ -11,7 +11,11 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-
+/**
+ * ServerController is the controller for serverView.
+ * severView is created with JavaFXsceneBuilder.
+ * In the serverView the user can see all the notifications it receives.
+ */
 public class ServerController {
 
     private int viewWidth  = 600;
