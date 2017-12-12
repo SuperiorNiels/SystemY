@@ -310,13 +310,14 @@ public class FileManager extends Thread {
                         FileEntry fiche = entry.getValue();
                         NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
                         NodeInterface ownerStub = null;
+                        Neighbour owner = namingStub.getOwner(fiche.getFileName());
                         //Check if you own the the file entry so this can be moved to your previous node
-                        if(fiche.getOwner().getName().equals(rootNode.getName())){
+                        if(owner.getName().equals(rootNode.getName())){
                             //If you are the owner set ownerStub to previous and create the entry
                             ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
                             ownerStub.createFileEntry(prev,prev,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                         }else{
-                            ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
+                            ownerStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
                         }
                         //Check the entry for downloads
                         ownerStub.remoteCheckFileEntry(fiche.getFileName(),new Neighbour(rootNode.getName(),rootNode.getIp()));
