@@ -384,7 +384,7 @@ public class FileManager extends Thread {
                 int myHash = calculateHash(rootNode.getName());
                 int nextHash = calculateHash(rootNode.getNext().getName());
                 //Check for filehash bigger then your next's hash
-                //And the special case when a new highest node joins --> he needs all the lower then the lowest file entries
+                //And the special case when a new highest node joins --> he needs all the lower than the lowest node file entries
                 if ((fileHash > nextHash) || (fileHash < myHash && nextOfNextHash < nextHash )){
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
@@ -403,14 +403,13 @@ public class FileManager extends Thread {
                         fiche.addNode(new Neighbour(fiche.getReplicated().getName(), fiche.getReplicated().getIp()));
                     }
 
-
                     //update fileEntry: new node becomes owner of the file
                     fiche.setOwner(next);
 
                     //Via RMI set update the file fiche on the owner
                     NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
                     NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node"); //namingStub.getOwner(fiche.getFileName())
-                    nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
+                    nodeStub.createFileEntry(fiche.getOwner(), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads()); //namingStub.getOwner(fiche.getFileName())
                     it.remove();
                 }
             }
