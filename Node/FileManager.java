@@ -312,10 +312,13 @@ public class FileManager extends Thread {
                         NodeInterface ownerStub = null;
                         //Check if you own the the file entry so this can be moved to your previous node
                         if(fiche.getOwner().getName().equals(rootNode.getName())){
+                            //If you are the owner set ownerStub to previous and create the entry
                             ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                            ownerStub.createFileEntry(prev,prev,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                         }else{
                             ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
                         }
+                        //Check the entry for downloads
                         ownerStub.remoteCheckFileEntry(fiche.getFileName(),new Neighbour(rootNode.getName(),rootNode.getIp()));
                     }
                 }
@@ -340,7 +343,7 @@ public class FileManager extends Thread {
     }
 
     /**
-     * This funtion check if a file has been downloaded before,
+     * This function check if a file has been downloaded before,
      * if not it removes the file from the system
      * else it removes the local field from the entry
      * @param filename
