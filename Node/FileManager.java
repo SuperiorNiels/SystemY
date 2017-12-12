@@ -408,9 +408,18 @@ public class FileManager extends Thread {
 
                     //Via RMI set update the file fiche on the owner
                     NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
-                    NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node"); //namingStub.getOwner(fiche.getFileName())
-                    nodeStub.createFileEntry(fiche.getOwner(), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads()); //namingStub.getOwner(fiche.getFileName())
-                    it.remove();
+                    NodeInterface nodeStub = null;
+                    //Check if you own the the file entry so this can be moved to your previous node
+                    if(namingStub.getOwner(fiche.getFileName()).getName().equals(rootNode.getName())){
+                        //When you are the owner yourself
+                        //Update the your file entry
+                        nodeStub = (NodeInterface) Naming.lookup("//" + rootNode.getIp() + "/Node");
+                    }else{
+                        //When you are not the owner update delete your file entry and create an entry on the new owner
+                        nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node");
+                        it.remove();
+                    }
+                    nodeStub.createFileEntry(fiche.getOwner(), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
                 }
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
