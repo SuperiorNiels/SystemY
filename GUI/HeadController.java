@@ -1,5 +1,6 @@
 package GUI;
 
+
 import javafx.fxml.FXMLLoader;
 import Node.Node;
 import javafx.scene.Parent;
@@ -36,8 +37,8 @@ public class HeadController {
 
     public HeadController() throws IOException {
         opening.setLocation( getClass().getResource("OpeningView.fxml"));
-        server.setLocation(  getClass().getResource("serverView.fxml" ));
-        login.setLocation(   getClass().getResource("loginView.fxml"  ));
+        server.setLocation(  getClass().getResource("ServerView.fxml" ));
+        login.setLocation(   getClass().getResource("LoginView.fxml"  ));
         main.setLocation(    getClass().getResource("mainView.fxml"   ));
         network.setLocation( getClass().getResource("networkView.fxml"));
         logoff.setLocation(  getClass().getResource("logoffView.fxml" ));
