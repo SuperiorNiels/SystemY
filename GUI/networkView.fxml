@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="193.9609375" prefWidth="258.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.NetworkController">
+  <children>
+    <Label fx:id="numberOfNodeLabel" layoutX="136.0" layoutY="40.0" text="Label" />
+    <Text layoutX="38.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="node in network" />
+    <Text layoutX="38.0" layoutY="85.0" strokeType="OUTSIDE" strokeWidth="0.0" text="previous" />
+    <Text layoutX="38.0" layoutY="132.0" strokeType="OUTSIDE" strokeWidth="0.0" text="next" />
+    <Label fx:id="previousLabel" layoutX="136.0" layoutY="75.0" text="Label" />
+    <Label fx:id="nextLabel" layoutX="136.0" layoutY="122.0" text="Label" />
+    <Button fx:id="backButton" layoutX="27.0" layoutY="159.0" mnemonicParsing="false" onAction="#mainView" text="back" />
+  </children>
+</AnchorPane>

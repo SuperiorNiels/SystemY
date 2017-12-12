@@ -1,8 +1,11 @@
 package Node;
 
 import Agents.AgentHandler;
+import GUI.MainController;
 import NameServer.NamingInterface;
+import NameServer.NamingServer;
 import Network.MulticastService;
+import javafx.fxml.FXMLLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +29,7 @@ public class Node implements NodeInterface, Observer {
     private String namingServerIp = null;
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
+    private MainController controller;
 
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
@@ -39,12 +43,21 @@ public class Node implements NodeInterface, Observer {
         this.name = name;
     }
 
+    public Node(String name,String ip){
+        this.name = name;
+        this.ip   = ip;
+    }
+
+    public void setController(MainController controller){
+        this.controller = controller;
+    }
     public TreeMap<String, Semaphore> getFiles() {
         return files;
     }
 
     public void setFiles(TreeMap<String, Semaphore> files) {
         this.files = files;
+        controller.update();
     }
 
     public boolean isRunning() {
@@ -74,7 +87,7 @@ public class Node implements NodeInterface, Observer {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             // update ip
-            ip = multicast.getIpAddress();
+            //ip = multicast.getIpAddress();
             Neighbour self = new Neighbour(name, ip);
             //set your neighbours as yourself
             updateNode(self, self);
@@ -89,10 +102,14 @@ public class Node implements NodeInterface, Observer {
             //sends the multicast to the network
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
-            Scanner input = new Scanner(System.in);
+
+            //command this part because GUI will handel this.
+            //Scanner input = new Scanner(System.in);
             /*
             * This part is used to test and debug
+            *
              */
+            /*
             while(running) {
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
@@ -129,6 +146,7 @@ public class Node implements NodeInterface, Observer {
                     System.err.println("Command not found.");
                 }
             }
+            */
         }
         catch (IOException e) {
             System.err.println("IOException: multicast failed.");
@@ -389,6 +407,7 @@ public class Node implements NodeInterface, Observer {
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
     }
+
 
     /**
      * This methode executes when a node wants to communicate with annother node
