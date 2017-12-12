@@ -76,9 +76,10 @@ public class LoginController {
             headController.toLoading();
             node = new Node(name , ipParts[1]);
             headController.setNode(node);
+            node.bootstrap();
             headController.toMain();
             headController.closeLoading();
-            node.bootstrap();
+
         }else{
             errorLabel.setText("Please enter a name");
         }

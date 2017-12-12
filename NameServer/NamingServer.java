@@ -37,10 +37,12 @@ public class NamingServer implements NamingInterface, Observer {
     private String ip = null;
     MulticastService multicast;
     private ServerController controller;
+    private NameServerOutputHandler handler;
 
     public NamingServer() { }
 
     public void start(){
+        handler = new NameServerOutputHandler();
         try {
             multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
@@ -79,7 +81,9 @@ public class NamingServer implements NamingInterface, Observer {
                 }
             }
     }
+
     public void start(ServerController controller) {
+        handler = new NameServerOutputHandler(controller);
         try {
             multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
@@ -107,6 +111,9 @@ public class NamingServer implements NamingInterface, Observer {
     public void update(Observable observable, Object o) {
         String message = o.toString();
         String parts[] = message.split(";");
+        if(controller == null) {
+
+        }
         if(parts[0].equals("00")) {
             controller.update("New node detected. Name: "+parts[1]+" IP: "+parts[2]);
             System.out.println("New node detected.");
