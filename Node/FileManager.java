@@ -301,13 +301,21 @@ public class FileManager extends Thread {
                         }
                     }
                 }
+
                 //Second the local files
                 TreeMap<Integer,FileEntry> localFiles = getFilesMap(LOCAL_FOLDER);
                 if(localFiles!=null){
                     for (Map.Entry<Integer, FileEntry> entry : localFiles.entrySet()) {
                         Integer key = entry.getKey();
                         FileEntry fiche = entry.getValue();
-                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
+                        NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
+                        NodeInterface ownerStub = null;
+                        //Check if you own the the file entry so this can be moved to your previous node
+                        if(fiche.getOwner().getName().equals(rootNode.getName())){
+                            ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                        }else{
+                            ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
+                        }
                         ownerStub.remoteCheckFileEntry(fiche.getFileName(),new Neighbour(rootNode.getName(),rootNode.getIp()));
                     }
                 }
