@@ -520,6 +520,10 @@ public class Node implements NodeInterface, Observer {
         manager.removeFromDownload(filename,leavingNode);
     }
 
+    public TreeMap<Integer,FileEntry> getFileFiches(){
+        return manager.getMap();
+    }
+
     /**
      * Get file entry from node via RMI (if the entry exists)
      * @param fileName
