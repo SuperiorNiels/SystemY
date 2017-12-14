@@ -2,6 +2,8 @@ package Agents;
 
 import NameServer.NamingInterface;
 import Node.Node;
+import Node.FileEntry;
+import Node.Neighbour;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
@@ -34,21 +36,21 @@ public class FailureAgent extends Agent {
     @Override
     public void run() {
         try {
-            TreeMap<Integer, Node.FileEntry> files = node.getFileFiches();
+            TreeMap<Integer, FileEntry> files = node.getFileFiches();
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + node.getNameServerIp() + "/NamingServer");
-            for (Map.Entry<Integer, Node.FileEntry> file : files.entrySet()) {
-                Node.FileEntry fiche = file.getValue();
+            for (Map.Entry<Integer, FileEntry> file : files.entrySet()) {
+                FileEntry fiche = file.getValue();
                 //Check if file is owned by the failing node
                 if(file.getKey() == failingNode){
                     //Change the owner
                     //For this we assume the failed node already left the system and is not listed by the naming server anymore
-                    Node.Neighbour newOwner = namingStub.getOwner(fiche.getFileName());
+                    Neighbour newOwner = namingStub.getOwner(fiche.getFileName());
                     //TODO send file + update file fiche
                 }else{
                     //Check if the file is replicated by the failing node
                     if(calculateHash(fiche.getReplicated().getName()) == failingNode) {
                         //Relocate the file to owner or the prev of the owner
-                        Node.Neighbour newOwner = namingStub.getOwner(fiche.getFileName());
+                        Neighbour newOwner = namingStub.getOwner(fiche.getFileName());
 
                     }
                 }
