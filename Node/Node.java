@@ -4,9 +4,11 @@ import Agents.AgentHandler;
 import NameServer.NamingInterface;
 import Network.MulticastService;
 
+import javax.sql.rowset.serial.SerialRef;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.ServerSocket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -469,12 +471,12 @@ public class Node implements NodeInterface, Observer {
                 //Remove the node at the nameserver
                 nameServer.removeNode(nameFailed);
             }
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
+
+            // Start a failureAgent
+            agentHandler.startAgent(agentHandler.createNewFailureAgent(this,calculateHash(failedNode.getName())));
+
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            System.err.println("Error 4595 solving a failed node: ");
         }
     }
 
@@ -520,8 +522,32 @@ public class Node implements NodeInterface, Observer {
         manager.removeFromDownload(filename,leavingNode);
     }
 
+    /**
+     * This function returns a Treemap with all files and file fiches from the replicated and local
+     * @return
+     */
     public TreeMap<Integer,FileEntry> getFileFiches(){
-        return manager.getMap();
+        TreeMap<Integer,FileEntry> map = null;
+        try {
+            //First get all files and filefiches from the replicated folder
+            TreeMap<Integer,FileEntry> replicated = manager.getFilesMap("replicated");
+            for (Map.Entry<Integer, FileEntry> file : replicated.entrySet()) {
+                map.put(file.getKey(),file.getValue());
+            }
+
+            //Second all file from the local folder
+            TreeMap<Integer,FileEntry> local = manager.getFilesMap("local");
+            for (Map.Entry<Integer, FileEntry> file : local.entrySet()) {
+                map.put(file.getKey(),file.getValue());
+            }
+        } catch (RemoteException e) {
+            System.err.println("Error with RMI from filemanager");
+        } catch (NotBoundException e) {
+            System.err.println("RMI stub not bound");
+        } catch (MalformedURLException e) {
+            System.err.println("Malformed url");
+        }
+        return map;
     }
 
     /**

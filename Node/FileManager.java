@@ -448,7 +448,7 @@ public class FileManager extends Thread {
      * @throws NotBoundException
      * @throws MalformedURLException
      */
-    private TreeMap<Integer,FileEntry> getFilesMap(String target) throws RemoteException, NotBoundException, MalformedURLException {
+    public TreeMap<Integer,FileEntry> getFilesMap(String target) throws RemoteException, NotBoundException, MalformedURLException {
         File[] files = new File(rootPath+"/"+target).listFiles();
         TreeMap<Integer,FileEntry> map = new TreeMap<Integer, FileEntry>();
         if(files!=null){

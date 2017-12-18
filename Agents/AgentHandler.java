@@ -68,4 +68,8 @@ public class AgentHandler implements AgentHandlerInterface {
     public FileAgent createNewFileAgent() {
         return new FileAgent();
     }
+
+    public FailureAgent createNewFailureAgent(Node node,int failingNode) {
+        return new FailureAgent(node,failingNode);
+    }
 }
