@@ -546,23 +546,14 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * This function returns a Treemap with all files and file fiches from the replicated and local 
+     * This function returns a Treemap with all files and file fiches from the replicated and local
      * @return
      */
-    public TreeMap<Integer,FileEntry> getFileFiches(){
+    public TreeMap<Integer,FileEntry> getFileFiches(String target){
         TreeMap<Integer,FileEntry> map = null;
         try {
-            //First get all files and filefiches from the replicated folder
-            TreeMap<Integer,FileEntry> replicated = manager.getFilesMap("replicated");
-            for (Map.Entry<Integer, FileEntry> file : replicated.entrySet()) {
-                map.put(file.getKey(),file.getValue());
-            }
+            TreeMap<Integer,FileEntry> replicated = manager.getFilesMap(target);
 
-            //Second all file from the local folder
-            TreeMap<Integer,FileEntry> local = manager.getFilesMap("local");
-            for (Map.Entry<Integer, FileEntry> file : local.entrySet()) {
-                map.put(file.getKey(),file.getValue());
-            }
         } catch (RemoteException e) {
             System.err.println("Error with RMI from filemanager");
         } catch (NotBoundException e) {
@@ -571,6 +562,14 @@ public class Node implements NodeInterface, Observer {
             System.err.println("Malformed url");
         }
         return map;
+    }
+
+    public void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
+        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder);
+    }
+
+    public void replicate(File file){
+        manager.replicate(file);
     }
 
     /**
