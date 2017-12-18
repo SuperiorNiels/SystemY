@@ -29,6 +29,7 @@ public class Node implements NodeInterface, Observer {
     private String namingServerIp = null;
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
+    private boolean Gui = false;
     private MainController controller;
 
     // AgentHandler, handler for fileAgent and failureAgent
@@ -46,6 +47,7 @@ public class Node implements NodeInterface, Observer {
     public Node(String name,String ip){
         this.name = name;
         this.ip   = ip;
+        this.Gui = true;
     }
 
     public void setController(MainController controller){
@@ -103,14 +105,8 @@ public class Node implements NodeInterface, Observer {
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
 
-            //command this part because GUI will handel this.
-            //Scanner input = new Scanner(System.in);
-            /*
-            * This part is used to test and debug
-            *
-             */
-            /*
-            while(running) {
+            while(running && !Gui) {
+                Scanner input = new Scanner(System.in);
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
                 if (parts[0].toLowerCase().equals("multicast")) {
@@ -146,7 +142,6 @@ public class Node implements NodeInterface, Observer {
                     System.err.println("Command not found.");
                 }
             }
-            */
         }
         catch (IOException e) {
             System.err.println("IOException: multicast failed.");
