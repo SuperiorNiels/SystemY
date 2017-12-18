@@ -3,8 +3,10 @@ package Agents;
 import Node.Node;
 import Node.Neighbour;
 
+import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -44,12 +46,15 @@ public class AgentHandler implements AgentHandlerInterface {
 
             // Run agent on next node
             Neighbour next = rootNode.getNext();
+            if (next == null) { next = new Neighbour(rootNode.getName(),rootNode.getIp()); }
             if(!next.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
                 try {
                     AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
                     agentStub.startAgent(agent);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (RemoteException | NotBoundException e) {
+                    this.startAgent(createNewFailureAgent());
+                } catch (MalformedURLException e) {
+                    System.err.println("Malformed url in RMI fileAgent");
                 }
             }
         }
@@ -69,7 +74,7 @@ public class AgentHandler implements AgentHandlerInterface {
         return new FileAgent();
     }
 
-    public FailureAgent createNewFailureAgent(Node node,int failingNode) {
-        return new FailureAgent(node,failingNode);
+    public FailureAgent createNewFailureAgent() {
+        return new FailureAgent(rootNode, rootNode.getNext());
     }
 }

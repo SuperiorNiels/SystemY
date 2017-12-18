@@ -17,7 +17,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 
 public class Node implements NodeInterface, Observer {
     private Neighbour previous = null;
@@ -32,22 +31,31 @@ public class Node implements NodeInterface, Observer {
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
     // Files map updates by file agent
-    TreeMap<String, Semaphore> files = new TreeMap<>();
+    private TreeMap<String, Boolean> files = new TreeMap<>();
+
+    private ArrayList<String> locksRequest = new ArrayList<>();
 
     public Node() {
         Scanner input = new Scanner(System.in);
         System.out.println("Hostname: ");
-        String name = input.nextLine();
-        this.name = name;
+        this.name = input.nextLine();
         bootstrap();
     }
 
-    public TreeMap<String, Semaphore> getFiles() {
+    public TreeMap<String, Boolean> getFiles() {
         return files;
     }
 
-    public void setFiles(TreeMap<String, Semaphore> files) {
+    public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
+    }
+
+    public ArrayList<String> getLocksRequest() {
+        return locksRequest;
+    }
+
+    public void setLocksRequest(ArrayList<String> locksRequest) {
+        this.locksRequest = locksRequest;
     }
 
     public boolean isRunning() {
@@ -60,7 +68,7 @@ public class Node implements NodeInterface, Observer {
             for (String filename : files.keySet()) {
                 System.out.println("File "+i+": ");
                 System.out.println("\tName: "+filename);
-                System.out.println("\tAvailable Slots: " + files.get(filename).availablePermits());
+                System.out.println("\tAvailable Slots: " + files.get(filename));
                 i++;
             }
         } else {
@@ -425,51 +433,38 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * This methode executes when a node wants to communicate with annother node
-     * and the communication cannot find place because their is a problem with the other node (failedNode)
+     * Method that gets executed when a node fails in a system
+     * When the failure happends, the neighbours of the next and the previous of the failed node get updated
      * @param failedNode
      */
     public void failure(Neighbour failedNode) {
         //Start communication with the nameserver
-        NamingInterface nameServer = null;
         try {
-            nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
             int numberOfNodes = nameServer.getNumberOfNodes();
-
-            /*
-            the procedure to handel failure is different depending on how many nodes there are in the network.
-            the min numberOfNodes is 2 ( in the case when there is only 1 node failure cannot be summoned)
-            */
+            //the procedure to handel failure is different depending on how many nodes there are in the network.
+            //the min numberOfNodes is 2 ( in the case when there is only 1 node failure cannot be summoned)
             if(numberOfNodes == 2){
                 //in the case where there are 2 nodes and one fails the remaining node
                 //gets updated, the nodes previous and next is the node itself.
                 setPrevious(new Neighbour(name,ip));
                 setNext(new Neighbour(name,ip));
+                nameServer.removeNode(failedNode.getName());
+            } else if(numberOfNodes > 2) {
+                //get the previous and next of a given node
+                Neighbour previous = nameServer.findPreviousNode(failedNode.getName());
+                Neighbour next = nameServer.findNextNode(failedNode.getName());
 
-                //not sure if getName would work because failedNode cannot be accesed
-                String nameFailed = failedNode.getName();
-                //Remove the node at the nameserver
-                nameServer.removeNode(nameFailed);
-            }
-            else if(numberOfNodes > 2) {
-                //ask the nameServer for the previous and next node from the failedNode
-
-                //not sure if getName would work because failedNode cannot be accesed
-                String nameFailed = failedNode.getName();
-
-                Neighbour previous = nameServer.findPreviousNode(nameFailed);
-                Neighbour next = nameServer.findNextNode(nameFailed);
-
-                //make communication with these nodes
-                NodeInterface previouscom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
-                NodeInterface nextcom = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
+                //start communication with these nodes
+                NodeInterface previousCom = (NodeInterface) Naming.lookup("//" + previous.getIp() + "/Node");
+                NodeInterface nextCom = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
 
                 //Update the previous node, next node address with the next node
-                previouscom.setNext(new Neighbour(next.getName(), next.getIp()));
+                previousCom.setNext(next);
                 //Update the next node, previous next node address with the previous node
-                nextcom.setPrevious(new Neighbour(previous.getName(), previous.getIp()));
+                nextCom.setPrevious(previous);
                 //Remove the node at the nameserver
-                nameServer.removeNode(nameFailed);
+                nameServer.removeNode(failedNode.getName());
             }
 
             // Start a failureAgent
@@ -573,5 +568,10 @@ public class Node implements NodeInterface, Observer {
             list.add(entry.getFileName());
         }
         return list;
+    }
+
+    public void downloadFile(String fileName) {
+
+
     }
 }

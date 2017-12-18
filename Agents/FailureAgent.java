@@ -13,6 +13,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Semaphore;
 
 public class FailureAgent extends Agent {
 
@@ -21,10 +22,10 @@ public class FailureAgent extends Agent {
     private Node node;
     private final int startNode;
 
-    public FailureAgent(Node node,int failing) {
+    public FailureAgent(Node node,Neighbour failing) {
         super(AgentType.FAILURE_AGENT);
         this.node = node;
-        this.failingNode = failing;
+        this.failingNode = calculateHash(failing.getName());
         this.startNode = calculateHash(node.getName());
     }
 
