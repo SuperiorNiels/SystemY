@@ -59,7 +59,6 @@ public class Node implements NodeInterface, Observer {
     }
 
     public TreeMap<String, Boolean> getFiles() {
-        if (gui) { controller.update(); }
         return files;
     }
 
@@ -595,10 +594,5 @@ public class Node implements NodeInterface, Observer {
             list.add(entry.getFileName());
         }
         return list;
-    }
-
-    public void downloadFile(String fileName) {
-
-
     }
 }

@@ -113,7 +113,6 @@ public void view(Parent root){
     }
 
     public void update(){
-        /*
         files = node.getFiles();
         fileName_list.getItems().clear();
         for (Map.Entry<String, Boolean> entry : files.entrySet()) {
@@ -121,6 +120,5 @@ public void view(Parent root){
             System.out.println(entry.getKey());
         }
         fileName_list.getSelectionModel().selectFirst();
-        */
     }
 }
