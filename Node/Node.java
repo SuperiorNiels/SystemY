@@ -64,7 +64,6 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
-        if (gui) {controller.update(); }
     }
 
     public ArrayList<String> getLocksRequest() {
