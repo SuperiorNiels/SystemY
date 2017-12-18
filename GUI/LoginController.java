@@ -77,6 +77,7 @@ public class LoginController {
             node = new Node(name , ipParts[1]);
             headController.setNode(node);
             node.bootstrap();
+            while(node.getLoggedIn() == false) {}
             headController.toMain();
             headController.closeLoading();
 

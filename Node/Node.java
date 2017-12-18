@@ -3,15 +3,11 @@ package Node;
 import Agents.AgentHandler;
 import GUI.MainController;
 import NameServer.NamingInterface;
-import NameServer.NamingServer;
 import Network.MulticastService;
-import javafx.fxml.FXMLLoader;
 
-import javax.sql.rowset.serial.SerialRef;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -30,7 +26,8 @@ public class Node implements NodeInterface, Observer {
     private String namingServerIp = null;
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
-    private boolean Gui = false;
+    private boolean gui = false;
+    private boolean logged_in = false;
     private MainController controller;
 
     // AgentHandler, handler for fileAgent and failureAgent
@@ -50,20 +47,25 @@ public class Node implements NodeInterface, Observer {
     public Node(String name,String ip){
         this.name = name;
         this.ip   = ip;
-        this.Gui = true;
+        this.gui = true;
     }
 
     public void setController(MainController controller){
         this.controller = controller;
     }
+
+    public Boolean getLoggedIn() {
+        return logged_in;
+    }
+
     public TreeMap<String, Boolean> getFiles() {
-        if (Gui) { controller.update(); }
+        if (gui) { controller.update(); }
         return files;
     }
 
     public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
-        controller.update();
+        if (gui) {controller.update(); }
     }
 
     public ArrayList<String> getLocksRequest() {
@@ -101,7 +103,9 @@ public class Node implements NodeInterface, Observer {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             // update ip
-            //ip = multicast.getIpAddress();
+            if (!gui) {
+                ip = multicast.getIpAddress();
+            }
             Neighbour self = new Neighbour(name, ip);
             //set your neighbours as yourself
             updateNode(self, self);
@@ -117,7 +121,7 @@ public class Node implements NodeInterface, Observer {
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
 
-            while(running && !Gui) {
+            while(running && !gui) {
                 Scanner input = new Scanner(System.in);
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
@@ -203,6 +207,7 @@ public class Node implements NodeInterface, Observer {
             System.out.println("New node detected.");
             System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
         } else if(parts[0].equals("01")) {
+            logged_in = true;
             System.out.println("Nameserver message received. #hosts: "+parts[1]);
             // fills in the ip of the nameserver
             namingServerIp = parts[4];

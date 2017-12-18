@@ -34,7 +34,7 @@ public class MainController {
     private Node node;
     private HeadController headController;
     private Scene view;
-    private TreeMap<String, Semaphore> files;
+    private TreeMap<String, Boolean> files;
 
 public void delete(){
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
@@ -97,7 +97,7 @@ public void view(Parent root){
                 headController.toLogoff();
             }
         });
-        stage.setTitle("SystemY Main");
+        stage.setTitle("SystemY Gui");
         stage.setScene(view);
         stage.show();
     }
@@ -113,12 +113,14 @@ public void viewNetwork(){
     }
 
 public void update(){
+    /*
     files = node.getFiles();
     fileName_list.getItems().clear();
-    for (Map.Entry<String, Semaphore> entry : files.entrySet()) {
+    for (Map.Entry<String, Boolean> entry : files.entrySet()) {
         fileName_list.getItems().add(entry.getKey());
         System.out.println(entry.getKey());
     }
     fileName_list.getSelectionModel().selectFirst();
+    */
 }
 }

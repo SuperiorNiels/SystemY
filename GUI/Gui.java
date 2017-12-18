@@ -11,7 +11,7 @@ import javafx.stage.Stage;
  * The headcontroller is created and the openingview opens.
  */
 
-public class Main extends Application {
+public class Gui extends Application {
 
 
     public static void main(String[] args) {
@@ -20,7 +20,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-     HeadController controller = new HeadController();
-     controller.toLogin();
+        HeadController controller = new HeadController();
+        controller.toLogin();
     }
 }
