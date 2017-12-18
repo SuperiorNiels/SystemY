@@ -22,9 +22,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-import GUI.ServerController;
 import Network.MulticastService;
-import javafx.fxml.FXMLLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -36,7 +34,6 @@ public class NamingServer implements NamingInterface, Observer {
     private TreeMap<Integer, Neighbour> map = new TreeMap<>();
     private String ip = null;
     MulticastService multicast;
-    private ServerController controller;
 
     public NamingServer() { }
 
@@ -80,21 +77,6 @@ public class NamingServer implements NamingInterface, Observer {
             }
     }
 
-    public void start(ServerController controller) {
-        try {
-            multicast = new MulticastService("224.0.0.1", 4446);
-            ip = multicast.getIpAddress();
-            multicast.addObserver(this);
-            multicast.start();
-            startRMI();
-            this.controller = controller;
-            System.out.println("Nameserver started. IP: "+ip);
-        }
-        catch (IOException e) {
-            System.err.println("IOException: multicast failed.");
-        }
-    }
-
     /**
      * New node sends multicast starting with 00, the name and ip of the new node are send in this message
      * The nameserver checks if the new node can join, if the node is accepted the nameserver will send a multicast message:
@@ -118,13 +100,13 @@ public class NamingServer implements NamingInterface, Observer {
                 try {
                     NodeInterface wrongNode = (NodeInterface) Naming.lookup("//" + parts[2] + "/Node");
                     wrongNode.failedToAddNode();
-                    System.err.println("Succesfully notified and shutdown the wrong node");
+                    System.err.println("Succesfully notified the wrong node");
                 } catch (NotBoundException e1) {
                     System.err.println("not bound exception in update Namingserver");
                 } catch (MalformedURLException e1) {
                     System.err.println("malformedURLException in update Namingserver");
                 } catch (RemoteException e1) {
-                    System.err.println("Succesfully notified and shutdown the wrong node");
+                    System.err.println("Problem with RMI to node");
                 }
 
             }

@@ -499,9 +499,15 @@ public class Node implements NodeInterface, Observer {
      * Function that gets called by the name server through RMI when the node can't be added
      */
     public void failedToAddNode(){
-        System.err.println("Failed to add the node to the Nameserver.");
+        System.err.println("Failed to add the node to the Nameserver. Node name already taken!");
+        if(!gui) {
+            Scanner input = new Scanner(System.in);
+            System.out.println("Hostname: ");
+            this.name = input.nextLine();
+            bootstrap();
+        }
         // Causes RMI problem
-        System.exit(1);
+        //System.exit(1);
     }
 
     /**

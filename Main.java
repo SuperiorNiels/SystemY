@@ -11,7 +11,7 @@ public class Main {
         } else if(args[0].toLowerCase().equals("client")) {
             try {
                 if (args[1].toLowerCase().equals("gui")) {
-                    new GUI.GUI().createGUI();
+                    new GUI().createGUI();
                 } else if (args[1].toLowerCase().equals("cli")) {
                     Node node = new Node();
                 }
