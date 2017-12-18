@@ -552,7 +552,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * This function returns a Treemap with all files and file fiches from the replicated and local
+     * This function returns a Treemap with all files and file fiches from the replicated and local 
      * @return
      */
     public TreeMap<Integer,FileEntry> getFileFiches(String target){
