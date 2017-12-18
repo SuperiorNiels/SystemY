@@ -15,7 +15,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
-import java.util.concurrent.Semaphore;
 
 public class Node implements NodeInterface, Observer {
     private Neighbour previous = null;
@@ -30,22 +29,31 @@ public class Node implements NodeInterface, Observer {
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
     // Files map updates by file agent
-    TreeMap<String, Semaphore> files = new TreeMap<>();
+    private TreeMap<String, Boolean> files = new TreeMap<>();
+
+    private ArrayList<String> locksRequest = new ArrayList<>();
 
     public Node() {
         Scanner input = new Scanner(System.in);
         System.out.println("Hostname: ");
-        String name = input.nextLine();
-        this.name = name;
+        this.name = input.nextLine();
         bootstrap();
     }
 
-    public TreeMap<String, Semaphore> getFiles() {
+    public TreeMap<String, Boolean> getFiles() {
         return files;
     }
 
-    public void setFiles(TreeMap<String, Semaphore> files) {
+    public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
+    }
+
+    public ArrayList<String> getLocksRequest() {
+        return locksRequest;
+    }
+
+    public void setLocksRequest(ArrayList<String> locksRequest) {
+        this.locksRequest = locksRequest;
     }
 
     public boolean isRunning() {
@@ -58,7 +66,7 @@ public class Node implements NodeInterface, Observer {
             for (String filename : files.keySet()) {
                 System.out.println("File "+i+": ");
                 System.out.println("\tName: "+filename);
-                System.out.println("\tAvailable Slots: " + files.get(filename).availablePermits());
+                System.out.println("\tAvailable Slots: " + files.get(filename));
                 i++;
             }
         } else {
@@ -547,5 +555,10 @@ public class Node implements NodeInterface, Observer {
             list.add(entry.getFileName());
         }
         return list;
+    }
+
+    public void downloadFile(String fileName) {
+
+
     }
 }

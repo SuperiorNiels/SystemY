@@ -19,10 +19,10 @@ public class FailureAgent extends Agent {
     private int failingNode;
     private Node node;
 
-    public FailureAgent(Node node,int failing) {
+    public FailureAgent(Node node,Neighbour failing) {
         super(AgentType.FAILURE_AGENT);
         this.node = node;
-        this.failingNode = failing;
+        this.failingNode = calculateHash(failing.getName());
     }
 
     public AgentHandler getHandler() {

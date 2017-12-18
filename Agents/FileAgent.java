@@ -7,7 +7,7 @@ import Node.Node;
 
 public class FileAgent extends Agent {
 
-    private TreeMap<String, Semaphore> files = new TreeMap<String, Semaphore>();
+    private TreeMap<String, Boolean> files = new TreeMap<String, Boolean>();
     private Node node;
 
     private AgentHandler handler;
@@ -33,12 +33,17 @@ public class FileAgent extends Agent {
         if (node != null) {
             for (String filename : node.getOwnedFiles()) {
                 if (!files.containsKey(filename)) {
-                    // Add file to list, add new semaphore with one slot and first-in first-out guarantee
-                    files.put(filename, new Semaphore(1, true));
+                    // Add file to list, add set boolean to false = not locked
+                    files.put(filename, false);
+
                 }
             }
             node.setFiles(files);
         }
         handler.startNextAgent(this);
     }
+
+
+
+
 }
