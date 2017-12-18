@@ -1,8 +1,7 @@
 import NameServer.NamingServer;
 
-import java.util.Scanner;
 import Node.Node;
-import GUI.Gui;
+import GUI.GUI;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,7 +11,7 @@ public class Main {
         } else if(args[0].toLowerCase().equals("client")) {
             try {
                 if (args[1].toLowerCase().equals("gui")) {
-                    new Gui().main(args);
+                    new GUI.GUI().createGUI();
                 } else if (args[1].toLowerCase().equals("cli")) {
                     Node node = new Node();
                 }

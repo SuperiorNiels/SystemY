@@ -11,11 +11,10 @@ import javafx.stage.Stage;
  * The headcontroller is created and the openingview opens.
  */
 
-public class Gui extends Application {
+public class GUI extends Application {
 
-
-    public static void main(String[] args) {
-        launch(args);
+    public void createGUI() {
+        launch();
     }
 
     @Override

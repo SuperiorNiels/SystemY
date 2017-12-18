@@ -97,7 +97,7 @@ public void view(Parent root){
                 headController.toLogoff();
             }
         });
-        stage.setTitle("SystemY Gui");
+        stage.setTitle("SystemY GUI");
         stage.setScene(view);
         stage.show();
     }
