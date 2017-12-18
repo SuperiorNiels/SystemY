@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="98.01171875" prefWidth="211.46484375" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.LoadingController">
+  <children>
+    <Text layoutX="42.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="RMI can take some time" />
+    <Text layoutX="60.0" layoutY="62.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Please be patient" />
+  </children>
+</AnchorPane>

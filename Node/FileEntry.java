@@ -23,32 +23,16 @@ public class FileEntry implements Serializable {
         this.fileName = fileName;
     }
 
-    public HashSet<Neighbour> getDownloads() {
-        return downloads;
-    }
-
     public void addNode(Neighbour node) {
         downloads.add(node);
     }
 
-    public void removeNode(Neighbour node) {
-        downloads.remove(node);
+    public HashSet<Neighbour> getDownloads() {
+        return downloads;
     }
 
-    public void setOwner(Neighbour owner) {
-        this.owner = owner;
-    }
-
-    public Neighbour getOwner() {
-        return owner;
-    }
-
-    public Neighbour getReplicated() {
-        return replicated;
-    }
-
-    public void setReplicated(Neighbour replicated) {
-        this.replicated = replicated;
+    public String getFileName(){
+        return fileName;
     }
 
     public Neighbour getLocal() {
@@ -59,8 +43,24 @@ public class FileEntry implements Serializable {
         this.local = local;
     }
 
-    public String getFileName(){
-        return fileName;
+    public Neighbour getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Neighbour owner) {
+        this.owner = owner;
+    }
+
+    public Neighbour getReplicated() {
+        return replicated;
+    }
+
+    public void setReplicated(Neighbour replicated) {
+        this.replicated = replicated;
+    }
+
+    public void removeNode(Neighbour node) {
+        downloads.remove(node);
     }
 
 }

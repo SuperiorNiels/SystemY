@@ -1,8 +1,11 @@
 package Node;
 
 import Agents.AgentHandler;
+import GUI.MainController;
 import NameServer.NamingInterface;
+import NameServer.NamingServer;
 import Network.MulticastService;
+import javafx.fxml.FXMLLoader;
 
 import javax.sql.rowset.serial.SerialRef;
 import java.io.File;
@@ -27,6 +30,8 @@ public class Node implements NodeInterface, Observer {
     private String namingServerIp = null;
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
+    private boolean Gui = false;
+    private MainController controller;
 
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
@@ -42,12 +47,23 @@ public class Node implements NodeInterface, Observer {
         bootstrap();
     }
 
+    public Node(String name,String ip){
+        this.name = name;
+        this.ip   = ip;
+        this.Gui = true;
+    }
+
+    public void setController(MainController controller){
+        this.controller = controller;
+    }
     public TreeMap<String, Boolean> getFiles() {
+        if (Gui) { controller.update(); }
         return files;
     }
 
     public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
+        controller.update();
     }
 
     public ArrayList<String> getLocksRequest() {
@@ -85,7 +101,7 @@ public class Node implements NodeInterface, Observer {
         try {
             MulticastService multicast = new MulticastService("224.0.0.1", 4446);
             // update ip
-            ip = multicast.getIpAddress();
+            //ip = multicast.getIpAddress();
             Neighbour self = new Neighbour(name, ip);
             //set your neighbours as yourself
             updateNode(self, self);
@@ -100,11 +116,9 @@ public class Node implements NodeInterface, Observer {
             //sends the multicast to the network
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
-            Scanner input = new Scanner(System.in);
-            /*
-            * This part is used to test and debug
-             */
-            while(running) {
+
+            while(running && !Gui) {
+                Scanner input = new Scanner(System.in);
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
                 if (parts[0].toLowerCase().equals("multicast")) {
@@ -431,6 +445,7 @@ public class Node implements NodeInterface, Observer {
     private int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
     }
+
 
     /**
      * Method that gets executed when a node fails in a system

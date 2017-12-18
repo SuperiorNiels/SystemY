@@ -22,7 +22,9 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
+import GUI.ServerController;
 import Network.MulticastService;
+import javafx.fxml.FXMLLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,17 +36,23 @@ public class NamingServer implements NamingInterface, Observer {
     private TreeMap<Integer, Neighbour> map = new TreeMap<>();
     private String ip = null;
     MulticastService multicast;
+    private ServerController controller;
 
     public NamingServer() { }
 
-    public void start() {
+    public void start(){
         try {
             multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
-            multicast.addObserver(this);
-            multicast.start();
-            startRMI();
-            System.out.println("Nameserver started. IP: "+ip);
+        } catch (IOException e) {
+            System.err.println("Multicast fail");
+        }
+
+        multicast.addObserver(this);
+        multicast.start();
+        startRMI();
+
+        System.out.println("Nameserver started. IP: "+ip);
             Scanner input = new Scanner(System.in);
             while(true) {
                 String command = input.nextLine();
@@ -70,9 +78,20 @@ public class NamingServer implements NamingInterface, Observer {
                     System.out.println("Command not found, run 'help' to get a list of available commands.");
                 }
             }
+    }
+
+    public void start(ServerController controller) {
+        try {
+            multicast = new MulticastService("224.0.0.1", 4446);
+            ip = multicast.getIpAddress();
+            multicast.addObserver(this);
+            multicast.start();
+            startRMI();
+            this.controller = controller;
+            System.out.println("Nameserver started. IP: "+ip);
         }
         catch (IOException e) {
-            System.out.println("IOException: multicast failed.");
+            System.err.println("IOException: multicast failed.");
         }
     }
 
@@ -89,24 +108,23 @@ public class NamingServer implements NamingInterface, Observer {
         String message = o.toString();
         String parts[] = message.split(";");
         if(parts[0].equals("00")) {
-            System.out.println("New node detected.");
-            System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
+            System.out.println("New node detected. Name: "+parts[1]+" IP: "+parts[2]);
             try {
                 addNode(parts[2],parts[1]);
                 multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]+";"+ip);
             }
             catch (AlreadyExistsException e) {
-                System.out.println("Node name already in use, won't add the node");
+                System.err.println("Node name already in use, won't add the node");
                 try {
                     NodeInterface wrongNode = (NodeInterface) Naming.lookup("//" + parts[2] + "/Node");
                     wrongNode.failedToAddNode();
-                    System.out.println("Succesfully notified and shutdown the wrong node");
+                    System.err.println("Succesfully notified and shutdown the wrong node");
                 } catch (NotBoundException e1) {
-                    e1.printStackTrace();
+                    System.err.println("not bound exception in update Namingserver");
                 } catch (MalformedURLException e1) {
-                    e1.printStackTrace();
+                    System.err.println("malformedURLException in update Namingserver");
                 } catch (RemoteException e1) {
-                    System.out.println("Succesfully notified and shutdown the wrong node");
+                    System.err.println("Succesfully notified and shutdown the wrong node");
                 }
 
             }
@@ -124,7 +142,6 @@ public class NamingServer implements NamingInterface, Observer {
             NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("NamingServer", stub);
-            //System.out.println("Server ready!");
         } catch (RemoteException e) {
             System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {
@@ -141,7 +158,7 @@ public class NamingServer implements NamingInterface, Observer {
     public void addNode(String ip, String name) throws AlreadyExistsException {
         Integer hash = getHash(name);
         if (map.containsKey(hash)) {
-            System.err.println("Hash already exists.");
+            System.out.println("Hash already exits");
             throw new AlreadyExistsException();
         } else {
             Neighbour newNeighbour = new Neighbour(name,ip);
