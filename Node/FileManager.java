@@ -205,6 +205,13 @@ public class FileManager extends Thread {
     }
 
     /**
+     * This function removes all the entries from the entries map
+     */
+    public void clearEntries() {
+        map = new TreeMap<Integer, FileEntry>();
+    }
+
+    /**
      * watcher thread that watches the folders that contain
      */
     public void run() {
@@ -250,7 +257,7 @@ public class FileManager extends Thread {
      */
     public void shutdown(Neighbour prev) {
         int number = rootNode.getNumberOfNodesInNetwork();
-        if (rootNode.getNumberOfNodesInNetwork() > 0) {
+        if(number > 1){
             try {
                 //First all the replicated files
                 TreeMap<Integer,FileEntry> replicatedFiles = getFilesMap(REPLICATED_FOLDER);
@@ -262,36 +269,57 @@ public class FileManager extends Thread {
                         try {
                             //Get RMI to the previous node
                             NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
-                            if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
-                                //send replicate to prev of prev
-                                if(!nodeStub.getPrevious().equals(fiche.getLocal())) { //Check if the prev has a prev
-                                    sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath + "/" + REPLICATED_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
-                                    replicated = nodeStub.getPrevious();
+                                if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
+                                    //send replicate to prev of prev
+                                    if(!nodeStub.getPrevious().equals(fiche.getLocal())) { //Check if the prev has a prev
+                                        sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath + "/" + REPLICATED_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                                        replicated = nodeStub.getPrevious();
+                                    }
+                                }else{
+                                    //send replicate to prev
+                                    sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                                    replicated = prev;
                                 }
-                            }else{
-                                //send replicate to prev
-                                sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
-                                replicated = prev;
-                            }
-                            //Send file entry to new owner node
-                            //the new owner node is always your previous node
-                            //the replicated node can be one of 2 options:
-                            //  - your previous
-                            //  - the previous of the previous
-                            NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
-                            ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
+
+                                //Send file entry to new owner node
+                                //the new owner node is always your previous node
+                                //the replicated node can be one of 2 options:
+                                //  - your previous
+                                //  - the previous of the previous
+
+                                NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
+                                 NodeInterface ownerStub = null;
+                                //Check if you own the the file entry so this can be moved to your previous node
+                                if(fiche.getOwner().getName().equals(rootNode.getName())){
+                                    ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                                }else{
+                                    ownerStub = (NodeInterface) Naming.lookup("//"+namingStub.getOwner(fiche.getFileName()).getIp()+"/Node");
+                                }
+                                ownerStub.createFileEntry(prev,replicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                         } catch (NotBoundException | MalformedURLException | RemoteException e) {
                             System.err.println("RMI error in filemanager shutdown!");
                         }
                     }
                 }
+
                 //Second the local files
                 TreeMap<Integer,FileEntry> localFiles = getFilesMap(LOCAL_FOLDER);
                 if(localFiles!=null){
                     for (Map.Entry<Integer, FileEntry> entry : localFiles.entrySet()) {
                         Integer key = entry.getKey();
                         FileEntry fiche = entry.getValue();
-                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//"+fiche.getOwner().getIp()+"/Node");
+                        NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
+                        NodeInterface ownerStub = null;
+                        Neighbour owner = namingStub.getOwner(fiche.getFileName());
+                        //Check if you own the the file entry so this can be moved to your previous node
+                        if(owner.getName().equals(rootNode.getName())){
+                            //If you are the owner set ownerStub to previous and create the entry
+                            ownerStub = (NodeInterface) Naming.lookup("//"+prev.getIp()+"/Node");
+                            ownerStub.createFileEntry(prev,prev,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
+                        }else{
+                            ownerStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
+                        }
+                        //Check the entry for downloads
                         ownerStub.remoteCheckFileEntry(fiche.getFileName(),new Neighbour(rootNode.getName(),rootNode.getIp()));
                     }
                 }
@@ -311,10 +339,12 @@ public class FileManager extends Thread {
                 System.err.println("Error shutting down your filemanager!");
             }
         }
+
+
     }
 
     /**
-     * This funtion check if a file has been downloaded before,
+     * This function check if a file has been downloaded before,
      * if not it removes the file from the system
      * else it removes the local field from the entry
      * @param filename
@@ -356,7 +386,7 @@ public class FileManager extends Thread {
      * if hash(file) is closer to hash next
      * send file to next, update nameserver about owner
      */
-    public void updateFilesNewNode(){
+    public void updateFilesNewNode(int nextOfNextHash ){
         Neighbour next = rootNode.getNext();
         try {
             for(Iterator<Map.Entry<Integer, FileEntry>> it = map.entrySet().iterator(); it.hasNext(); ) {
@@ -365,7 +395,9 @@ public class FileManager extends Thread {
                 int fileHash = calculateHash(fiche.getFileName());
                 int myHash = calculateHash(rootNode.getName());
                 int nextHash = calculateHash(rootNode.getNext().getName());
-                if ((fileHash > nextHash) || (fileHash < nextHash && myHash > nextHash)) {
+                //Check for filehash bigger then your next's hash
+                //And the special case when a new highest node joins --> he needs all the lower than the lowest node file entries
+                if ((fileHash > nextHash) || (fileHash < myHash && nextOfNextHash < nextHash )){
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
@@ -383,15 +415,23 @@ public class FileManager extends Thread {
                         fiche.addNode(new Neighbour(fiche.getReplicated().getName(), fiche.getReplicated().getIp()));
                     }
 
-
                     //update fileEntry: new node becomes owner of the file
                     fiche.setOwner(next);
 
                     //Via RMI set update the file fiche on the owner
                     NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + nameServerIp + "/NamingServer");
-                    NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node");
-                    nodeStub.createFileEntry(namingStub.getOwner(fiche.getFileName()), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
-                    it.remove();
+                    NodeInterface nodeStub = null;
+                    //Check if you own the the file entry so this can be moved to your previous node
+                    if(namingStub.getOwner(fiche.getFileName()).getName().equals(rootNode.getName())){
+                        //When you are the owner yourself
+                        //Update the your file entry
+                        nodeStub = (NodeInterface) Naming.lookup("//" + rootNode.getIp() + "/Node");
+                    }else{
+                        //When you are not the owner update delete your file entry and create an entry on the new owner
+                        nodeStub = (NodeInterface) Naming.lookup("//" + namingStub.getOwner(fiche.getFileName()).getIp() + "/Node");
+                        it.remove();
+                    }
+                    nodeStub.createFileEntry(fiche.getOwner(), next, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
                 }
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {

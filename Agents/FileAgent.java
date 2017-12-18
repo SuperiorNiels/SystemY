@@ -30,7 +30,7 @@ public class FileAgent extends Agent {
 
     @Override
     public void run() {
-        if (node != null && handler != null) {
+        if (node != null) {
             for (String filename : node.getOwnedFiles()) {
                 if (!files.containsKey(filename)) {
                     // Add file to list, add new semaphore with one slot and first-in first-out guarantee
@@ -38,7 +38,7 @@ public class FileAgent extends Agent {
                 }
             }
             node.setFiles(files);
-            handler.startNextAgent(this);
         }
+        handler.startNextAgent(this);
     }
 }

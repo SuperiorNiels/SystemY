@@ -44,6 +44,7 @@ public class AgentHandler implements AgentHandlerInterface {
 
             // Run agent on next node
             Neighbour next = rootNode.getNext();
+            if (next == null) { next = new Neighbour(rootNode.getName(),rootNode.getIp()); }
             if(!next.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
                 try {
                     AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
