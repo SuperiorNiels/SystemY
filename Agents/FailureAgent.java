@@ -24,17 +24,16 @@ public class FailureAgent extends Agent {
 
     public FailureAgent(Node node,Neighbour failing) {
         super(AgentType.FAILURE_AGENT);
-        this.node = node;
         this.failingNode = calculateHash(failing.getName());
         this.startNode = calculateHash(node.getName());
     }
 
-    public AgentHandler getHandler() {
-        return handler;
-    }
-
     public void setHandler(AgentHandler handler) {
         this.handler = handler;
+    }
+
+    public void setNode(Node node) {
+        this.node = node;
     }
 
     @Override

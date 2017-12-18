@@ -52,9 +52,26 @@ public class AgentHandler implements AgentHandlerInterface {
                     AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
                     agentStub.startAgent(agent);
                 } catch (RemoteException | NotBoundException e) {
-                    this.startAgent(createNewFailureAgent());
+                    rootNode.failure(rootNode.getNext());
                 } catch (MalformedURLException e) {
                     System.err.println("Malformed url in RMI fileAgent");
+                }
+            }
+        } else if (agent.getType().equals(AgentType.FAILURE_AGENT)) {
+            FailureAgent failureAgent = (FailureAgent) agent;
+            // Prepare agent for rmi transport
+            failureAgent.setNode(null);
+            failureAgent.setHandler(null);
+
+            // Run agent on next node
+            Neighbour previous = rootNode.getPrevious();
+            if (previous == null) { previous = new Neighbour(rootNode.getName(),rootNode.getIp()); }
+            if(!previous.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
+                try {
+                    AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + previous.getIp() + "/AgentHandler");
+                    agentStub.startAgent(agent);
+                } catch (RemoteException | MalformedURLException | NotBoundException e) {
+                    System.err.println("RMI failed in failureAgent");
                 }
             }
         }
@@ -66,6 +83,11 @@ public class AgentHandler implements AgentHandlerInterface {
             FileAgent fileAgent = (FileAgent) agent;
             fileAgent.setNode(rootNode);
             fileAgent.setHandler(this);
+            new Thread(agent).start();
+        } else if (agent.getType().equals(AgentType.FAILURE_AGENT)) {
+            FailureAgent failureAgent = (FailureAgent) agent;
+            failureAgent.setNode(rootNode);
+            failureAgent.setHandler(this);
             new Thread(agent).start();
         }
     }

@@ -468,7 +468,7 @@ public class Node implements NodeInterface, Observer {
             }
 
             // Start a failureAgent
-            agentHandler.startAgent(agentHandler.createNewFailureAgent(this,calculateHash(failedNode.getName())));
+            agentHandler.startAgent(agentHandler.createNewFailureAgent());
 
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             System.err.println("Error 4595 solving a failed node: ");
