@@ -37,12 +37,10 @@ public class NamingServer implements NamingInterface, Observer {
     private String ip = null;
     MulticastService multicast;
     private ServerController controller;
-    private NameServerOutputHandler handler;
 
     public NamingServer() { }
 
     public void start(){
-        handler = new NameServerOutputHandler();
         try {
             multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
@@ -83,7 +81,6 @@ public class NamingServer implements NamingInterface, Observer {
     }
 
     public void start(ServerController controller) {
-        handler = new NameServerOutputHandler(controller);
         try {
             multicast = new MulticastService("224.0.0.1", 4446);
             ip = multicast.getIpAddress();
@@ -91,11 +88,10 @@ public class NamingServer implements NamingInterface, Observer {
             multicast.start();
             startRMI();
             this.controller = controller;
-            controller.update("Nameserver started. IP: "+ip);
-
+            System.out.println("Nameserver started. IP: "+ip);
         }
         catch (IOException e) {
-            System.out.println("IOException: multicast failed.");
+            System.err.println("IOException: multicast failed.");
         }
     }
 
@@ -111,32 +107,24 @@ public class NamingServer implements NamingInterface, Observer {
     public void update(Observable observable, Object o) {
         String message = o.toString();
         String parts[] = message.split(";");
-        if(controller == null) {
-
-        }
         if(parts[0].equals("00")) {
-            controller.update("New node detected. Name: "+parts[1]+" IP: "+parts[2]);
-            System.out.println("New node detected.");
-            System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
+            System.out.println("New node detected. Name: "+parts[1]+" IP: "+parts[2]);
             try {
                 addNode(parts[2],parts[1]);
                 multicast.sendMulticast("01;"+(map.size()-1)+";"+parts[1]+";"+parts[2]+";"+ip);
             }
             catch (AlreadyExistsException e) {
-                controller.update("Node name already in use, won't add the node");
-                System.out.println("Node name already in use, won't add the node");
+                System.err.println("Node name already in use, won't add the node");
                 try {
                     NodeInterface wrongNode = (NodeInterface) Naming.lookup("//" + parts[2] + "/Node");
                     wrongNode.failedToAddNode();
-                    controller.update("Succesfully notified and shutdown the wrong node");
-                    System.out.println("Succesfully notified and shutdown the wrong node");
+                    System.err.println("Succesfully notified and shutdown the wrong node");
                 } catch (NotBoundException e1) {
-                    e1.printStackTrace();
+                    System.err.println("not bound exception in update Namingserver");
                 } catch (MalformedURLException e1) {
-                    e1.printStackTrace();
+                    System.err.println("malformedURLException in update Namingserver");
                 } catch (RemoteException e1) {
-                    controller.update("Succesfully notified and shutdown the wrong node");
-                    System.out.println("Succesfully notified and shutdown the wrong node");
+                    System.err.println("Succesfully notified and shutdown the wrong node");
                 }
 
             }
@@ -154,12 +142,9 @@ public class NamingServer implements NamingInterface, Observer {
             NamingInterface stub = (NamingInterface) UnicastRemoteObject.exportObject(server,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("NamingServer", stub);
-            //System.out.println("Server ready!");
         } catch (RemoteException e) {
-            controller.updateError("Remote exception: "+e.getMessage());
             System.err.println("Remote exception: "+e.getMessage());
         } catch (AlreadyBoundException e) {
-            controller.updateError("Port already bound");
             System.err.println("Port already bound");
         }
     }
@@ -173,8 +158,7 @@ public class NamingServer implements NamingInterface, Observer {
     public void addNode(String ip, String name) throws AlreadyExistsException {
         Integer hash = getHash(name);
         if (map.containsKey(hash)) {
-            controller.updateError("Hash already exists.");
-            System.err.println("Hash already exists.");
+            System.out.println("Hash already exits");
             throw new AlreadyExistsException();
         } else {
             Neighbour newNeighbour = new Neighbour(name,ip);
@@ -193,7 +177,6 @@ public class NamingServer implements NamingInterface, Observer {
         if(map.remove(getHash(name))== null){
             throw new NullPointerException();
         }
-        controller.update("Node: "+name+" successfully removed.");
         System.out.println("Node: "+name+" successfully removed.");
     }
 
@@ -239,11 +222,9 @@ public class NamingServer implements NamingInterface, Observer {
             } catch (TransformerException e) {
                 throw e;
             }
-            controller.update("Map saved to ./data/output.xml");
             System.out.println("Map saved to ./data/output.xml");
         } else {
-            controller.updateError("Empty map (no nodes in network), map not saved.");
-            System.err.println("Empty map (no nodes in network), map not saved.");
+            System.out.println("Empty map (no nodes in network), map not saved.");
         }
     }
 
