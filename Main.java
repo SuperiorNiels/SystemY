@@ -10,7 +10,6 @@ public class Main {
             server.start();
         } else if(args[0].toLowerCase().equals("client")) {
             Node node = new Node();
-            node.bootstrap();
         }
     }
 }

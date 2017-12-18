@@ -3,8 +3,10 @@ package Agents;
 import Node.Node;
 import Node.Neighbour;
 
+import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -44,12 +46,32 @@ public class AgentHandler implements AgentHandlerInterface {
 
             // Run agent on next node
             Neighbour next = rootNode.getNext();
+            if (next == null) { next = new Neighbour(rootNode.getName(),rootNode.getIp()); }
             if(!next.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
                 try {
                     AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
                     agentStub.startAgent(agent);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (RemoteException | NotBoundException e) {
+                    rootNode.failure(rootNode.getNext());
+                } catch (MalformedURLException e) {
+                    System.err.println("Malformed url in RMI fileAgent");
+                }
+            }
+        } else if (agent.getType().equals(AgentType.FAILURE_AGENT)) {
+            FailureAgent failureAgent = (FailureAgent) agent;
+            // Prepare agent for rmi transport
+            failureAgent.setNode(null);
+            failureAgent.setHandler(null);
+
+            // Run agent on next node
+            Neighbour previous = rootNode.getPrevious();
+            if (previous == null) { previous = new Neighbour(rootNode.getName(),rootNode.getIp()); }
+            if(!previous.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
+                try {
+                    AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + previous.getIp() + "/AgentHandler");
+                    agentStub.startAgent(agent);
+                } catch (RemoteException | MalformedURLException | NotBoundException e) {
+                    System.err.println("RMI failed in failureAgent");
                 }
             }
         }
@@ -62,10 +84,19 @@ public class AgentHandler implements AgentHandlerInterface {
             fileAgent.setNode(rootNode);
             fileAgent.setHandler(this);
             new Thread(agent).start();
+        } else if (agent.getType().equals(AgentType.FAILURE_AGENT)) {
+            FailureAgent failureAgent = (FailureAgent) agent;
+            failureAgent.setNode(rootNode);
+            failureAgent.setHandler(this);
+            new Thread(agent).start();
         }
     }
 
     public FileAgent createNewFileAgent() {
         return new FileAgent();
+    }
+
+    public FailureAgent createNewFailureAgent() {
+        return new FailureAgent(rootNode, rootNode.getNext());
     }
 }
