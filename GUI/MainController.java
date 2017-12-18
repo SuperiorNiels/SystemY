@@ -102,7 +102,7 @@ public void view(Parent root){
         stage.show();
     }
 
-public void viewNetwork(){
+    public void viewNetwork(){
 
         Stage currentWindow = (Stage) Log_off_bnt.getScene().getWindow();
         currentWindow.close();
@@ -112,15 +112,15 @@ public void viewNetwork(){
 
     }
 
-public void update(){
-    /*
-    files = node.getFiles();
-    fileName_list.getItems().clear();
-    for (Map.Entry<String, Boolean> entry : files.entrySet()) {
-        fileName_list.getItems().add(entry.getKey());
-        System.out.println(entry.getKey());
+    public void update(){
+        /*
+        files = node.getFiles();
+        fileName_list.getItems().clear();
+        for (Map.Entry<String, Boolean> entry : files.entrySet()) {
+            fileName_list.getItems().add(entry.getKey());
+            System.out.println(entry.getKey());
+        }
+        fileName_list.getSelectionModel().selectFirst();
+        */
     }
-    fileName_list.getSelectionModel().selectFirst();
-    */
-}
 }
