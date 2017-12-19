@@ -116,7 +116,7 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Node started.");
 
             // Start a new polling server
-            new PollingService(this);
+            new PollingService(this).start();
 
             while(running && !gui) {
                 Scanner input = new Scanner(System.in);
