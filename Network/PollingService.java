@@ -43,15 +43,17 @@ public class PollingService extends Thread implements PollingServiceInterface {
 
     @Override
     public void run() {
-        Neighbour next = rootNode.getNext();
-        if(next.equals(new Neighbour(rootNode.getName(), rootNode.getIp()))) {
-            try {
-                PollingServiceInterface pollingStub = (PollingServiceInterface) Naming.lookup("//" + next.getIp() + "/Polling");
-                pollingStub.pollNode();
-            } catch (RemoteException | NotBoundException e) {
-                rootNode.failure(rootNode.getNext());
-            } catch (MalformedURLException e) {
-                System.err.println("Malformed url in RMI fileAgent");
+        while (rootNode.isRunning()){
+            Neighbour next = rootNode.getNext();
+            if (!next.equals(new Neighbour(rootNode.getName(), rootNode.getIp()))) {
+                try {
+                    PollingServiceInterface pollingStub = (PollingServiceInterface) Naming.lookup("//" + next.getIp() + "/Polling");
+                    pollingStub.pollNode();
+                } catch (RemoteException | NotBoundException e) {
+                    rootNode.failure(rootNode.getNext());
+                } catch (MalformedURLException e) {
+                    System.err.println("Malformed url in RMI fileAgent");
+                }
             }
         }
     }
