@@ -43,6 +43,7 @@ public class PollingService extends Thread implements PollingServiceInterface {
 
     @Override
     public void run() {
+        // TODO: Add timer to this loop
         while (rootNode.isRunning()){
             Neighbour next = rootNode.getNext();
             if (!next.equals(new Neighbour(rootNode.getName(), rootNode.getIp()))) {
@@ -54,6 +55,11 @@ public class PollingService extends Thread implements PollingServiceInterface {
                 } catch (MalformedURLException e) {
                     System.err.println("Malformed url in RMI fileAgent");
                 }
+            }
+            try {
+                this.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

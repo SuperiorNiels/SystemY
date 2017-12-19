@@ -112,7 +112,7 @@ public class FileManager extends Thread {
         } catch (MalformedURLException e) {
             System.err.println("Malformed URL");
         } catch (RemoteException e) {
-            System.err.println("Problem with RMI connection"+nameServerIp);
+            System.err.println("Problem with RMI connection: "+nameServerIp+" in fileManager.");
         }
     }
 
