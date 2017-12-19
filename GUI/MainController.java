@@ -52,7 +52,6 @@ public void init(HeadController headcontroller){
 
 public void initData(){
         node = headController.getNode();
-        node.setController(this);
         nameLabel.setText(node.getName());
         update();
 }
