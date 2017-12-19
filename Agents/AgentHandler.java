@@ -27,6 +27,7 @@ public class AgentHandler implements AgentHandlerInterface {
     private void startRMI() {
         try {
             System.setProperty("java.rmi.server.hostname",rootNode.getIp());
+            System.setProperty("sun.rmi.transport.tcp.responseTimeout","1000");
             AgentHandlerInterface stub = (AgentHandlerInterface) UnicastRemoteObject.exportObject(this,0);
             Registry registry = LocateRegistry.getRegistry(1099);
             registry.bind("AgentHandler", stub);
