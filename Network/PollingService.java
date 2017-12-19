@@ -57,7 +57,7 @@ public class PollingService extends Thread implements PollingServiceInterface {
                 }
             }
             try {
-                this.sleep(5000);
+                sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -66,7 +66,7 @@ public class PollingService extends Thread implements PollingServiceInterface {
 
     @Override
     public Boolean pollNode() throws RemoteException {
-        System.out.println("polled");
+        System.out.println("polled by previous");
         return true;
     }
 }
