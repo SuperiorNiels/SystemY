@@ -40,6 +40,7 @@ public class FailureAgent extends Agent {
     @Override
     public void run() {
         try {
+            System.out.println("A node in the network failed!");
             //first check your replicated files
             TreeMap<Integer, FileEntry> replicated = node.getFileFiches("replicated");
             for (Map.Entry<Integer, FileEntry> file : replicated.entrySet()) {

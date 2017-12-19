@@ -57,6 +57,9 @@ public class AgentHandler implements AgentHandlerInterface {
                 } catch (MalformedURLException e) {
                     System.err.println("Malformed url in RMI fileAgent");
                 }
+            } else {
+                // run agent again on self (not using RMI to be sure)
+                startAgent(agent);
             }
         } else if (agent.getType().equals(AgentType.FAILURE_AGENT)) {
             FailureAgent failureAgent = (FailureAgent) agent;

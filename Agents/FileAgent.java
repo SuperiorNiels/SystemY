@@ -1,7 +1,6 @@
 package Agents;
 
 import java.util.TreeMap;
-import java.util.concurrent.Semaphore;
 
 import Node.Node;
 
@@ -42,8 +41,5 @@ public class FileAgent extends Agent {
         }
         handler.startNextAgent(this);
     }
-
-
-
 
 }
