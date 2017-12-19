@@ -4,6 +4,7 @@ import Agents.AgentHandler;
 import GUI.MainController;
 import NameServer.NamingInterface;
 import Network.MulticastService;
+import Network.PollingService;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +29,6 @@ public class Node implements NodeInterface, Observer {
     private boolean running = true;
     private boolean gui = false;
     private boolean logged_in = false;
-    private MainController controller;
 
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
@@ -48,10 +48,6 @@ public class Node implements NodeInterface, Observer {
         this.name = name;
         this.ip   = ip;
         this.gui = true;
-    }
-
-    public void setController(MainController controller){
-        this.controller = controller;
     }
 
     public Boolean getLoggedIn() {
@@ -118,6 +114,9 @@ public class Node implements NodeInterface, Observer {
             //sends the multicast to the network
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
+
+            // Start a new polling server
+            new PollingService(this);
 
             while(running && !gui) {
                 Scanner input = new Scanner(System.in);
