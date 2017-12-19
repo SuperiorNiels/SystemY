@@ -53,7 +53,8 @@ public class AgentHandler implements AgentHandlerInterface {
                     AgentHandlerInterface agentStub = (AgentHandlerInterface) Naming.lookup("//" + next.getIp() + "/AgentHandler");
                     agentStub.startAgent(agent);
                 } catch (RemoteException | NotBoundException e) {
-                    rootNode.failure(rootNode.getNext());
+                    System.out.println("RMI to next node failed for fileAgent.");
+                    //rootNode.failure(rootNode.getNext());
                 } catch (MalformedURLException e) {
                     System.err.println("Malformed url in RMI fileAgent");
                 }
