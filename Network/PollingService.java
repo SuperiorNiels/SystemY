@@ -43,27 +43,17 @@ public class PollingService extends Thread implements PollingServiceInterface {
 
     @Override
     public void run() {
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                Neighbour next = rootNode.getNext();
-                if(next.equals(new Neighbour(rootNode.getName(), rootNode.getIp()))) {
-                    try {
-                        PollingServiceInterface pollingStub = (PollingServiceInterface) Naming.lookup("//" + next.getIp() + "/Polling");
-                        pollingStub.pollNode();
-                    } catch (RemoteException | NotBoundException e) {
-                        rootNode.failure(rootNode.getNext());
-                    } catch (MalformedURLException e) {
-                        System.err.println("Malformed url in RMI fileAgent");
-                    }
-                }
+        Neighbour next = rootNode.getNext();
+        if(next.equals(new Neighbour(rootNode.getName(), rootNode.getIp()))) {
+            try {
+                PollingServiceInterface pollingStub = (PollingServiceInterface) Naming.lookup("//" + next.getIp() + "/Polling");
+                pollingStub.pollNode();
+            } catch (RemoteException | NotBoundException e) {
+                rootNode.failure(rootNode.getNext());
+            } catch (MalformedURLException e) {
+                System.err.println("Malformed url in RMI fileAgent");
             }
-        };
-
-        System.out.println("Current time" + System.currentTimeMillis());
-        timer.schedule(task, 2000,1000);
-        System.out.println("Current time" + System.currentTimeMillis());
+        }
     }
 
     @Override
