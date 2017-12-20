@@ -103,10 +103,11 @@ public class FailureAgent extends Agent {
                 e1.printStackTrace();
             } catch (NullPointerException e) {
                 e.printStackTrace();
+                System.err.println("This could be because there were only 2 nodes in the network");
             }
-            handler.startNextAgent(this);
             //Set started true to make sure it keeps running and is stopped when it reaches the
             started = true;
+            handler.startNextAgent(this);
         }
     }
 

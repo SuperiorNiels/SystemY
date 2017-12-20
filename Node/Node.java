@@ -553,7 +553,7 @@ public class Node implements NodeInterface, Observer {
     public TreeMap<Integer,FileEntry> getFileFiches(String target){
         TreeMap<Integer,FileEntry> map = null;
         try {
-            TreeMap<Integer,FileEntry> replicated = manager.getFilesMap(target);
+            map = manager.getFilesMap(target);
 
         } catch (RemoteException e) {
             System.err.println("Error with RMI from filemanager");
