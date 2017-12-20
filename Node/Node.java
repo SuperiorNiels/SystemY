@@ -95,10 +95,13 @@ public class Node implements NodeInterface, Observer {
     public void bootstrap() {
         //starts the watcher thread that watches the map with files
         try {
-            MulticastService multicast = new MulticastService("224.0.0.1", 4446);
+            MulticastService multicast = null;
             // update ip
             if (!gui) {
+                multicast = new MulticastService("224.0.0.1", 4446);
                 ip = multicast.getIpAddress();
+            }else{
+                multicast = new MulticastService(this.ip,"224.0.0.1", 4446);
             }
             Neighbour self = new Neighbour(name, ip);
             //set your neighbours as yourself

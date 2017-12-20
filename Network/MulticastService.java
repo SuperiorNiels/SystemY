@@ -16,9 +16,30 @@ public class MulticastService extends Thread {
     private String received;
     private MulticastObservable observer;
 
+    /**
+     * Constructor for the CLI version where an interfaces is automatically chosen
+     * @param multicast_ip
+     * @param port
+     * @throws IOException
+     */
     public MulticastService(String multicast_ip,int port) throws IOException {
         this.multicast_ip = multicast_ip;
         this.interface_ip = getIpAddress();
+        this.multicast_port = port;
+        received = "";
+        observer = new MulticastObservable();
+    }
+
+    /**
+     * Constructor for the GUI where an interfaces is chosen
+     * @param ip
+     * @param multicast_ip
+     * @param port
+     * @throws IOException
+     */
+    public MulticastService(String ip,String multicast_ip,int port) throws IOException {
+        this.multicast_ip = multicast_ip;
+        this.interface_ip = ip;
         this.multicast_port = port;
         received = "";
         observer = new MulticastObservable();
