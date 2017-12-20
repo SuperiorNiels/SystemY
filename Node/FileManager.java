@@ -221,7 +221,8 @@ public class FileManager extends Thread {
                     switch (event.kind().toString()) {
                         case "ENTRY_CREATE":
                             System.out.println("File created.");
-                            if(new File(rootPath+"/"+ LOCAL_FOLDER+"/"+event.context().toString()).exists()) {
+                            if(new File(rootPath+"/"+ LOCAL_FOLDER+"/"+event.context().toString()).exists()
+                                    && !event.context().toString().startsWith("~")) {
                                 replicate(new File(event.context().toString()));
                             }
                             break;

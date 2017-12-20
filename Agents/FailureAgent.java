@@ -22,6 +22,7 @@ public class FailureAgent extends Agent {
     private Neighbour failingNode;
     private Node node;
     private final int startNode;
+    private Boolean started = false;
 
     public FailureAgent(Node node,Neighbour failing) {
         super(AgentType.FAILURE_AGENT);
@@ -40,7 +41,7 @@ public class FailureAgent extends Agent {
     @Override
     public void run() {
         //Stop the failure agent when you are the node that started
-        if(startNode == calculateHash(node.getName())) {
+        if(startNode == calculateHash(node.getName()) && started) {
             Thread.currentThread().interrupt();
             return;
         }
@@ -104,6 +105,8 @@ public class FailureAgent extends Agent {
                 e.printStackTrace();
             }
             handler.startNextAgent(this);
+            //Set started true to make sure it keeps running and is stopped when it reaches the
+            started = true;
         }
     }
 
