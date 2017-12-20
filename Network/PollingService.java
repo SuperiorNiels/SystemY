@@ -46,7 +46,7 @@ public class PollingService extends Thread implements PollingServiceInterface {
         // TODO: Add timer to this loop
         while (rootNode.isRunning()){
             Neighbour next = rootNode.getNext();
-            if (!next.equals(new Neighbour(rootNode.getName(), rootNode.getIp()))) {
+            if (!(rootNode.calculateHash(next.getName())== rootNode.calculateHash(rootNode.getName()))) {
                 try {
                     PollingServiceInterface pollingStub = (PollingServiceInterface) Naming.lookup("//" + next.getIp() + "/Polling");
                     pollingStub.pollNode();

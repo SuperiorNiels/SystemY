@@ -28,7 +28,7 @@ public class Node implements NodeInterface, Observer {
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
     private boolean gui = false;
-    private boolean logged_in = false;
+    private volatile boolean  logged_in = false;
 
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
@@ -447,7 +447,7 @@ public class Node implements NodeInterface, Observer {
      * @param name
      * @return
      */
-    private int calculateHash(String name) {
+    public int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
     }
 
@@ -504,6 +504,7 @@ public class Node implements NodeInterface, Observer {
             Scanner input = new Scanner(System.in);
             System.out.println("Hostname: ");
             this.name = input.nextLine();
+
         } else {
             // TODO: JAMIE FIXT DIT NOG AUB PLS
         }
