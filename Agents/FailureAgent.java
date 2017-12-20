@@ -39,64 +39,72 @@ public class FailureAgent extends Agent {
 
     @Override
     public void run() {
-        try {
-            System.out.println("A node in the network failed!");
-            //first check your replicated files
-            TreeMap<Integer, FileEntry> replicated = node.getFileFiches("replicated");
-            for (Map.Entry<Integer, FileEntry> file : replicated.entrySet()) {
-                FileEntry fiche = file.getValue();
-                int fileHash = file.getKey();
-                //if fiche null ==> fiche was owned by the failing node
-                if (fiche == null) {
-                    //You are the only one with the file left ==> move to local and filemanager will take care of the replication
-                    String filename = null;
-                    for (Map.Entry<String, Boolean> f : node.getFiles().entrySet()) {
-                        if(fileHash == calculateHash(f.getKey()))
-                            filename = f.getKey();
-                    }
-                    if(filename!=null){
-                        //Move file to local folder ==> filemanager will take care of the rest
-                        node.moveFile("./files/replicated/"+filename,"./files/local/"+filename);
-                    }
-                }else if(calculateHash(fiche.getLocal().getName()) == calculateHash(failingNode.getName())) {
-                    //The local node is the failed node ==> check for downloads and maybe remove the file from the system
-                    NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
-                    ownerStub.remoteCheckFileEntry(fiche.getFileName(),failingNode);
-                }
-            }
-
-            //Second check your local files
-            TreeMap<Integer, FileEntry> local = node.getFileFiches("local");
-            for (Map.Entry<Integer, FileEntry> file : local.entrySet()) {
-                FileEntry fiche = file.getValue();
-                int fileHash = file.getKey();
-                //if fiche null ==> fiche was owned by the failing node
-                if (fiche == null) {
-                    //First find the filename of the file then replicate it
-                    File replicateFile = null;
-                    for (Map.Entry<String, Boolean> f : node.getFiles().entrySet()) {
-                        if(fileHash == calculateHash(f.getKey()))
-                        replicateFile = new File("./files/local/"+f.getKey());
-                    }
-                    node.replicate(replicateFile);
-                } else if (calculateHash(fiche.getReplicated().getName()) == calculateHash(failingNode.getName())) {
-                    //This owner is the owner, the failed node repliceted because he is your previous
-                    //Send file to your new previous node
-                    Neighbour newReplicated = node.getPrevious();
-                    NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
-                    ownerStub.createFileEntry(fiche.getOwner(),newReplicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
-                    node.sendFile(newReplicated.getIp(),6000,"./files/local",fiche.getFileName(),"replicated");
-                }
-            }
-
-        } catch (RemoteException e1) {
-            e1.printStackTrace();
-        } catch (NotBoundException e1) {
-            e1.printStackTrace();
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
+        //Stop the failure agent when you are the node that started
+        if(startNode == calculateHash(node.getName())) {
+            Thread.currentThread().interrupt();
+            return;
         }
-        handler.startNextAgent(this);
+        else{
+            try {
+                //first check your replicated files
+                TreeMap<Integer, FileEntry> replicated = node.getFileFiches("replicated");
+                for (Map.Entry<Integer, FileEntry> file : replicated.entrySet()) {
+                    FileEntry fiche = file.getValue();
+                    int fileHash = file.getKey();
+                    //if fiche null ==> fiche was owned by the failing node
+                    if (fiche == null) {
+                        //You are the only one with the file left ==> move to local and filemanager will take care of the replication
+                        String filename = null;
+                        for (Map.Entry<String, Boolean> f : node.getFiles().entrySet()) {
+                            if(fileHash == calculateHash(f.getKey()))
+                                filename = f.getKey();
+                        }
+                        if(filename!=null){
+                            //Move file to local folder ==> filemanager will take care of the rest
+                            node.moveFile("./files/replicated/"+filename,"./files/local/"+filename);
+                        }
+                    }else if(calculateHash(fiche.getLocal().getName()) == calculateHash(failingNode.getName())) {
+                        //The local node is the failed node ==> check for downloads and maybe remove the file from the system
+                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
+                        ownerStub.remoteCheckFileEntry(fiche.getFileName(),failingNode);
+                    }
+                }
+
+                //Second check your local files
+                TreeMap<Integer, FileEntry> local = node.getFileFiches("local");
+                for (Map.Entry<Integer, FileEntry> file : local.entrySet()) {
+                    FileEntry fiche = file.getValue();
+                    int fileHash = file.getKey();
+                    //if fiche null ==> fiche was owned by the failing node
+                    if (fiche == null) {
+                        //First find the filename of the file then replicate it
+                        File replicateFile = null;
+                        for (Map.Entry<String, Boolean> f : node.getFiles().entrySet()) {
+                            if(fileHash == calculateHash(f.getKey()))
+                                replicateFile = new File("./files/local/"+f.getKey());
+                        }
+                        node.replicate(replicateFile);
+                    } else if (calculateHash(fiche.getReplicated().getName()) == calculateHash(failingNode.getName())) {
+                        //This owner is the owner, the failed node replicated because he is your previous
+                        //Send file to your new previous node
+                        Neighbour newReplicated = node.getPrevious();
+                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
+                        ownerStub.createFileEntry(fiche.getOwner(),newReplicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
+                        node.sendFile(newReplicated.getIp(),6000,"./files/local",fiche.getFileName(),"replicated");
+                    }
+                }
+
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            } catch (NotBoundException e1) {
+                e1.printStackTrace();
+            } catch (MalformedURLException e1) {
+                e1.printStackTrace();
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+            handler.startNextAgent(this);
+        }
     }
 
     /**
