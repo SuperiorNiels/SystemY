@@ -66,8 +66,9 @@ public class FailureAgent extends Agent {
                         }
                     }else if(calculateHash(fiche.getLocal().getName()) == calculateHash(failingNode.getName())) {
                         //The local node is the failed node ==> check for downloads and maybe remove the file from the system
-                        NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
-                        ownerStub.remoteCheckFileEntry(fiche.getFileName(),failingNode);
+                        //NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
+                        //ownerStub.remoteCheckFileEntry(fiche.getFileName(),failingNode);
+                        node.remoteCheckFileEntry(fiche.getFileName(),failingNode);
                     }
                 }
 
@@ -86,7 +87,7 @@ public class FailureAgent extends Agent {
                         }
                         node.replicate(replicateFile);
                     } else if (calculateHash(fiche.getReplicated().getName()) == calculateHash(failingNode.getName())) {
-                        //This owner is the owner, the failed node replicated because he is your previous
+                        //This node is the owner, the failed node replicated because he is your previous
                         //Send file to your new previous node
                         Neighbour newReplicated = node.getPrevious();
                         NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
