@@ -9,7 +9,7 @@
 
 <AnchorPane prefHeight="193.9609375" prefWidth="258.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.NetworkController">
   <children>
-    <Label fx:id="numberOfNodeLabel" layoutX="136.0" layoutY="40.0" text="Label" />
+    <Label fx:id="numberOfNodeLabel" layoutX="136.0" layoutY="40.0" prefWidth="45.0703125" text="Label" />
     <Text layoutX="38.0" layoutY="53.0" strokeType="OUTSIDE" strokeWidth="0.0" text="node in network" />
     <Text layoutX="38.0" layoutY="85.0" strokeType="OUTSIDE" strokeWidth="0.0" text="previous" />
     <Text layoutX="38.0" layoutY="132.0" strokeType="OUTSIDE" strokeWidth="0.0" text="next" />
