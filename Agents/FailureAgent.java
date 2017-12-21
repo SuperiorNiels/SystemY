@@ -61,8 +61,8 @@ public class FailureAgent extends Agent {
                                 filename = f.getKey();
                         }
                         if(filename!=null){
-                            //Move file to local folder ==> filemanager will take care of the rest
-                            node.moveFile("./files/replicated/"+filename,"./files/local/"+filename);
+                            //Replicate the file again to make sure the copy remains in the system
+                            node.replicate(new File("./files/replicated/"+filename));
                         }
                     }else if(calculateHash(fiche.getLocal().getName()) == calculateHash(failingNode.getName())) {
                         //The local node is the failed node ==> check for downloads and maybe remove the file from the system
