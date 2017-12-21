@@ -66,7 +66,7 @@ public class PollingService extends Thread implements PollingServiceInterface {
 
     @Override
     public Boolean pollNode() throws RemoteException {
-        System.out.println("polled by previous");
+        //System.out.println("polled by previous");
         return true;
     }
 }
