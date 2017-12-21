@@ -44,6 +44,8 @@ public class FileManager extends Thread {
             System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
         TCPListenerService TCPListener = new TCPListenerService(rootPath);
+        threadList = new ArrayList<Thread>();
+
 
         try {
             watcher = FileSystems.getDefault().newWatchService();
