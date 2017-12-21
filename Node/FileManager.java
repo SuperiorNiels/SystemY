@@ -22,6 +22,7 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public class FileManager extends Thread {
     private Path rootPath;
+    private ArrayList<Thread> threadList;
     private static final int PORT = 6000;
     private WatchService watcher;
     private String nameServerIp;
@@ -148,6 +149,8 @@ public class FileManager extends Thread {
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
             SendTCP send = new SendTCP(sendSocket,srcFilePath,fileName,destFolder);
+            //adds the threads to a list
+            threadList.add(send);
         } catch (IOException e) {
             System.err.println("Problem opening port "+destPort+" ");
             e.printStackTrace();
@@ -257,6 +260,8 @@ public class FileManager extends Thread {
      * @param prev the previous node
      */
     public void shutdown(Neighbour prev) {
+        //resets the threadList
+        threadList = new ArrayList<Thread>();
         int number = rootNode.getNumberOfNodesInNetwork();
         if(number > 1){
             try {
@@ -554,5 +559,12 @@ public class FileManager extends Thread {
                 }
             }
         }
+    }
+
+    /**
+     * returns a list of running threads, used when shutdown is called so that every file gets send without error
+     */
+    public ArrayList<Thread> getThreadList(){
+        return threadList;
     }
 }

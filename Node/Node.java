@@ -118,7 +118,7 @@ public class Node implements NodeInterface, Observer {
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
 
-            // Start a new polling server
+            // Start a new polling service
             new PollingService(this).start();
 
             while(running && !gui) {
@@ -432,6 +432,9 @@ public class Node implements NodeInterface, Observer {
                 nodeStub.setPrevious(previous);
                 //Deletes itself in the naming server
                 namingStub.removeNode(name);
+                //waits for threads to finish
+                checkRunningThreads();
+
             }
         } catch (NotBoundException e) {
             System.err.println("The stub is not bound "+e.getMessage());
@@ -439,6 +442,19 @@ public class Node implements NodeInterface, Observer {
             System.err.println("Malformed URL: "+e.getMessage());
         } catch (RemoteException e) {
             System.err.println("Problem with RMI connection: "+e.getMessage());
+        }
+    }
+
+    /**
+     * Method that waits for all the running tcp threads to finish
+     */
+    private void checkRunningThreads(){
+        for(Thread thread: manager.getThreadList()){
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
