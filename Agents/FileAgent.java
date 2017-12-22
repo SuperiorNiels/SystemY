@@ -45,7 +45,6 @@ public class FileAgent extends Agent {
 
                 }
             }
-            node.setFiles(files);
 
             ArrayList<String> requests = node.getRequests();
             ArrayList<String> dowloaded = node.getDowloaded();
@@ -81,6 +80,7 @@ public class FileAgent extends Agent {
                     request.unlock();
                 }
             }
+            node.setFiles(files);
         }
         handler.startNextAgent(this);
     }
