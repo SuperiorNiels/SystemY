@@ -90,7 +90,7 @@ public class FailureAgent extends Agent {
 
                 //Last check your file entries and remove everything with the failed node or replace with out of system
                 TreeMap<Integer, FileEntry> entries = node.getFileEntries();
-                for (Map.Entry<Integer, FileEntry> file : local.entrySet()) {
+                for (Map.Entry<Integer, FileEntry> file : entries.entrySet()) {
                     FileEntry fiche = file.getValue();
                     node.removeFromDownload(fiche.getFileName(),failingNode);
                 }
