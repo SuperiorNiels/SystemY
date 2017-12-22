@@ -526,15 +526,16 @@ public class Node implements NodeInterface, Observer {
     public void failedToAddNode(){
         System.err.println("Failed to add the node to the Nameserver. Node name already taken!");
         if(!gui) {
-            Scanner input = new Scanner(System.in);
+            /*Scanner input = new Scanner(System.in);
             System.out.println("Hostname: ");
             this.name = input.nextLine();
-            bootstrap();
+            bootstrap();*/
+            //Causes RMI problem
+            System.exit(1);
         } else {
             loginController.setNodeExitst(true);
         }
-        // Causes RMI problem
-        //System.exit(1);
+
     }
 
     /**
