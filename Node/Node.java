@@ -68,7 +68,9 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
-        mainController.update();
+        if(gui){
+            mainController.update();
+        }
     }
 
     public ArrayList<String> getLocksRequest() {
@@ -606,7 +608,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     /**
-     * Function returs a list of names of all owned files.
+     * Function returns a list of names of all owned files.
      * @return
      */
     public ArrayList<String> getOwnedFiles() {

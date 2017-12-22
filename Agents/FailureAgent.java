@@ -95,7 +95,6 @@ public class FailureAgent extends Agent {
                         node.remoteSendFile(newReplicated.getIp(),6000,"./files/local",fiche.getFileName(),"replicated");
                     }
                 }
-
             } catch (RemoteException e1) {
                 e1.printStackTrace();
             } catch (NotBoundException e1) {

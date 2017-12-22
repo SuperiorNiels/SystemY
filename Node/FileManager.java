@@ -44,7 +44,6 @@ public class FileManager extends Thread {
             System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
         TCPListenerService TCPListener = new TCPListenerService(rootPath);
-        //makes a threadList for the first time
         threadList = new ArrayList<Thread>();
 
 
@@ -91,14 +90,18 @@ public class FileManager extends Thread {
             //get the owner of each file
             Neighbour owner = namingStub.getOwner(file.getName());
             Neighbour replicated = null;
-            if (owner.getIp().equals(rootNode.getIp())) {
-                //This node is the owner of the file = replicate it to the previous node
-                sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER,false);
-                replicated = rootNode.getPrevious();
-            } else{
-                //replicate it to the owner of the file
-                sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER,false);
-                replicated = owner;
+            int number = rootNode.getNumberOfNodesInNetwork();
+            //Do not send files if you are the only node in the network
+            if(number > 0){
+                if (owner.getIp().equals(rootNode.getIp())) {
+                    //This node is the owner of the file = replicate it to the previous node
+                    sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER,false);
+                    replicated = rootNode.getPrevious();
+                } else{
+                    //replicate it to the owner of the file
+                    sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER,false);
+                    replicated = owner;
+                }
             }
 
             NodeInterface owner_stub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
@@ -144,7 +147,6 @@ public class FileManager extends Thread {
      * @param srcFilePath source path of the file that you want to send
      * @param fileName name of the file
      * @param destFolder name of the folder where the file has to be saved at the destination
-     * @param notifDownloader set true to notify the downloader when the file has been sent successfully
      */
     public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader){
         try {
