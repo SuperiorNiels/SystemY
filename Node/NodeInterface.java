@@ -14,7 +14,7 @@ public interface NodeInterface extends Remote {
     public void failedToAddNode() throws RemoteException;
     public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, HashSet<Neighbour> downloads) throws RemoteException;
     public FileEntry getFileEntry(String fileName) throws RemoteException, NullPointerException;
-    public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder) throws RemoteException;
+    public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader) throws RemoteException;
     public void moveFile(String from,String to) throws RemoteException;
     public void remoteCheckFileEntry(String filename,Neighbour leavingNode) throws RemoteException;
     public void remoteRemoveFromDownload(String filename,Neighbour leavingNode) throws RemoteException;

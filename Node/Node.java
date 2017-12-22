@@ -554,8 +554,8 @@ public class Node implements NodeInterface, Observer {
     }
 
     @Override
-    public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
-        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder,false);
+    public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader){
+        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder,notifDownloader);
     }
 
     @Override

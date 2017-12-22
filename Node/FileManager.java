@@ -424,7 +424,7 @@ public class FileManager extends Thread {
                         // First remote replace file
                         nodeStub.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
                         //sent remote via tcp to next
-                        nodeStub.remoteSendFile(next.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                        nodeStub.remoteSendFile(next.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER,false);
                         //the next node is now download location of file
                         fiche.addNode(new Neighbour(fiche.getReplicated().getName(), fiche.getReplicated().getIp()));
                     }

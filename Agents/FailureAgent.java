@@ -92,7 +92,7 @@ public class FailureAgent extends Agent {
                         Neighbour newReplicated = node.getPrevious();
                         NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + fiche.getOwner().getIp() + "/Node");
                         ownerStub.createFileEntry(fiche.getOwner(),newReplicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
-                        node.remoteSendFile(newReplicated.getIp(),6000,"./files/local",fiche.getFileName(),"replicated");
+                        node.remoteSendFile(newReplicated.getIp(),6000,"./files/local",fiche.getFileName(),"replicated",false);
                     }
                 }
             } catch (RemoteException e1) {
