@@ -46,7 +46,7 @@ public class Node implements NodeInterface, Observer {
         bootstrap();
     }
 
-    public Node(String name,String ip){
+    public Node(String name,String ip) {
         this.name = name;
         this.ip   = ip;
         this.gui = true;
@@ -57,6 +57,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     public void setMainController(MainController m ){this.mainController = m;}
+
     public Boolean getLoggedIn() {
         return logged_in;
     }
@@ -306,7 +307,7 @@ public class Node implements NodeInterface, Observer {
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        return Nodes;
+        return Nodes-1;
 
     }
 
