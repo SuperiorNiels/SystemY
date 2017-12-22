@@ -18,4 +18,8 @@ public interface NodeInterface extends Remote {
     public void moveFile(String from,String to) throws RemoteException;
     public void remoteCheckFileEntry(String filename,Neighbour leavingNode) throws RemoteException;
     public void remoteRemoveFromDownload(String filename,Neighbour leavingNode) throws RemoteException;
+    public void downloadFile(String filename) throws RemoteException;
+    public void fileDownloaded(String filename) throws RemoteException;
+    public Integer getCurrentNumberDownloads() throws RemoteException;
+    public Neighbour getDownloadLocation(String filename, Neighbour want_download) throws RemoteException;
 }

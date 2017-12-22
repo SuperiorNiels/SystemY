@@ -150,7 +150,14 @@ public class FileManager extends Thread {
      * @param destFolder name of the folder where the file has to be saved at the destination
      * @param notifDownloader set true to notify the downloader when the file has been sent successfully
      */
-    public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader){
+    public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader) {
+        if(srcFilePath.isEmpty()) {
+            if(new File(rootPath+"/"+ LOCAL_FOLDER+"/"+fileName).exists()) {
+                srcFilePath = rootPath+"/"+ LOCAL_FOLDER+"/";
+            } else if(new File(rootPath+"/"+ REPLICATED_FOLDER +"/"+fileName).exists()) {
+                srcFilePath = rootPath+"/"+ REPLICATED_FOLDER+"/";
+            }
+        }
         try {
             //System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
@@ -164,6 +171,16 @@ public class FileManager extends Thread {
             e.printStackTrace();
         }
 
+    }
+
+    public Integer getNumberOfThreadsAlive() {
+        int to_return = 0;
+        for(Thread thread : threadList) {
+            if(thread.isAlive()) {
+                to_return++;
+            }
+        }
+        return to_return;
     }
 
     /**

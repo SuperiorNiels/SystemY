@@ -43,7 +43,6 @@ public class PollingService extends Thread implements PollingServiceInterface {
 
     @Override
     public void run() {
-        // TODO: Add timer to this loop
         while (rootNode.isRunning()){
             Neighbour next = rootNode.getNext();
             if (!(rootNode.calculateHash(next.getName())== rootNode.calculateHash(rootNode.getName()))) {

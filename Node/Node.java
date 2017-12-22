@@ -1,6 +1,7 @@
 package Node;
 
 import Agents.AgentHandler;
+import Agents.FileRequest;
 import GUI.LoginController;
 import GUI.MainController;
 import NameServer.NamingInterface;
@@ -34,7 +35,7 @@ public class Node implements NodeInterface, Observer {
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
     // Files map updates by file agent
-    private TreeMap<String, Boolean> files = new TreeMap<>();
+    private TreeMap<String, FileRequest> files = new TreeMap<>();
     private ArrayList<String> locksRequest = new ArrayList<>();
     private LoginController loginController;
     private MainController mainController;
@@ -62,11 +63,11 @@ public class Node implements NodeInterface, Observer {
         return logged_in;
     }
 
-    public TreeMap<String, Boolean> getFiles() {
+    public TreeMap<String, FileRequest> getFiles() {
         return files;
     }
 
-    public void setFiles(TreeMap<String, Boolean> files) {
+    public void setFiles(TreeMap<String, FileRequest> files) {
         this.files = files;
         if(gui){
             mainController.update();
@@ -169,6 +170,13 @@ public class Node implements NodeInterface, Observer {
                     System.exit(0);
                 } else if(parts[0].toLowerCase().equals("fail")) {
                     failure(previous);
+                } else if(parts[0].toLowerCase().equals("download")) {
+                    try {
+                        String filename = parts[1].toLowerCase();
+                        startDownload(filename);
+                    } catch (Exception e) {
+                        System.out.println("Please enter a filename as parameter.");
+                    }
                 } else if(parts[0].toLowerCase().equals("owner")) {
                     try {
                         String filename = parts[1];
@@ -619,5 +627,87 @@ public class Node implements NodeInterface, Observer {
             list.add(entry.getFileName());
         }
         return list;
+    }
+
+
+    public ArrayList<String> getRequests() {
+        return requests;
+    }
+
+    private ArrayList<String> requests = new ArrayList<>();
+
+    public ArrayList<String> getDowloaded() {
+        return dowloaded;
+    }
+
+    private ArrayList<String> dowloaded = new ArrayList<>();
+
+
+    /**
+     * The goal of this function is to ask the fileAgent for a download, when the node can download the file the download function will be called
+     * @param filename
+     */
+    public void startDownload(String filename) {
+        requests.add(filename);
+    }
+
+    public void downloadFile(String filename) {
+        try {
+            requests.remove(filename);
+            NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            Neighbour owner = nameServer.getOwner(filename);
+
+            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
+            Neighbour download_location = nodeStub.getDownloadLocation(filename, new Neighbour(name,ip));
+
+            nodeStub = (NodeInterface) Naming.lookup("//"+download_location.getIp()+"/Node");
+            nodeStub.remoteSendFile(ip,6000,"",filename,"download", true);
+        } catch (NullPointerException e) {
+            System.out.println("FileAgent error: this node did not want to download the file: "+filename);
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            System.out.println("Problem with RMI in node while asking for owner of a file.");
+        }
+    }
+
+    public void fileDownloaded(String filename) {
+        dowloaded.add(filename);
+    }
+
+    /**
+     * Get the download location from the owner via RMI.
+     * @param filename
+     * @param want_download
+     * @return
+     */
+    public Neighbour getDownloadLocation(String filename, Neighbour want_download) {
+        TreeMap<Integer, FileEntry> map = (TreeMap<Integer, FileEntry>) manager.getMap();
+        int hash = calculateHash(filename);
+        if(map.containsKey(hash)) {
+            // This node is owner and has fileEntry, also update the entry (add download)
+            FileEntry entry = map.get(hash);
+            Neighbour compare = null;
+            if(calculateHash(entry.getLocal().getName()) == calculateHash(name)) {
+                // this node is local ask replicated node for current downloads
+                compare = entry.getReplicated();
+            } else {
+                // this node is the replicated node, ask the local for current downloads
+                compare = entry.getReplicated();
+            }
+            int number_compare = 0;
+            try {
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + compare.getIp() + "/Node");
+                number_compare = nodeStub.getCurrentNumberDownloads();
+            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                System.out.println("Problem with RMI to replicated node in request for download location.");
+            }
+            // update fileEntry downloads
+            entry.addNode(want_download);
+            return (number_compare > getCurrentNumberDownloads()) ?  new Neighbour(name,ip) : compare;
+        }
+        return null;
+    }
+
+    public Integer getCurrentNumberDownloads() {
+        return manager.getNumberOfThreadsAlive();
     }
 }

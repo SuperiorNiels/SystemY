@@ -63,8 +63,8 @@ public class SendTCP extends Thread {
             out.write(file,0,file.length);
             out.flush();
             if(notifDownloader){
-                NodeInterface stub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress()+"/Node");
-                //TODO notify downloader
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress()+"/Node");
+                nodeStub.fileDownloaded(fileName);
             }
         } catch (IOException e) {
             System.out.println("readline: " + e.getMessage());
