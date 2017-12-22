@@ -101,7 +101,7 @@ public class AgentHandler implements AgentHandlerInterface {
         return new FileAgent();
     }
 
-    public FailureAgent createNewFailureAgent() {
-        return new FailureAgent(rootNode, rootNode.getNext());
+    public FailureAgent createNewFailureAgent(Neighbour failedNode) {
+        return new FailureAgent(rootNode, failedNode);
     }
 }

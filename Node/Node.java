@@ -254,9 +254,11 @@ public class Node implements NodeInterface, Observer {
         } else if(parts[0].equals("02")){
             //Handle a failed node
             if(parts[1].equals("fail-detected")){
-                System.out.print("Failed node detected:");
+                System.out.print("Failed node detected. ");
                 System.out.println("Name: "+parts[2]+" IP: "+parts[3]);
-                failedNode = true;
+                if(getNumberOfNodesInNetwork()>0){
+                    failedNode = true;
+                }
             }else if(parts[1].equals("fail-fixed")){
                 failedNode = false;
             }
@@ -536,7 +538,7 @@ public class Node implements NodeInterface, Observer {
             this.sendMulticast("02;fail-detected;" + failedNode.getName() + ";" + failedNode.getIp());
 
             // Start a failureAgent
-            agentHandler.startAgent(agentHandler.createNewFailureAgent());
+            agentHandler.startAgent(agentHandler.createNewFailureAgent(failedNode));
 
 
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
