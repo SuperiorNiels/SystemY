@@ -84,6 +84,9 @@ public class FileAgent extends Agent {
             }
             node.setFiles(files);
         }
-        handler.startNextAgent(this);
+
+        //check if a failed node was detected; if so don't start the next agent
+        if(!node.checkFailedNode())
+            handler.startNextAgent(this);
     }
 }

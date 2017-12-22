@@ -27,10 +27,12 @@ public class Node implements NodeInterface, Observer {
     private String name = null;
     private String rootPath = "./files/";
     private String namingServerIp = null;
+    MulticastService multicast;
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
     private boolean gui = false;
-    private volatile boolean  logged_in = false;
+    private volatile boolean logged_in = false;
+    private volatile boolean failedNode = false;
 
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
@@ -107,7 +109,7 @@ public class Node implements NodeInterface, Observer {
     public void bootstrap() {
         //starts the watcher thread that watches the map with files
         try {
-            MulticastService multicast = null;
+            multicast = null;
             // update ip
             if (!gui) {
                 multicast = new MulticastService("224.0.0.1", 4446);
@@ -248,6 +250,15 @@ public class Node implements NodeInterface, Observer {
                 }
                 // initialize your filemanager
                 manager.initialize();
+            }
+        } else if(parts[0].equals("02")){
+            //Handle a failed node
+            if(parts[1].equals("fail-detected")){
+                System.out.print("Failed node detected:");
+                System.out.println("Name: "+parts[2]+" IP: "+parts[3]);
+                failedNode = true;
+            }else if(parts[1].equals("fail-fixed")){
+                failedNode = false;
             }
         }
     }
@@ -521,13 +532,38 @@ public class Node implements NodeInterface, Observer {
                 //Remove the node at the nameserver
                 nameServer.removeNode(failedNode.getName());
             }
+            //Send a multicast to notify all nodes a node failed
+            this.sendMulticast("02;fail-detected;" + failedNode.getName() + ";" + failedNode.getIp());
 
             // Start a failureAgent
             agentHandler.startAgent(agentHandler.createNewFailureAgent());
 
+
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             System.err.println("Error 4595 solving a failed node: ");
         }
+    }
+
+    /**
+     * This method is called to check if this node detected a failed node
+     * If failedNode is true, the fileAgent needs to be stopped
+     * @return true/false depending on the state of failedNode
+     */
+    public boolean checkFailedNode(){
+        return failedNode;
+    }
+
+    /**
+     * This method sends a multicast
+     * @param message
+     * @return true when send, false when an error occurred
+     */
+    public boolean sendMulticast(String message){
+        //Send a multicast
+        if(multicast.sendMulticast(message))
+            return true;
+        else
+            return false;
     }
 
     /**

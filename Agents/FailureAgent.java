@@ -42,6 +42,11 @@ public class FailureAgent extends Agent {
     public void run() {
         //Stop the failure agent when you are the node that started
         if(startNode == calculateHash(node.getName()) && started) {
+            //Notify the network the failed node was taken care of
+            node.sendMulticast("02;fail-fixed;");
+            //Start a new file agent
+            handler.startAgent(handler.createNewFileAgent());
+            //Stop this agent
             Thread.currentThread().interrupt();
             return;
         }
