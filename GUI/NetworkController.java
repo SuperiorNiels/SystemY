@@ -43,7 +43,7 @@ public class NetworkController {
 
     public void initData(){
         this.node = headController.getNode();
-        numberOfNodeLabel.setText(Integer.toString(node.getNumberOfNodesInNetwork()));
+        numberOfNodeLabel.setText(Integer.toString(node.getNumberOfNodesInNetwork()+1));
         Neighbour temp = node.getNext();
         nextLabel.setText("Name: " + temp.getName() + "\nIP: " + temp.getIp());
         temp = node.getPrevious();
