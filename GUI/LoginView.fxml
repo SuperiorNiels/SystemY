@@ -12,7 +12,7 @@
   <children>
     <Button fx:id="login_bnt" layoutX="129.0" layoutY="123.0" mnemonicParsing="false" onAction="#login" prefWidth="75.0" text="Login" />
     <Text layoutX="111.0" layoutY="29.0" scaleX="1.348737294351881" scaleY="1.3157064519089574" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome to SystemY" />
-    <TextField fx:id="login_name_text" layoutX="40.0" layoutY="53.0" prefWidth="231.0" promptText="Name" />
+    <TextField fx:id="login_name_text" layoutX="40.0" layoutY="53.0" onInputMethodTextChanged="#textEnterd" onKeyPressed="#textEnterd" prefWidth="231.0" promptText="Name" />
     <ChoiceBox fx:id="interface_select" layoutX="113.0" layoutY="89.0" prefWidth="158.0">
       <items>
         <FXCollections fx:factory="observableArrayList" />

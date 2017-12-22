@@ -2,8 +2,10 @@ package GUI;
 
 
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -15,14 +17,14 @@ import javafx.stage.WindowEvent;
  * This call can take some time, the loadingView notific the users that it can take some time.
  * When the RMI Call is finished this view will automaticly close.
  */
-public class LoadingController {
+public class LoadingController{
 
     HeadController headController;
     Scene view;
     Stage stage;
 
-    private int viewWidth  = 260;
-    private int viewHeight = 90;
+    private int viewWidth  = 400;
+    private int viewHeight = 58;
     public void init(HeadController headcontroller){
         this.headController =headcontroller;
     }
@@ -42,4 +44,5 @@ public class LoadingController {
     public void close(){
         stage.close();
     }
+
 }

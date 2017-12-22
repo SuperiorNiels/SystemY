@@ -13,6 +13,7 @@ import Node.Node;
 import javafx.stage.WindowEvent;
 
 import java.io.IOException;
+import java.util.concurrent.*;
 
 /**
  * LogoffController is the controller for the LogOffview.
@@ -31,9 +32,11 @@ public class LogoffController {
     private Node node;
     private HeadController headController;
     private Scene view;
+    private int delay;
 
     public void init(HeadController headcontroller){
         this.headController =headcontroller;
+        this.delay = headcontroller.getDelay();
     }
 
     public void initData(){
@@ -42,12 +45,33 @@ public class LogoffController {
 
     public void logOff() throws IOException {
         headController.toLoading();
-        node.shutDown();
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        try {
+            Runnable r = () -> {
+                node.shutDown();
+            };
+            Future<?> f = service.submit(r);
+            f.get(delay, TimeUnit.SECONDS);
+        }
+        catch (final InterruptedException e) {
+            // The thread was interrupted during sleep, wait or join
+        }
+        catch (final TimeoutException e) {
+            // Took too long!
+            headController.closeLoading();
+            System.out.println("time expired");
+        }
+        catch (final ExecutionException e) {
+            // An exception from within the Runnable task
+        }
+        finally {
+            service.shutdown();
+        }
         headController.closeLoading();
         Stage currentWindow = (Stage) logoff_yes_bnt.getScene().getWindow();
         currentWindow.close();
         System.exit(0);
-    };
+    }
 
     public void mainView(){
         headController.toMain();

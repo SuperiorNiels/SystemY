@@ -1,6 +1,7 @@
 package Node;
 
 import Agents.AgentHandler;
+import GUI.LoginController;
 import GUI.MainController;
 import NameServer.NamingInterface;
 import Network.MulticastService;
@@ -34,8 +35,9 @@ public class Node implements NodeInterface, Observer {
     private AgentHandler agentHandler;
     // Files map updates by file agent
     private TreeMap<String, Boolean> files = new TreeMap<>();
-
     private ArrayList<String> locksRequest = new ArrayList<>();
+    private LoginController loginController;
+    private MainController mainController;
 
     public Node() {
         Scanner input = new Scanner(System.in);
@@ -44,11 +46,17 @@ public class Node implements NodeInterface, Observer {
         bootstrap();
     }
 
-    public Node(String name,String ip){
+    public Node(String name,String ip) {
         this.name = name;
         this.ip   = ip;
         this.gui = true;
     }
+
+    public void setLoginController(LoginController l){
+        this.loginController = l;
+    }
+
+    public void setMainController(MainController m ){this.mainController = m;}
 
     public Boolean getLoggedIn() {
         return logged_in;
@@ -60,6 +68,7 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, Boolean> files) {
         this.files = files;
+        mainController.update();
     }
 
     public ArrayList<String> getLocksRequest() {
@@ -517,16 +526,16 @@ public class Node implements NodeInterface, Observer {
     public void failedToAddNode(){
         System.err.println("Failed to add the node to the Nameserver. Node name already taken!");
         if(!gui) {
-            Scanner input = new Scanner(System.in);
+            /*Scanner input = new Scanner(System.in);
             System.out.println("Hostname: ");
             this.name = input.nextLine();
-
+            bootstrap();*/
+            //Causes RMI problem
+            System.exit(1);
         } else {
-            // TODO: JAMIE FIXT DIT NOG AUB PLS
+            loginController.setNodeExitst(true);
         }
-        bootstrap();
-        // Causes RMI problem
-        //System.exit(1);
+
     }
 
     /**

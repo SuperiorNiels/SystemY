@@ -34,6 +34,7 @@ public class HeadController {
     private Parent rloading;
 
     private Node node;
+    private int delay = 300;
 
     public HeadController() throws IOException {
         login.setLocation(   getClass().getResource("LoginView.fxml"  ));
@@ -90,4 +91,6 @@ public class HeadController {
     public void closeLoading(){
         loadingController.close();
     }
+
+    public int getDelay(){return this.delay;}
 }

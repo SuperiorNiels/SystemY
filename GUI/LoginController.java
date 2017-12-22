@@ -20,6 +20,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.concurrent.*;
 
 
 /**
@@ -42,6 +43,9 @@ public class LoginController {
     private ChoiceBox interface_select;
     @FXML
     private Label errorLabel;
+    private int delay;
+    private boolean nodeExist = false;
+    private boolean triedToLogin = false;
 
     private HeadController headController;
     public void init(HeadController headcontroller) throws SocketException {
@@ -57,7 +61,7 @@ public class LoginController {
         }
 
         interface_select.getSelectionModel().selectFirst();
-
+        this.delay = headcontroller.getDelay();
     }
 
     public void login(){
@@ -72,15 +76,32 @@ public class LoginController {
 
         if(validEntered) {
             Stage currentWindow = (Stage) login_name_text.getScene().getWindow();
-            currentWindow.close();
             headController.toLoading();
-            node = new Node(name , ipParts[1]);
+            if(!triedToLogin){
+                node.setLoginController(this);
+                node = new Node(name, ipParts[1]);
+            }
+            else
+                node.setName(name);
             headController.setNode(node);
             node.bootstrap();
-            while(node.getLoggedIn() == false) {}
-            headController.toMain();
-            headController.closeLoading();
-
+            while ((node.getLoggedIn() == false)&& !nodeExist) {
+                //check if name already exits
+                //if name already exits stop and warn the user
+                //else wait for bootstrap, etc.
+            }
+            if(!nodeExist) {
+                //if this is a new node and its logged in normaly
+                //close the window and go to main view
+                currentWindow.close();
+                headController.toMain();
+                headController.closeLoading();
+            }else{
+                //if the node name already exits.
+                //close the loading scene.
+                errorLabel.setText("name already exist");
+                headController.closeLoading();
+            }
         }else{
             errorLabel.setText("Please enter a name");
         }
@@ -101,5 +122,12 @@ public class LoginController {
         stage.setScene(view);
         stage.show();
     }
+
+    public void textEnterd(){
+        errorLabel.setText("");
+        this.nodeExist = false;
+    }
+
+    public void setNodeExitst(Boolean b){this.nodeExist = b;}
 
 }

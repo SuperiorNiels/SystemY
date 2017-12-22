@@ -16,9 +16,12 @@ import javafx.stage.WindowEvent;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Semaphore;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.*;
 
 
 public class MainController {
@@ -34,7 +37,9 @@ public class MainController {
     private Node node;
     private HeadController headController;
     private Scene view;
-    private TreeMap<String, Boolean> files;
+    private TreeMap<String, Boolean> newFiles;
+    private TreeMap<String, Boolean> oldFiles = null;
+    private int delay;
 
 public void delete(){
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
@@ -44,15 +49,19 @@ public void delete(){
 public void deleteLocal(){
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
     System.out.println("deleteLocal : " + file);
+    File localf = new File("files\\local\\"+ file);
+    localf.delete();
 }
 
 public void init(HeadController headcontroller){
         this.headController =headcontroller;
+        this.delay = headcontroller.getDelay();
     };
 
 public void initData(){
         node = headController.getNode();
         nameLabel.setText(node.getName());
+        node.setMainController(this);
         update();
 }
 
@@ -63,11 +72,13 @@ public void logOff(){
     }
 
 public void open(){
+    headController.toLoading();
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
     try {
         if (Desktop.isDesktopSupported()) {
             File localf = new File("files\\local\\"+ file);
             File replif = new File("files\\replicated\\"+ file);
+            File downlf = new File("files\\download\\" + file);
             if(localf.exists()){
                 System.out.println("in local");
                 Desktop.getDesktop().open(localf);
@@ -75,13 +86,18 @@ public void open(){
             else if(replif.exists()) {
                 System.out.println("in replicated");
                 Desktop.getDesktop().open(replif);
-            }else{
+            }
+            else if(downlf.exists()){
+                System.out.println("in download");
+                Desktop.getDesktop().open(downlf);
+            } else{
                 //download the file from the network
             }
         }
     } catch (IOException ioe) {
         System.err.println("could not open file");;
     }
+    headController.closeLoading();
     System.out.println("opening : " + file);
 }
 
@@ -101,23 +117,29 @@ public void view(Parent root){
         stage.show();
     }
 
-    public void viewNetwork(){
-
-        Stage currentWindow = (Stage) Log_off_bnt.getScene().getWindow();
-        currentWindow.close();
+public void viewNetwork(){
         headController.toLoading();
         headController.toNetwork();
         headController.closeLoading();
-
     }
 
-    public void update(){
-        files = node.getFiles();
-        fileName_list.getItems().clear();
-        for (Map.Entry<String, Boolean> entry : files.entrySet()) {
-            fileName_list.getItems().add(entry.getKey());
-            System.out.println(entry.getKey());
+public void update(){
+        newFiles = node.getFiles();
+
+        Set values1 = new HashSet(newFiles.values());
+        Set values2 = new HashSet(oldFiles.values());
+        boolean equal = values1.equals(values2);
+
+        if(!equal) {
+            fileName_list.getItems().clear();
+            for (Map.Entry<String, Boolean> entry : newFiles.entrySet()) {
+                fileName_list.getItems().add(entry.getKey());
+                System.out.println(entry.getKey());
+            }
+            fileName_list.getSelectionModel().selectFirst();
+        }else{
+            oldFiles = newFiles;
         }
-        fileName_list.getSelectionModel().selectFirst();
     }
+
 }
