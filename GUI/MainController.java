@@ -1,5 +1,6 @@
 package GUI;
 
+import Agents.FileRequest;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,8 +38,8 @@ public class MainController {
     private Node node;
     private HeadController headController;
     private Scene view;
-    private TreeMap<String, Boolean> newFiles;
-    private TreeMap<String, Boolean> oldFiles = null;
+    private TreeMap<String, FileRequest> newFiles;
+    private TreeMap<String, FileRequest> oldFiles = null;
     private int delay;
 
 public void delete(){
@@ -132,7 +133,7 @@ public void update(){
 
         if(!equal) {
             fileName_list.getItems().clear();
-            for (Map.Entry<String, Boolean> entry : newFiles.entrySet()) {
+            for (Map.Entry<String, FileRequest> entry : newFiles.entrySet()) {
                 fileName_list.getItems().add(entry.getKey());
                 System.out.println(entry.getKey());
             }

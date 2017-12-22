@@ -56,7 +56,7 @@ public class FailureAgent extends Agent {
                     if (fiche == null) {
                         //You are the only one with the file left ==> move to local and filemanager will take care of the replication
                         String filename = null;
-                        for (Map.Entry<String, Boolean> f : node.getFiles().entrySet()) {
+                        for (Map.Entry<String, FileRequest> f : node.getFiles().entrySet()) {
                             if(fileHash == calculateHash(f.getKey()))
                                 filename = f.getKey();
                         }
@@ -81,7 +81,7 @@ public class FailureAgent extends Agent {
                     if (fiche == null) {
                         //First find the filename of the file then replicate it
                         File replicateFile = null;
-                        for (Map.Entry<String, Boolean> f : node.getFiles().entrySet()) {
+                        for (Map.Entry<String, FileRequest> f : node.getFiles().entrySet()) {
                             if(fileHash == calculateHash(f.getKey()))
                                 replicateFile = new File("./files/local/"+f.getKey());
                         }
