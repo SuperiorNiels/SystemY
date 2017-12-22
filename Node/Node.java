@@ -248,7 +248,7 @@ public class Node implements NodeInterface, Observer {
     private void startRMI() {
         try {
             System.setProperty("java.rmi.server.hostname",ip);
-            //Start the RMI-server
+            // Start the RMI-server
             NodeInterface stub = (NodeInterface) UnicastRemoteObject.exportObject(this,0);
             Registry registry = LocateRegistry.createRegistry(1099);
             registry.bind("Node", stub);
