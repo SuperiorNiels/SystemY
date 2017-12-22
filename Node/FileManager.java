@@ -44,6 +44,7 @@ public class FileManager extends Thread {
             System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
         TCPListenerService TCPListener = new TCPListenerService(rootPath);
+        //makes a threadList for the first time
         threadList = new ArrayList<Thread>();
 
 
@@ -147,6 +148,7 @@ public class FileManager extends Thread {
      * @param srcFilePath source path of the file that you want to send
      * @param fileName name of the file
      * @param destFolder name of the folder where the file has to be saved at the destination
+     * @param notifDownloader set true to notify the downloader when the file has been sent successfully
      */
     public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader){
         try {
