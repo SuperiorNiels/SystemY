@@ -53,6 +53,8 @@ public class FileAgent extends Agent {
                 if (requests.contains(name)) {
                     FileRequest request = files.get(name);
                     request.addRequest(new Neighbour(node.getName(),node.getIp()));
+                    // TODO: when a node can download the file, remove the file from his request list
+                    // TODO: check if object is already in queue
                     if(!request.getLocked()) {
                         // A node can download the file
                         // Always at least one neighbour in queue so don't need to check
