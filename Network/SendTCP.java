@@ -4,6 +4,7 @@ import Node.Neighbour;
 import Node.NodeInterface;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -62,8 +63,8 @@ public class SendTCP extends Thread {
             //sends the file
             out.write(file,0,file.length);
             out.flush();
-            if(notifDownloader){
-                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress()+"/Node");
+            if(notifDownloader) {
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress().toString()+"/Node");
                 nodeStub.fileDownloaded(fileName);
             }
         } catch (IOException e) {
