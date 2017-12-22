@@ -55,7 +55,7 @@ public class FailureAgent extends Agent {
                     //if fiche null ==> fiche was owned by the failing node
                     if (fiche == null) {
                         //You are the only one with the file left ==> move to local and filemanager will take care of the replication
-                        String filename = getFile(fileHash).getName();
+                        String filename = getFile(fileHash,"./files/replicated/").getName();
                         if(filename!=null){
                             //Replicate the file again to make sure the copy remains in the system
                             node.replicate(new File("./files/replicated/"+filename));
@@ -76,7 +76,7 @@ public class FailureAgent extends Agent {
                     //if fiche null ==> fiche was owned by the failing node
                     if (fiche == null) {
                         //First find the filename of the file then replicate it
-                        File replicateFile = getFile(fileHash);
+                        File replicateFile = getFile(fileHash,"./files/local/");
                         node.replicate(replicateFile);
                     } else if (calculateHash(fiche.getReplicated().getName()) == calculateHash(failingNode.getName())) {
                         //This node is the owner, the failed node replicated because he is your previous
@@ -115,11 +115,11 @@ public class FailureAgent extends Agent {
      * @param hash
      * @return
      */
-    public File getFile(int hash){
+    public File getFile(int hash, String location){
         File replicateFile = null;
         for (Map.Entry<String, FileRequest> f : node.getFiles().entrySet()) {
             if(hash == calculateHash(f.getKey()))
-                replicateFile = new File("./files/local/"+f.getKey());
+                replicateFile = new File(location+f.getKey());//"./files/local/"
         }
         return  replicateFile;
     }
