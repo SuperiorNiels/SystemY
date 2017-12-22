@@ -55,11 +55,7 @@ public class FailureAgent extends Agent {
                     //if fiche null ==> fiche was owned by the failing node
                     if (fiche == null) {
                         //You are the only one with the file left ==> move to local and filemanager will take care of the replication
-                        String filename = null;
-                        for (Map.Entry<String, FileRequest> f : node.getFiles().entrySet()) {
-                            if(fileHash == calculateHash(f.getKey()))
-                                filename = f.getKey();
-                        }
+                        String filename = getFile(fileHash).getName();
                         if(filename!=null){
                             //Replicate the file again to make sure the copy remains in the system
                             node.replicate(new File("./files/replicated/"+filename));
@@ -80,11 +76,7 @@ public class FailureAgent extends Agent {
                     //if fiche null ==> fiche was owned by the failing node
                     if (fiche == null) {
                         //First find the filename of the file then replicate it
-                        File replicateFile = null;
-                        for (Map.Entry<String, FileRequest> f : node.getFiles().entrySet()) {
-                            if(fileHash == calculateHash(f.getKey()))
-                                replicateFile = new File("./files/local/"+f.getKey());
-                        }
+                        File replicateFile = getFile(fileHash);
                         node.replicate(replicateFile);
                     } else if (calculateHash(fiche.getReplicated().getName()) == calculateHash(failingNode.getName())) {
                         //This node is the owner, the failed node replicated because he is your previous
@@ -94,6 +86,13 @@ public class FailureAgent extends Agent {
                         ownerStub.createFileEntry(fiche.getOwner(),newReplicated,fiche.getLocal(),fiche.getFileName(),fiche.getDownloads());
                         node.remoteSendFile(newReplicated.getIp(),6000,"./files/local",fiche.getFileName(),"replicated",false);
                     }
+                }
+
+                //Last check your file entries and remove everything with the failed node or replace with out of system
+                TreeMap<Integer, FileEntry> entries = node.getFileEntries();
+                for (Map.Entry<Integer, FileEntry> file : local.entrySet()) {
+                    FileEntry fiche = file.getValue();
+                    node.removeFromDownload(fiche.getFileName(),failingNode);
                 }
             } catch (RemoteException e1) {
                 e1.printStackTrace();
@@ -109,6 +108,20 @@ public class FailureAgent extends Agent {
             started = true;
             handler.startNextAgent(this);
         }
+    }
+
+    /**
+     * getFile searches for the file hash in the nodes fileAgent map
+     * @param hash
+     * @return
+     */
+    public File getFile(int hash){
+        File replicateFile = null;
+        for (Map.Entry<String, FileRequest> f : node.getFiles().entrySet()) {
+            if(hash == calculateHash(f.getKey()))
+                replicateFile = new File("./files/local/"+f.getKey());
+        }
+        return  replicateFile;
     }
 
     /**

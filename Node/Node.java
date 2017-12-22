@@ -581,6 +581,10 @@ public class Node implements NodeInterface, Observer {
         manager.removeFromDownload(filename,leavingNode);
     }
 
+    public void removeFromDownload(String filename,Neighbour leavingNode){
+        manager.removeFromDownload(filename,leavingNode);
+    }
+
     /**
      * This function returns a Treemap with all files and file fiches from the replicated and local
      * @return
@@ -613,6 +617,10 @@ public class Node implements NodeInterface, Observer {
     @Override
     public FileEntry getFileEntry(String fileName) throws NullPointerException {
         return manager.getFileEntry(fileName);
+    }
+
+    public TreeMap<Integer,FileEntry> getFileEntries(){
+        return manager.getMap();
     }
 
     /**
