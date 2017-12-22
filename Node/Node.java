@@ -544,7 +544,7 @@ public class Node implements NodeInterface, Observer {
 
     @Override
     public void remoteSendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
-        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder);
+        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder,false);
     }
 
     @Override
@@ -579,10 +579,6 @@ public class Node implements NodeInterface, Observer {
             System.err.println("Malformed url");
         }
         return map;
-    }
-
-    public void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
-        manager.sendFile(ip,destPort,srcFilePath,fileName,destFolder);
     }
 
     public void replicate(File file){

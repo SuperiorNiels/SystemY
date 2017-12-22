@@ -1,7 +1,12 @@
 package Network;
 
+import Node.Neighbour;
+import Node.NodeInterface;
+
 import java.io.*;
 import java.net.Socket;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
 
 /**
  * Class that is used to send a file over a tcp connection
@@ -13,18 +18,21 @@ public class SendTCP extends Thread {
     private String srcFilePath;
     private String destFolder;
     private String fileName;
+    private boolean notifDownloader;
 
     /**
      * @param aClientSocket socket to send to
      * @param srcFilePath source path of the file
      * @param fileName name of the file
      * @param destFolder name of the folder where the file has to be sent
+     * @param notifDownloader set this boolean true to notify the downloader when the file has been sent through RMI
      */
-    public SendTCP(Socket aClientSocket, String srcFilePath, String fileName,String destFolder) {
+    public SendTCP(Socket aClientSocket, String srcFilePath, String fileName,String destFolder,boolean notifDownloader) {
         try {
             this.srcFilePath = srcFilePath;
             this.destFolder = destFolder;
             this.fileName = fileName;
+            this.notifDownloader = notifDownloader;
             clientSocket = aClientSocket;
             //We wrap everything in bufferedstream to fasten up the transaction
             //The reason for using datastream is because we can write/read primitive types straigth from/to the input/output
@@ -54,9 +62,16 @@ public class SendTCP extends Thread {
             //sends the file
             out.write(file,0,file.length);
             out.flush();
+            if(notifDownloader){
+                NodeInterface stub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress()+"/Node");
+                //TODO notify downloader
+            }
         } catch (IOException e) {
             System.out.println("readline: " + e.getMessage());
-        }finally{
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+            System.err.println("There was an error notifying the downloader"+e.getMessage());
+        } finally{
             try{
                 //closes the socket
                 clientSocket.close();

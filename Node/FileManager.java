@@ -44,6 +44,7 @@ public class FileManager extends Thread {
             System.out.println("There was an error creating the sub directories");
         //starts a tcp listener that listens for tcp request
         TCPListenerService TCPListener = new TCPListenerService(rootPath);
+        //makes a threadList for the first time
         threadList = new ArrayList<Thread>();
 
 
@@ -92,11 +93,11 @@ public class FileManager extends Thread {
             Neighbour replicated = null;
             if (owner.getIp().equals(rootNode.getIp())) {
                 //This node is the owner of the file = replicate it to the previous node
-                sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
+                sendFile(rootNode.getPrevious().getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER,false);
                 replicated = rootNode.getPrevious();
             } else{
                 //replicate it to the owner of the file
-                sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER);
+                sendFile(owner.getIp(), PORT, rootPath+"/"+LOCAL_FOLDER, file.getName(),REPLICATED_FOLDER,false);
                 replicated = owner;
             }
 
@@ -143,14 +144,15 @@ public class FileManager extends Thread {
      * @param srcFilePath source path of the file that you want to send
      * @param fileName name of the file
      * @param destFolder name of the folder where the file has to be saved at the destination
+     * @param notifDownloader set true to notify the downloader when the file has been sent successfully
      */
-    public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder){
+    public synchronized void sendFile(String ip,int destPort,String srcFilePath,String fileName,String destFolder,boolean notifDownloader){
         try {
             //System.out.println("Sending file: "+fileName);
             //opens a send socket with a given destination ip and destination port
             Socket sendSocket = new Socket(ip,destPort);
             //sends the given file to the given ip
-            SendTCP send = new SendTCP(sendSocket,srcFilePath,fileName,destFolder);
+            SendTCP send = new SendTCP(sendSocket,srcFilePath,fileName,destFolder,notifDownloader);
             //adds the threads to a list
             threadList.add(send);
         } catch (IOException e) {
@@ -280,12 +282,12 @@ public class FileManager extends Thread {
                                 if (calculateHash(fiche.getLocal().getName()) == calculateHash(prev.getName())) {
                                     //send replicate to prev of prev
                                     if(!nodeStub.getPrevious().equals(fiche.getLocal())) { //Check if the prev has a prev
-                                        sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath + "/" + REPLICATED_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                                        sendFile(nodeStub.getPrevious().getIp(), PORT, rootPath + "/" + REPLICATED_FOLDER, fiche.getFileName(), REPLICATED_FOLDER,false);
                                         replicated = nodeStub.getPrevious();
                                     }
                                 }else{
                                     //send replicate to prev
-                                    sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER);
+                                    sendFile(prev.getIp(), PORT, rootPath+"/"+REPLICATED_FOLDER, fiche.getFileName(),REPLICATED_FOLDER,false);
                                     replicated = prev;
                                 }
 
@@ -410,7 +412,7 @@ public class FileManager extends Thread {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
                         //sent via tcp to next
-                        sendFile(next.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER);
+                        sendFile(next.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER,false);
                         //this node is now download location of file
                         fiche.addNode(new Neighbour(rootNode.getName(), rootNode.getIp()));
                     } else {
