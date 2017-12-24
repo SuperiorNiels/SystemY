@@ -64,14 +64,13 @@ public class SendTCP extends Thread {
             out.write(file,0,file.length);
             out.flush();
             if(notifDownloader) {
-                System.out.println("RMI to: //"+clientSocket.getInetAddress().toString()+"/Node");
-                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress().toString()+"/Node");
+                NodeInterface nodeStub = (NodeInterface) Naming.lookup("/"+clientSocket.getInetAddress().toString()+"/Node");
                 nodeStub.fileDownloaded(fileName);
             }
         } catch (IOException e) {
             System.out.println("readline: " + e.getMessage());
         } catch (NotBoundException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.err.println("There was an error notifying the downloader "+e.getMessage());
         } finally{
             try{
