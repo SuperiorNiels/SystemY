@@ -64,6 +64,7 @@ public class SendTCP extends Thread {
             out.write(file,0,file.length);
             out.flush();
             if(notifDownloader) {
+                System.out.println("RMI to: //"+clientSocket.getInetAddress().toString()+"/Node");
                 NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+clientSocket.getInetAddress().toString()+"/Node");
                 nodeStub.fileDownloaded(fileName);
             }
