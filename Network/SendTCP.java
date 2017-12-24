@@ -70,7 +70,7 @@ public class SendTCP extends Thread {
         } catch (IOException e) {
             System.out.println("readline: " + e.getMessage());
         } catch (NotBoundException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
             System.err.println("There was an error notifying the downloader "+e.getMessage());
         } finally{
             try{

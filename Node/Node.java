@@ -94,7 +94,7 @@ public class Node implements NodeInterface, Observer {
             for (String filename : files.keySet()) {
                 System.out.println("File "+i+": ");
                 System.out.println("\tName: "+filename);
-                System.out.println("\tAvailable Slots: " + files.get(filename));
+                System.out.println("\tFile Request: " + files.get(filename).toString());
                 i++;
             }
         } else {

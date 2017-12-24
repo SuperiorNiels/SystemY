@@ -59,8 +59,8 @@ public class MulticastService extends Thread {
                 NetworkInterface iface = interfaces.nextElement();
                 // filters out 127.0.0.1 and inactive interfaces
                 if (iface.isLoopback() || !iface.isUp() || !iface.supportsMulticast() ||
-                        iface.getDisplayName().contains("wlan") || iface.getDisplayName().contains("Wireless LAN")
-                        || iface.getDisplayName().contains("wlp"))
+                        iface.getDisplayName().contains("wlan") || iface.getDisplayName().contains("Wireless LAN"))
+                        //|| iface.getDisplayName().contains("wlp"))
                     continue;
 
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();

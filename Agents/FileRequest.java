@@ -35,4 +35,12 @@ public class FileRequest implements Serializable {
     public Boolean hasInQueue(Neighbour node) {
         return requested_nodes.contains(node);
     }
+
+    public String toString() {
+        String to_return = "\n\t\tLocked: "+locked+"\n\t\tNodes in queue:\n";
+        for(Neighbour in_queue : requested_nodes) {
+            to_return += "\t\t\t"+in_queue.toString();
+        }
+        return to_return;
+    }
 }
