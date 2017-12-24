@@ -2,12 +2,11 @@ package Agents;
 
 import Node.Neighbour;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.LinkedList;
-import java.util.Queue;
 
 public class FileRequest implements Serializable {
+    private static final long serialVersionUID = 1;
     private LinkedList<Neighbour> requested_nodes = new LinkedList<>();
     private Boolean locked = false;
 
@@ -31,5 +30,9 @@ public class FileRequest implements Serializable {
 
     public Boolean getLocked() {
         return locked;
+    }
+
+    public Boolean hasInQueue(Neighbour node) {
+        return requested_nodes.contains(node);
     }
 }

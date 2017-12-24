@@ -1,10 +1,10 @@
 package Node;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class FileEntry implements Serializable {
+    private static final long serialVersionUID = 2;
     private Neighbour owner;
     private Neighbour replicated;
     private Neighbour local;

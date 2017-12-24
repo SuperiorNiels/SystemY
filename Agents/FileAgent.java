@@ -47,14 +47,13 @@ public class FileAgent extends Agent {
             }
 
             ArrayList<String> requests = node.getRequests();
-            ArrayList<String> dowloaded = node.getDowloaded();
+            ArrayList<String> downloaded = node.getDowloaded();
             for (String name : files.keySet()) {
                 // Go through map and check for download requests
                 if (requests.contains(name)) {
                     FileRequest request = files.get(name);
-                    request.addRequest(new Neighbour(node.getName(),node.getIp()));
-                    // TODO: when a node can download the file, remove the file from his request list
-                    // TODO: check if object is already in queue
+                    Neighbour current = new Neighbour(node.getName(),node.getIp());
+                    if(!request.hasInQueue(current)) {request.addRequest(current); }
                     if(!request.getLocked()) {
                         // A node can download the file
                         // Always at least one neighbour in queue so don't need to check
@@ -76,9 +75,10 @@ public class FileAgent extends Agent {
                     }
                 }
                 // Check for the downloaded files in the node map (so we can clear the lock)
-                if(dowloaded.contains(name)) {
+                if(downloaded.contains(name)) {
                     // the current node has downloaded the file, remove the lock
                     FileRequest request = files.get(name);
+                    // TODO : remove downloaded file from downloaded arraylist in node?
                     request.unlock();
                 }
             }

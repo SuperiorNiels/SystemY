@@ -3,6 +3,7 @@ package Node;
 import java.io.Serializable;
 
 public class Neighbour implements Serializable {
+    private static final long serialVersionUID = 3;
     private String ip;
     private String name;
 

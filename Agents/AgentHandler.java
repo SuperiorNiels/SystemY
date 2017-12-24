@@ -68,7 +68,7 @@ public class AgentHandler implements AgentHandlerInterface {
             failureAgent.setNode(null);
             failureAgent.setHandler(null);
 
-            // Run agent on next node
+            // Run agent on previous node
             Neighbour previous = rootNode.getPrevious();
             if (previous == null) { previous = new Neighbour(rootNode.getName(),rootNode.getIp()); }
             if(!previous.equals(new Neighbour(rootNode.getName(),rootNode.getIp()))) {
