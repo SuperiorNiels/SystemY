@@ -8,6 +8,7 @@ import NameServer.NamingInterface;
 import Network.MulticastService;
 import Network.PollingService;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -160,7 +161,7 @@ public class Node implements NodeInterface, Observer {
                         } else {
                             System.out.println("Enter correct parameter for what to print.");
                         }
-                    } catch(Exception e) {
+                    } catch (Exception e) {
                         System.out.println("Enter parameter for what to print.");
                     }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
@@ -170,12 +171,23 @@ public class Node implements NodeInterface, Observer {
                     multicast.terminate();
                     //stops SystemY process
                     System.exit(0);
-                } else if(parts[0].toLowerCase().equals("fail")) {
+                } else if (parts[0].toLowerCase().equals("fail")) {
                     failure(previous);
-                } else if(parts[0].toLowerCase().equals("download")) {
+                } else if (parts[0].toLowerCase().equals("download")) {
                     try {
                         String filename = parts[1].toLowerCase();
-                        startDownload(filename);
+                        if (files.containsKey(filename)) {
+                            startDownload(filename);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Please enter a filename as parameter.");
+                    }
+                } else if(parts[0].toLowerCase().equals("open")) {
+                    try {
+                        String filename = parts[1].toLowerCase();
+                        if (files.containsKey(filename)) {
+                            openFile(filename);
+                        }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
                     }
@@ -717,6 +729,7 @@ public class Node implements NodeInterface, Observer {
 
     public void fileDownloaded(String filename) {
         dowloaded.add(filename);
+        openFile(filename);
     }
 
     /**
@@ -755,5 +768,36 @@ public class Node implements NodeInterface, Observer {
 
     public Integer getCurrentNumberDownloads() {
         return manager.getNumberOfThreadsAlive();
+    }
+
+    public void openFile(String filename) {
+        try {
+            if (Desktop.isDesktopSupported() && files.containsKey(filename)) {
+                File local = new File("files\\local\\"+ filename);
+                if(local.exists()){
+                    System.out.println("File found in local folder.");
+                    Desktop.getDesktop().open(local);
+                } else {
+                    File replicated = new File("files\\replicated\\"+ filename);
+                    if(replicated.exists()) {
+                        System.out.println("File found in replicated folder.");
+                        Desktop.getDesktop().open(replicated);
+                    } else {
+                        File download = new File("files\\download\\" + filename);
+                        if(download.exists()){
+                            System.out.println("File found in download folder.");
+                            Desktop.getDesktop().open(download);
+                        } else {
+                            System.out.println("File not found on node. Downloading...");
+                            startDownload(filename);
+                        }
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            System.err.println("could not open file");;
+        } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+            System.out.println("Please enter a filename as parameter.");
+        }
     }
 }
