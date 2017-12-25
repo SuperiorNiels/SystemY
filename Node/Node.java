@@ -698,7 +698,7 @@ public class Node implements NodeInterface, Observer {
 
     private ArrayList<String> requests = new ArrayList<>();
 
-    public ArrayList<String> getDowloaded() {
+    public ArrayList<String> getDownloaded() {
         return dowloaded;
     }
 
