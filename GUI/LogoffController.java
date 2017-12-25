@@ -3,17 +3,13 @@ package GUI;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import Node.Node;
 import javafx.stage.WindowEvent;
-
 import java.io.IOException;
-import java.util.concurrent.*;
 
 /**
  * LogoffController is the controller for the LogOffview.
@@ -45,28 +41,7 @@ public class LogoffController {
 
     public void logOff() throws IOException {
         headController.toLoading();
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        try {
-            Runnable r = () -> {
-                node.shutDown();
-            };
-            Future<?> f = service.submit(r);
-            f.get(delay, TimeUnit.SECONDS);
-        }
-        catch (final InterruptedException e) {
-            // The thread was interrupted during sleep, wait or join
-        }
-        catch (final TimeoutException e) {
-            // Took too long!
-            headController.closeLoading();
-            System.out.println("time expired");
-        }
-        catch (final ExecutionException e) {
-            // An exception from within the Runnable task
-        }
-        finally {
-            service.shutdown();
-        }
+        node.shutDown();
         headController.closeLoading();
         Stage currentWindow = (Stage) logoff_yes_bnt.getScene().getWindow();
         currentWindow.close();

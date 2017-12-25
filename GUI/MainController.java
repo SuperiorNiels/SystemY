@@ -3,27 +3,19 @@ package GUI;
 import Agents.FileRequest;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import Node.Node;
 import javafx.stage.WindowEvent;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.*;
-
 
 public class MainController {
 
@@ -92,7 +84,9 @@ public void open(){
                 Desktop.getDesktop().open(downlf);
             } else{
                 //download the file from the network
-
+                node.startDownload(file);
+                while(!downlf.exists()){}
+                Desktop.getDesktop().open(downlf);
             }
         }
     } catch (IOException ioe) {
