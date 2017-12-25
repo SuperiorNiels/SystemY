@@ -46,6 +46,7 @@ public class LoginController {
     private int delay;
     private boolean nodeExist = false;
     private boolean triedToLogin = false;
+    Stage stage;
 
     private HeadController headController;
     public void init(HeadController headcontroller) throws SocketException {
@@ -78,11 +79,12 @@ public class LoginController {
             Stage currentWindow = (Stage) login_name_text.getScene().getWindow();
             headController.toLoading();
             if(!triedToLogin){
-                node.setLoginController(this);
                 node = new Node(name, ipParts[1]);
             }
             else
                 node.setName(name);
+
+            node.setLoginController(this);
             headController.setNode(node);
             node.bootstrap();
             while ((node.getLoggedIn() == false)&& !nodeExist) {
@@ -94,12 +96,14 @@ public class LoginController {
                 //if this is a new node and its logged in normaly
                 //close the window and go to main view
                 currentWindow.close();
+                System.out.println(headController);
                 headController.toMain();
                 headController.closeLoading();
             }else{
                 //if the node name already exits.
                 //close the loading scene.
-                errorLabel.setText("name already exist");
+                headController.closeLogin();
+                headController.toNameAlreadyExist();
                 headController.closeLoading();
             }
         }else{
@@ -110,7 +114,9 @@ public class LoginController {
     public void view(Parent root){
         if(view == null)
             view = new Scene(root,viewWidth,viewHeight);
-        Stage stage = new Stage();
+        if(stage == null)
+            stage = new Stage();
+
         stage.setResizable(false);
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
@@ -129,5 +135,9 @@ public class LoginController {
     }
 
     public void setNodeExitst(Boolean b){this.nodeExist = b;}
+
+    public void close(){
+        stage.close();
+    }
 
 }
