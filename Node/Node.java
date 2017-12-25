@@ -773,25 +773,25 @@ public class Node implements NodeInterface, Observer {
     public void openFile(String filename) {
         try {
             if (Desktop.isDesktopSupported() && files.containsKey(filename)) {
-                File local = new File(rootPath+"local/"+ filename);
-                if(local.exists()){
-                    System.out.println("File found in local folder.");
-                    Desktop.getDesktop().open(local);
-                } else {
-                    File replicated = new File(rootPath+"replicated/"+ filename);
-                    if(replicated.exists()) {
-                        System.out.println("File found in replicated folder.");
-                        Desktop.getDesktop().open(replicated);
-                    } else {
-                        File download = new File(rootPath+"download/" + filename);
-                        if(download.exists()){
-                            System.out.println("File found in download folder.");
-                            Desktop.getDesktop().open(download);
+                        File local = new File(rootPath+"local/"+ filename);
+                        if(local.exists()){
+                            System.out.println("File found in local folder.");
+                            Desktop.getDesktop().open(local);
                         } else {
-                            System.out.println("File not found on node. Downloading...");
-                            startDownload(filename);
-                        }
-                    }
+                            File replicated = new File(rootPath+"replicated/"+ filename);
+                            if(replicated.exists()) {
+                                System.out.println("File found in replicated folder.");
+                                Desktop.getDesktop().open(replicated);
+                            } else {
+                                File download = new File(rootPath+"download/" + filename);
+                                if(download.exists()){
+                                    System.out.println("File found in download folder.");
+                                    Desktop.getDesktop().open(download);
+                                } else {
+                                    System.out.println("File not found on node. Downloading...");
+                                    startDownload(filename);
+                                }
+                            }
                 }
             }
         } catch (IOException ioe) {

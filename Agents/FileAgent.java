@@ -42,7 +42,6 @@ public class FileAgent extends Agent {
                 if (!files.containsKey(filename)) {
                     // Add file to list, add set boolean to false = not locked
                     files.put(filename, new FileRequest());
-
                 }
             }
 
