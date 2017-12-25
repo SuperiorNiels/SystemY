@@ -77,7 +77,6 @@ public class FileAgent extends Agent {
                 if(downloaded.contains(name)) {
                     // the current node has downloaded the file, remove the lock
                     FileRequest request = files.get(name);
-                    // TODO : remove downloaded file from downloaded arraylist in node?
                     request.unlock();
                 }
             }

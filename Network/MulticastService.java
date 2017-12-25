@@ -58,8 +58,8 @@ public class MulticastService extends Thread {
             while (interfaces.hasMoreElements()) {
                 NetworkInterface iface = interfaces.nextElement();
                 // filters out 127.0.0.1 and inactive interfaces
-                if (iface.isLoopback() || !iface.isUp() || !iface.supportsMulticast() ||
-                        iface.getDisplayName().contains("wlan") || iface.getDisplayName().contains("Wireless LAN"))
+                if (iface.isLoopback() || !iface.isUp() || !iface.supportsMulticast() )
+                        //|| iface.getDisplayName().contains("wlan") || iface.getDisplayName().contains("Wireless LAN"))
                         //|| iface.getDisplayName().contains("wlp"))
                     continue;
 

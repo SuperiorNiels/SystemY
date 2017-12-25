@@ -178,6 +178,8 @@ public class Node implements NodeInterface, Observer {
                         String filename = parts[1].toLowerCase();
                         if (files.containsKey(filename)) {
                             startDownload(filename);
+                        } else {
+                            System.out.println("File not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
@@ -187,6 +189,8 @@ public class Node implements NodeInterface, Observer {
                         String filename = parts[1].toLowerCase();
                         if (files.containsKey(filename)) {
                             openFile(filename);
+                        } else {
+                            System.out.println("File not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
@@ -694,11 +698,15 @@ public class Node implements NodeInterface, Observer {
 
     private ArrayList<String> requests = new ArrayList<>();
 
-    public ArrayList<String> getDownloaded() {
-        return downloaded;
+    public ArrayList<String> getDowloaded() {
+        return dowloaded;
     }
 
-    private ArrayList<String> downloaded = new ArrayList<>();
+    public void setDownloaded(ArrayList<String> d) {
+        dowloaded = d;
+    }
+
+    private ArrayList<String> dowloaded = new ArrayList<>();
 
 
     /**
@@ -718,7 +726,6 @@ public class Node implements NodeInterface, Observer {
             NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
             Neighbour download_location = nodeStub.getDownloadLocation(filename, new Neighbour(name,ip));
 
-
             nodeStub = (NodeInterface) Naming.lookup("//"+download_location.getIp()+"/Node");
             nodeStub.remoteSendFile(ip,6000,"",filename,"download", true);
         } catch (NullPointerException e) {
@@ -729,7 +736,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     public void fileDownloaded(String filename) {
-        downloaded.add(filename);
+        dowloaded.add(filename);
         openFile(filename);
     }
 
@@ -779,25 +786,28 @@ public class Node implements NodeInterface, Observer {
     public void openFile(String filename) {
         try {
             if (Desktop.isDesktopSupported() && files.containsKey(filename)) {
-                File local = new File(rootPath+"local/"+ filename);
-                if(local.exists()){
-                    System.out.println("File found in local folder.");
-                    Desktop.getDesktop().open(local);
-                } else {
-                    File replicated = new File(rootPath+"replicated/"+ filename);
-                    if(replicated.exists()) {
-                        System.out.println("File found in replicated folder.");
-                        Desktop.getDesktop().open(replicated);
-                    } else {
-                        File download = new File(rootPath+"download/" + filename);
-                        if(download.exists()){
-                            System.out.println("File found in download folder.");
-                            Desktop.getDesktop().open(download);
+                        File local = new File(rootPath+"local/"+ filename);
+                        if(local.exists()){
+                            System.out.println("File found in local folder.");
+                            Desktop.getDesktop().open(local);
                         } else {
-                            System.out.println("File not found on node. Downloading...");
-                            startDownload(filename);
-                        }
-                    }
+                            File replicated = new File(rootPath+"replicated/"+ filename);
+                            if(replicated.exists()) {
+                                System.out.println("File found in replicated folder.");
+                                Desktop.getDesktop().open(replicated);
+                            } else {
+                                File download = new File(rootPath+"download/" + filename);
+                                if(download.exists()){
+                                    System.out.println("File found in download folder.");
+                                    if(dowloaded.contains(filename)) {
+                                        dowloaded.remove(filename);
+                                    }
+                                    Desktop.getDesktop().open(download);
+                                } else {
+                                    System.out.println("File not found on node. Downloading...");
+                                    startDownload(filename);
+                                }
+                            }
                 }
             }
         } catch (IOException ioe) {
