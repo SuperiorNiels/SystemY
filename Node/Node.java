@@ -702,6 +702,10 @@ public class Node implements NodeInterface, Observer {
         return dowloaded;
     }
 
+    public void setDownloaded(ArrayList<String> d) {
+        dowloaded = d;
+    }
+
     private ArrayList<String> dowloaded = new ArrayList<>();
 
 
@@ -790,6 +794,9 @@ public class Node implements NodeInterface, Observer {
                                 File download = new File(rootPath+"download/" + filename);
                                 if(download.exists()){
                                     System.out.println("File found in download folder.");
+                                    if(dowloaded.contains(filename)) {
+                                        dowloaded.remove(filename);
+                                    }
                                     Desktop.getDesktop().open(download);
                                 } else {
                                     System.out.println("File not found on node. Downloading...");
