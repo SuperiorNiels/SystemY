@@ -694,11 +694,11 @@ public class Node implements NodeInterface, Observer {
 
     private ArrayList<String> requests = new ArrayList<>();
 
-    public ArrayList<String> getDowloaded() {
-        return dowloaded;
+    public ArrayList<String> getDownloaded() {
+        return downloaded;
     }
 
-    private ArrayList<String> dowloaded = new ArrayList<>();
+    private ArrayList<String> downloaded = new ArrayList<>();
 
 
     /**
@@ -718,6 +718,7 @@ public class Node implements NodeInterface, Observer {
             NodeInterface nodeStub = (NodeInterface) Naming.lookup("//"+owner.getIp()+"/Node");
             Neighbour download_location = nodeStub.getDownloadLocation(filename, new Neighbour(name,ip));
 
+
             nodeStub = (NodeInterface) Naming.lookup("//"+download_location.getIp()+"/Node");
             nodeStub.remoteSendFile(ip,6000,"",filename,"download", true);
         } catch (NullPointerException e) {
@@ -728,7 +729,7 @@ public class Node implements NodeInterface, Observer {
     }
 
     public void fileDownloaded(String filename) {
-        dowloaded.add(filename);
+        downloaded.add(filename);
         openFile(filename);
     }
 
@@ -750,7 +751,7 @@ public class Node implements NodeInterface, Observer {
                 compare = entry.getReplicated();
             } else {
                 // this node is the replicated node, ask the local for current downloads
-                compare = entry.getReplicated();
+                compare = entry.getLocal();
             }
             int number_compare = 0;
             try {
@@ -761,12 +762,17 @@ public class Node implements NodeInterface, Observer {
             }
             // update fileEntry downloads
             entry.addNode(want_download);
-            return (number_compare > getCurrentNumberDownloads()) ?  new Neighbour(name,ip) : compare;
+            return (number_compare >= getCurrentNumberDownloads()) ?  new Neighbour(name,ip) : compare;
         }
         return null;
     }
 
-    public Integer getCurrentNumberDownloads() {
+    /**
+     * functions that returns the amount of running threads of a given node.
+     * This amount can be used to determine how many files are being downloaded from a node at the same time.
+     * @return
+     */
+    public int getCurrentNumberDownloads() {
         return manager.getNumberOfThreadsAlive();
     }
 
