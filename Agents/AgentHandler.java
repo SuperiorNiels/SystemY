@@ -57,7 +57,10 @@ public class AgentHandler implements AgentHandlerInterface {
                     System.out.println(e.getMessage());
                     System.out.println(e.getCause());
                     // run the agent again on this node
-                    //startAgent(agent);
+                    if(!e.getMessage().getClass().isInstance("SocketTimeoutException")) {
+                        System.out.println("Starting new fileAgent.");
+                        startAgent(agent);
+                    }
                 } catch (MalformedURLException e) {
                     System.err.println("Malformed url in RMI fileAgent");
                 }
