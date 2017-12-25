@@ -178,6 +178,8 @@ public class Node implements NodeInterface, Observer {
                         String filename = parts[1].toLowerCase();
                         if (files.containsKey(filename)) {
                             startDownload(filename);
+                        } else {
+                            System.out.println("File not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
@@ -187,6 +189,8 @@ public class Node implements NodeInterface, Observer {
                         String filename = parts[1].toLowerCase();
                         if (files.containsKey(filename)) {
                             openFile(filename);
+                        } else {
+                            System.out.println("File not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
