@@ -112,7 +112,10 @@ public class HeadController {
         nameAlreadyExistController.view(rNameExist);
     }
 
-    public void toError(){errorController.view(rerror);}
+    public void toError(String text){
+        errorController.setString(text);
+        errorController.view(rerror);
+    }
 
     public int getDelay(){return this.delay;}
 
