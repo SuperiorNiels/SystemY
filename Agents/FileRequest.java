@@ -8,7 +8,7 @@ import java.util.LinkedList;
 public class FileRequest implements Serializable {
     private static final long serialVersionUID = 1;
     private LinkedList<Neighbour> requested_nodes = new LinkedList<>();
-    private Boolean locked = false;
+    private boolean locked = false;
 
     public FileRequest() { }
 
@@ -21,7 +21,7 @@ public class FileRequest implements Serializable {
     }
 
     public void lock() {
-        locked = true;
+       locked = true;
     }
 
     public void unlock() {
