@@ -36,7 +36,4 @@ public class TCPListenerService extends Thread{
             }
         }
     }
-    private void listen(){
-
-    }
 }

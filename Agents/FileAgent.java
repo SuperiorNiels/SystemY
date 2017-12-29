@@ -42,12 +42,11 @@ public class FileAgent extends Agent {
                 if (!files.containsKey(filename)) {
                     // Add file to list, add set boolean to false = not locked
                     files.put(filename, new FileRequest());
-
                 }
             }
 
             ArrayList<String> requests = node.getRequests();
-            ArrayList<String> downloaded = node.getDowloaded();
+            ArrayList<String> downloaded = node.getDownloaded();
             for (String name : files.keySet()) {
                 // Go through map and check for download requests
                 if (requests.contains(name)) {
@@ -58,7 +57,7 @@ public class FileAgent extends Agent {
                         // A node can download the file
                         // Always at least one neighbour in queue so don't need to check
                         Neighbour to_download = request.popRequest();
-                        // Check if to_dowload is currect node else perform rmi call to let the node download the file
+                        // Check if to_download is correct node else perform rmi call to let the node download the file
                         if(!(node.calculateHash(to_download.getName())== node.calculateHash(node.getName()))) {
                             // Perform RMI function
                             try {
@@ -78,10 +77,19 @@ public class FileAgent extends Agent {
                 if(downloaded.contains(name)) {
                     // the current node has downloaded the file, remove the lock
                     FileRequest request = files.get(name);
-                    // TODO : remove downloaded file from downloaded arraylist in node?
                     request.unlock();
                 }
             }
+
+            // Check files to_remove from file
+            ArrayList<String> to_remove = node.getFilesToRemove();
+            for(String file : to_remove) {
+                if(files.containsKey(file)) {
+                    files.remove(file);
+                    to_remove.remove(file);
+                }
+            }
+
             node.setFiles(files);
         }
 

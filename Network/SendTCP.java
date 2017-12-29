@@ -1,10 +1,8 @@
 package Network;
 
-import Node.Neighbour;
 import Node.NodeInterface;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;

@@ -13,7 +13,7 @@ public class ReceiveTCP extends Thread {
     private String rootPath;
     private Socket clientSocket;
 
-    public ReceiveTCP(Socket aClientSocket, String rootPath){
+    ReceiveTCP(Socket aClientSocket, String rootPath){
         try {
             clientSocket = aClientSocket;
             this.rootPath = rootPath;

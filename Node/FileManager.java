@@ -592,4 +592,12 @@ public class FileManager extends Thread {
     public ArrayList<Thread> getThreadList(){
         return threadList;
     }
+
+    /**
+     * removes a fiven filename from the entries map
+     * @param filename
+     */
+    public void removeFileEntry(String filename){
+        map.remove(calculateHash(filename));
+    }
 }

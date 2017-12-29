@@ -28,7 +28,7 @@ public class Node implements NodeInterface, Observer {
     private String name = null;
     private String rootPath = "./files/";
     private String namingServerIp = null;
-    MulticastService multicast;
+    private MulticastService multicast;
     private FileManager manager = new FileManager(rootPath,this);
     private boolean running = true;
     private boolean gui = false;
@@ -39,7 +39,6 @@ public class Node implements NodeInterface, Observer {
     private AgentHandler agentHandler;
     // Files map updates by file agent
     private TreeMap<String, FileRequest> files = new TreeMap<>();
-    private ArrayList<String> locksRequest = new ArrayList<>();
     private LoginController loginController;
     private MainController mainController;
 
@@ -77,19 +76,11 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
-    public ArrayList<String> getLocksRequest() {
-        return locksRequest;
-    }
-
-    public void setLocksRequest(ArrayList<String> locksRequest) {
-        this.locksRequest = locksRequest;
-    }
-
     public boolean isRunning() {
         return running;
     }
 
-    public void printFiles() {
+    private void printFiles() {
         if(files.size() != 0) {
             int i = 0;
             for (String filename : files.keySet()) {
@@ -175,18 +166,22 @@ public class Node implements NodeInterface, Observer {
                     failure(previous);
                 } else if (parts[0].toLowerCase().equals("download")) {
                     try {
-                        String filename = parts[1].toLowerCase();
+                        String filename = parts[1].toLowerCase().trim();
                         if (files.containsKey(filename)) {
                             startDownload(filename);
+                        } else {
+                            System.out.println("File not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
                     }
                 } else if(parts[0].toLowerCase().equals("open")) {
                     try {
-                        String filename = parts[1].toLowerCase();
+                        String filename = parts[1].toLowerCase().trim();
                         if (files.containsKey(filename)) {
                             openFile(filename);
+                        } else {
+                            System.out.println("File not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
@@ -229,51 +224,54 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Method that gets executed when a multicast message is received
-     * @param observable
-     * @param o
+     * @param observable, observable
+     * @param o, object
      */
     @Override
     public void update(Observable observable, Object o) {
         String message = o.toString();
         String parts[] = message.split(";");
-        if(parts[0].equals("00")) {
-            System.out.println("New node detected.");
-            System.out.println("Name: "+parts[1]+" IP: "+parts[2]);
-        } else if(parts[0].equals("01")) {
-            logged_in = true;
-            System.out.println("Nameserver message received. #hosts: "+parts[1]);
-            // fills in the ip of the nameserver
-            namingServerIp = parts[4];
-            // checks if you are the new node that just joined
-            if(!name.equals(parts[2])) {
-                try {
-                    updateNeighbours(parts[2], parts[3]);
-                } catch (NodeAlreadyExistsException e) {
-                    System.err.println("The hash of the new node is the same as mine!");
-                    // Handle error?
+        switch (parts[0]) {
+            case "00":
+                System.out.println("New node detected.");
+                System.out.println("Name: " + parts[1] + " IP: " + parts[2]);
+                break;
+            case "01":
+                logged_in = true;
+                System.out.println("Nameserver message received. #hosts: " + parts[1]);
+                // fills in the ip of the nameserver
+                namingServerIp = parts[4];
+                // checks if you are the new node that just joined
+                if (!name.equals(parts[2])) {
+                    try {
+                        updateNeighbours(parts[2], parts[3]);
+                    } catch (NodeAlreadyExistsException e) {
+                        System.err.println("The hash of the new node is the same as mine!");
+                        // Handle error?
+                    }
+                } else {
+                    // you are the new node that just joined
+                    Neighbour self = new Neighbour(name, ip);
+                    while (getNumberOfNodesInNetwork() != 0 && (previous.equals(self) || next.equals(self))) {
+                        // wait till your neighbours are set
+                        System.out.print("Waiting for neighbors to change... \r");
+                    }
+                    // initialize your filemanager
+                    manager.initialize();
                 }
-            } else {
-                // you are the new node that just joined
-                Neighbour self = new Neighbour(name, ip);
-                char p = ' ';
-                while(getNumberOfNodesInNetwork()!=0 &&(previous.equals(self) || next.equals(self))){
-                    // wait till your neighbours are set
-                    System.out.print("Waiting for neighbors to change... \r");
+                break;
+            case "02":
+                //Handle a failed node
+                if (parts[1].equals("fail-detected")) {
+                    System.out.print("Failed node detected. ");
+                    System.out.println("Name: " + parts[2] + " IP: " + parts[3]);
+                    if (getNumberOfNodesInNetwork() > 0) {
+                        failedNode = true;
+                    }
+                } else if (parts[1].equals("fail-fixed")) {
+                    failedNode = false;
                 }
-                // initialize your filemanager
-                manager.initialize();
-            }
-        } else if(parts[0].equals("02")){
-            //Handle a failed node
-            if(parts[1].equals("fail-detected")){
-                System.out.print("Failed node detected. ");
-                System.out.println("Name: "+parts[2]+" IP: "+parts[3]);
-                if(getNumberOfNodesInNetwork()>0){
-                    failedNode = true;
-                }
-            }else if(parts[1].equals("fail-fixed")){
-                failedNode = false;
-            }
+                break;
         }
     }
 
@@ -314,10 +312,6 @@ public class Node implements NodeInterface, Observer {
         return ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
     public String getName() {
         return name;
     }
@@ -328,40 +322,17 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * gets the number of nodes
-     * @return
+     * @return the number of nodes (without yourself = -1)
      */
     public int getNumberOfNodesInNetwork() {
         int Nodes = 0;
         try {
             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
             Nodes = namingStub.getNumberOfNodes();
-        } catch (NotBoundException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            System.err.printf("Problem with RMI when asking number of nodes.");
         }
         return Nodes-1;
-
-    }
-
-    /**
-     * Function compares 2 nodes and returns Boolean if either name or ip are same
-     * @param node the node to compare to
-     * @return error, true when ip or name are equal
-     */
-    public Boolean equals(Node node) {
-        Boolean error = false;
-        if(this.ip.equals(node.ip)) {
-            //System.out.println("IP address already in use.");
-            error = true;
-        }
-        if(this.name.equals(node.name)) {
-            //System.out.println("Name already in use.");
-            error = true;
-        }
-        return error;
     }
 
     /**
@@ -370,7 +341,7 @@ public class Node implements NodeInterface, Observer {
      * @param new_name, String name of the new node (received via multicast)
      * @param new_ip, String ip address of the new node
      */
-    public void updateNeighbours(String new_name, String new_ip) throws NodeAlreadyExistsException {
+    private void updateNeighbours(String new_name, String new_ip) throws NodeAlreadyExistsException {
         //multiple nodes in the network
         if(getNumberOfNodesInNetwork() > 1) {
             int my_hash = calculateHash(name);
@@ -450,7 +421,7 @@ public class Node implements NodeInterface, Observer {
         namingServerIp = ip;
     }
 
-    public String getNameServerIp(){
+    String getNameServerIp(){
         return namingServerIp;
     }
 
@@ -504,8 +475,8 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Calculates the hash of a given String
-     * @param name
-     * @return
+     * @param name, name to calulate hash from
+     * @return hashvalue
      */
     public int calculateHash(String name) {
         return Math.abs(name.hashCode() % 32768);
@@ -515,7 +486,7 @@ public class Node implements NodeInterface, Observer {
     /**
      * Method that gets executed when a node fails in a system
      * When the failure happends, the neighbours of the next and the previous of the failed node get updated
-     * @param failedNode
+     * @param failedNode, Neighbour
      */
     public void failure(Neighbour failedNode) {
         //Start communication with the nameserver
@@ -569,15 +540,11 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * This method sends a multicast
-     * @param message
-     * @return true when send, false when an error occurred
+     * @param message, string
      */
-    public boolean sendMulticast(String message){
+    public void sendMulticast(String message){
         //Send a multicast
-        if(multicast.sendMulticast(message))
-            return true;
-        else
-            return false;
+        multicast.sendMulticast(message);
     }
 
     /**
@@ -600,11 +567,11 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * RMI function to remotely create a file entry on a node
-     * @param owner
-     * @param replicated
-     * @param local
-     * @param fileName
-     * @param downloads
+     * @param owner, Neighbour
+     * @param replicated, Neighbour
+     * @param local, Neighbour
+     * @param fileName, String
+     * @param downloads, HashSet<Neighbour>
      */
     @Override
     public void createFileEntry(Neighbour owner, Neighbour replicated, Neighbour local, String fileName, HashSet<Neighbour> downloads) {
@@ -637,7 +604,7 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * This function returns a Treemap with all files and file fiches from the replicated and local
-     * @return
+     * @return  treemap of fileentries
      */
     public TreeMap<Integer,FileEntry> getFileFiches(String target){
         TreeMap<Integer,FileEntry> map = null;
@@ -660,8 +627,8 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Get file entry from node via RMI (if the entry exists)
-     * @param fileName
-     * @return
+     * @param fileName, name of file
+     * @return a fileentry
      * @throws NullPointerException when fileEntry does not exist
      */
     @Override
@@ -675,7 +642,7 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Function returns a list of names of all owned files.
-     * @return
+     * @return an arraylist with all owned file(names)
      */
     public ArrayList<String> getOwnedFiles() {
         ArrayList<String> list = new ArrayList<>();
@@ -687,6 +654,56 @@ public class Node implements NodeInterface, Observer {
         return list;
     }
 
+    /**
+     * This method deletes a file from the network
+     * @param file
+     */
+    public void deleteFileOwner(File file){
+        try {
+            NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            Neighbour owner = nameServer.getOwner(file.getName());
+            if(calculateHash(owner.getName())==calculateHash(this.getName())){
+                //You are the owner check the file entry en delete it at all nodes
+                FileEntry fiche = this.getFileEntry(file.getName());
+
+                //First remove the file from the fileAgent
+
+                //second the replicated
+                Neighbour replicated = fiche.getReplicated();
+                NodeInterface replicatedStub = (NodeInterface) Naming.lookup("//" + replicated.getIp() + "/Node");
+                replicatedStub.deleteFile(rootPath+"replicated/"+ file.getName());
+
+                //third the local
+                Neighbour local = fiche.getLocal();
+                NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
+                replicatedStub.deleteFile(rootPath+"local/"+ file.getName());
+
+                //fourth the downloads
+                HashSet<Neighbour> downloads = fiche.getDownloads();
+                Iterator<Neighbour> it = downloads.iterator();
+                while(it.hasNext()){
+                    Neighbour next = it.next();
+                    NodeInterface downloadStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
+                    replicatedStub.deleteFile(rootPath+"download/"+ file.getName());
+                }
+
+                //Lastly remove file entry
+                manager.removeFileEntry(file.getName());
+            }else{
+                //You are not the owner, pass the function to the owner node
+                NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
+                ownerStub.deleteFileOwner(file);
+            }
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteFile(String target){
+        if(!new File(target).delete()){
+            throw new NullPointerException("Could not delete file: not found! ");
+        }
+    }
 
     public ArrayList<String> getRequests() {
         return requests;
@@ -694,7 +711,7 @@ public class Node implements NodeInterface, Observer {
 
     private ArrayList<String> requests = new ArrayList<>();
 
-    public ArrayList<String> getDowloaded() {
+    public ArrayList<String> getDownloaded() {
         return dowloaded;
     }
 
@@ -703,9 +720,9 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * The goal of this function is to ask the fileAgent for a download, when the node can download the file the download function will be called
-     * @param filename
+     * @param filename String
      */
-    public void startDownload(String filename) {
+    private void startDownload(String filename) {
         requests.add(filename);
     }
 
@@ -734,23 +751,23 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * Get the download location from the owner via RMI.
-     * @param filename
-     * @param want_download
-     * @return
+     * @param filename String
+     * @param want_download Neighbour that wants to download the file
+     * @return a neighbour = the location to download from
      */
     public Neighbour getDownloadLocation(String filename, Neighbour want_download) {
-        TreeMap<Integer, FileEntry> map = (TreeMap<Integer, FileEntry>) manager.getMap();
+        TreeMap<Integer, FileEntry> map = manager.getMap();
         int hash = calculateHash(filename);
         if(map.containsKey(hash)) {
             // This node is owner and has fileEntry, also update the entry (add download)
             FileEntry entry = map.get(hash);
-            Neighbour compare = null;
+            Neighbour compare;
             if(calculateHash(entry.getLocal().getName()) == calculateHash(name)) {
                 // this node is local ask replicated node for current downloads
                 compare = entry.getReplicated();
             } else {
                 // this node is the replicated node, ask the local for current downloads
-                compare = entry.getReplicated();
+                compare = entry.getLocal();
             }
             int number_compare = 0;
             try {
@@ -761,12 +778,17 @@ public class Node implements NodeInterface, Observer {
             }
             // update fileEntry downloads
             entry.addNode(want_download);
-            return (number_compare > getCurrentNumberDownloads()) ?  new Neighbour(name,ip) : compare;
+            return (number_compare >= getCurrentNumberDownloads()) ?  new Neighbour(name,ip) : compare;
         }
         return null;
     }
 
-    public Integer getCurrentNumberDownloads() {
+    /**
+     * functions that returns the amount of running threads of a given node.
+     * This amount can be used to determine how many files are being downloaded from a node at the same time.
+     * @return amount of running threads of the node
+     */
+    public int getCurrentNumberDownloads() {
         return manager.getNumberOfThreadsAlive();
     }
 
@@ -786,6 +808,9 @@ public class Node implements NodeInterface, Observer {
                         File download = new File(rootPath+"download/" + filename);
                         if(download.exists()){
                             System.out.println("File found in download folder.");
+                            if(dowloaded.contains(filename)) {
+                                dowloaded.remove(filename);
+                            }
                             Desktop.getDesktop().open(download);
                         } else {
                             System.out.println("File not found on node. Downloading...");
@@ -795,9 +820,40 @@ public class Node implements NodeInterface, Observer {
                 }
             }
         } catch (IOException ioe) {
-            System.err.println("could not open file");;
+            System.err.println("could not open file");
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
             System.out.println("Please enter a filename as parameter.");
         }
+    }
+
+    public void locallyRemoveFile(String filename) throws FileLocationException, NullPointerException {
+        File local = new File(rootPath+"local/"+filename);
+        File replicated = new File(rootPath+"replicated/"+filename);
+        if(local.exists() || replicated.exists()) throw new FileLocationException();
+        File download = new File(rootPath+"download/"+filename);
+        if(download.exists()) {
+            if(!download.delete()) throw new NullPointerException();
+        } else {
+            throw new NullPointerException();
+        }
+        // update owner fileEntry
+        try {
+            NamingInterface nameServer = (NamingInterface) Naming.lookup("//" + namingServerIp + "/NamingServer");
+            Neighbour owner = nameServer.getOwner(filename);
+
+            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
+            nodeStub.remoteRemoveFromDownload(filename,new Neighbour(name,ip));
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            System.out.println("Problem with RMI in node while asking for owner of a file.");
+        }
+    }
+
+    public ArrayList<String> getFilesToRemove() {
+        return filesToRemove;
+    }
+
+    private ArrayList<String> filesToRemove = new ArrayList<>();
+    public void removeFileFromFileAgent(String filename) {
+        filesToRemove.add(filename);
     }
 }
