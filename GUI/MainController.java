@@ -34,12 +34,13 @@ public class MainController {
 
 public void delete(){
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    System.out.println("delete : " + file);
+    //System.out.println("delete : " + file);
+    node.deleteFileOwner(file);
 }
 
 public void deleteLocal() {
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    System.out.println("deleteLocal : " + file);
+    //System.out.println("deleteLocal : " + file);
     try {
         node.locallyRemoveFile(file);
     } catch (NullPointerException e) {
