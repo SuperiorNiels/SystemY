@@ -71,9 +71,9 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, FileRequest> files) {
         this.files = files;
-        if(gui){
+        /*if(gui){
             mainController.update();
-        }
+        }*/
     }
 
     public boolean isRunning() {

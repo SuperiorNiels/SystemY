@@ -81,14 +81,16 @@ public class FileAgent extends Agent {
                 }
             }
 
-            // Check files to_remove from file
-            ArrayList<String> to_remove = node.getFilesToRemove();
+            ArrayList<String> to_remove = node.getFilesToRemove(); // Check files to_remove from file
+            ArrayList<String> remove_from_list = new ArrayList<>();
             for(String file : to_remove) {
                 if(files.containsKey(file)) {
                     files.remove(file);
-                    to_remove.remove(file);
+                    remove_from_list.add(file);
                 }
             }
+
+            to_remove.removeAll(remove_from_list);
 
             node.setFiles(files);
         }
