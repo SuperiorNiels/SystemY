@@ -745,34 +745,46 @@ public class Node implements NodeInterface, Observer {
     public void openFile(String filename) {
         try {
             if (Desktop.isDesktopSupported() && files.containsKey(filename)) {
-                        File local = new File(rootPath+"local/"+ filename);
-                        if(local.exists()){
-                            System.out.println("File found in local folder.");
-                            Desktop.getDesktop().open(local);
-                        } else {
-                            File replicated = new File(rootPath+"replicated/"+ filename);
-                            if(replicated.exists()) {
-                                System.out.println("File found in replicated folder.");
-                                Desktop.getDesktop().open(replicated);
-                            } else {
-                                File download = new File(rootPath+"download/" + filename);
-                                if(download.exists()){
-                                    System.out.println("File found in download folder.");
-                                    if(dowloaded.contains(filename)) {
-                                        dowloaded.remove(filename);
-                                    }
-                                    Desktop.getDesktop().open(download);
-                                } else {
-                                    System.out.println("File not found on node. Downloading...");
-                                    startDownload(filename);
-                                }
+                File local = new File(rootPath+"local/"+ filename);
+                if(local.exists()){
+                    System.out.println("File found in local folder.");
+                    Desktop.getDesktop().open(local);
+                } else {
+                    File replicated = new File(rootPath+"replicated/"+ filename);
+                    if(replicated.exists()) {
+                        System.out.println("File found in replicated folder.");
+                        Desktop.getDesktop().open(replicated);
+                    } else {
+                        File download = new File(rootPath+"download/" + filename);
+                        if(download.exists()){
+                            System.out.println("File found in download folder.");
+                            if(dowloaded.contains(filename)) {
+                                dowloaded.remove(filename);
                             }
+                            Desktop.getDesktop().open(download);
+                        } else {
+                            System.out.println("File not found on node. Downloading...");
+                            startDownload(filename);
+                        }
+                    }
                 }
             }
         } catch (IOException ioe) {
             System.err.println("could not open file");
         } catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
             System.out.println("Please enter a filename as parameter.");
+        }
+    }
+
+    public void locallyRemoveFile(String filename) throws FileLocationException, NullPointerException {
+        File local = new File(rootPath+"local/"+filename);
+        File replicated = new File(rootPath+"replicated/"+filename);
+        if(local.exists() || replicated.exists()) throw new FileLocationException();
+        File download = new File(rootPath+"download/"+filename);
+        if(download.exists()) {
+            if(!download.delete()) throw new NullPointerException();
+        } else {
+            throw new NullPointerException();
         }
     }
 }

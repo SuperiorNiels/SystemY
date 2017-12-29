@@ -47,7 +47,7 @@ public void delete(){
     System.out.println("delete : " + file);
 }
 
-public void deleteLocal(){
+public void deleteLocal() {
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
     System.out.println("deleteLocal : " + file);
     File localf = new File("files\\local\\"+ file);
