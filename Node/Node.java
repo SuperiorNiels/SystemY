@@ -786,5 +786,15 @@ public class Node implements NodeInterface, Observer {
         } else {
             throw new NullPointerException();
         }
+        // update owner fileEntry
+        try {
+            NamingInterface nameServer = (NamingInterface) Naming.lookup("//" + namingServerIp + "/NamingServer");
+            Neighbour owner = nameServer.getOwner(filename);
+
+            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
+            nodeStub.remoteRemoveFromDownload(filename,new Neighbour(name,ip));
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            System.out.println("Problem with RMI in node while asking for owner of a file.");
+        }
     }
 }
