@@ -9,9 +9,8 @@ import javafx.stage.Stage;
 public class ErrorController {
 
     HeadController headController;
-    Scene view;
-    Stage stage;
-
+    private Scene view;
+    private Stage stage;
     private int viewWidth  = 253;
     private int viewHeight = 77;
     @FXML
