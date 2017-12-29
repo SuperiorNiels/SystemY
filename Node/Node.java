@@ -654,6 +654,56 @@ public class Node implements NodeInterface, Observer {
         return list;
     }
 
+    /**
+     * This method deletes a file from the network
+     * @param file
+     */
+    public void deleteFileOwner(File file){
+        try {
+            NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            Neighbour owner = nameServer.getOwner(file.getName());
+            if(calculateHash(owner.getName())==calculateHash(this.getName())){
+                //You are the owner check the file entry en delete it at all nodes
+                FileEntry fiche = this.getFileEntry(file.getName());
+
+                //First remove the file from the fileAgent
+
+                //second the replicated
+                Neighbour replicated = fiche.getReplicated();
+                NodeInterface replicatedStub = (NodeInterface) Naming.lookup("//" + replicated.getIp() + "/Node");
+                replicatedStub.deleteFile(rootPath+"replicated/"+ file.getName());
+
+                //third the local
+                Neighbour local = fiche.getLocal();
+                NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
+                replicatedStub.deleteFile(rootPath+"local/"+ file.getName());
+
+                //fourth the downloads
+                HashSet<Neighbour> downloads = fiche.getDownloads();
+                Iterator<Neighbour> it = downloads.iterator();
+                while(it.hasNext()){
+                    Neighbour next = it.next();
+                    NodeInterface downloadStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
+                    replicatedStub.deleteFile(rootPath+"download/"+ file.getName());
+                }
+
+                //Lastly remove file entry
+                manager.removeFileEntry(file.getName());
+            }else{
+                //You are not the owner, pass the function to the owner node
+                NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
+                ownerStub.deleteFileOwner(file);
+            }
+        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteFile(String target){
+        if(!new File(target).delete()){
+            throw new NullPointerException("Could not delete file: not found! ");
+        }
+    }
 
     public ArrayList<String> getRequests() {
         return requests;

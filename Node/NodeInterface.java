@@ -1,5 +1,6 @@
 package Node;
 
+import java.io.File;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.HashSet;
@@ -22,4 +23,6 @@ public interface NodeInterface extends Remote {
     public void fileDownloaded(String filename) throws RemoteException;
     public int getCurrentNumberDownloads() throws RemoteException;
     public Neighbour getDownloadLocation(String filename, Neighbour want_download) throws RemoteException;
+    public void deleteFileOwner(File file)throws RemoteException;
+    public void deleteFile(String target)throws RemoteException;
 }
