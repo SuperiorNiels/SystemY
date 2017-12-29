@@ -1,14 +1,8 @@
 package GUI;
 
-
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 /**
  * LoadingController is the controller for the loadingView.

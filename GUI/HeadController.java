@@ -20,18 +20,21 @@ public class HeadController {
     private FXMLLoader network  = new FXMLLoader();
     private FXMLLoader logoff   = new FXMLLoader();
     private FXMLLoader loading  = new FXMLLoader();
+    private FXMLLoader nameAlreadyExist = new FXMLLoader();
 
     private LoginController   loginController  ;
     private MainController    mainController   ;
     private NetworkController networkController;
     private LogoffController  logoffController ;
     private LoadingController loadingController;
+    private NameAlreadyExistController nameAlreadyExistController;
 
     private Parent rlogin  ;
     private Parent rmain   ;
     private Parent rnetwork;
     private Parent rlogoff ;
     private Parent rloading;
+    private Parent rNameExist;
 
     private Node node;
     private int delay = 300;
@@ -42,24 +45,28 @@ public class HeadController {
         network.setLocation( getClass().getResource("networkView.fxml"));
         logoff.setLocation(  getClass().getResource("logoffView.fxml" ));
         loading.setLocation( getClass().getResource("LoadingView.fxml"));
+        nameAlreadyExist.setLocation(getClass().getResource("NameAlreadyExist.fxml"));
 
         rlogin   = login.load();
         rmain    = main.load();
         rnetwork = network.load();
         rlogoff  = logoff.load();
         rloading = loading.load();
+        rNameExist = nameAlreadyExist.load();
 
         loginController   = login.getController()  ;
         mainController    = main.getController()   ;
         networkController = network.getController();
         logoffController  = logoff.getController() ;
         loadingController = loading.getController();
+        nameAlreadyExistController = nameAlreadyExist.getController();
 
         loginController.init(this  );
         mainController.init(this   );
         networkController.init(this);
         logoffController.init(this );
         loadingController.init(this);
+        nameAlreadyExistController.init(this);
     }
 
     public Node getNode(){
@@ -92,5 +99,12 @@ public class HeadController {
         loadingController.close();
     }
 
+    public void closeLogin(){loginController.close();}
+
+    public void toNameAlreadyExist(){
+        nameAlreadyExistController.view(rNameExist);
+    }
+
     public int getDelay(){return this.delay;}
+
 }
