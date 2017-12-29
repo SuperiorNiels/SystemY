@@ -378,8 +378,8 @@ public class FileManager extends Thread {
      * This function check if a file has been downloaded before,
      * if not it removes the file from the system
      * else it removes the local field from the entry
-     * @param filename
-     * @param leavingNode
+     * @param filename, String
+     * @param leavingNode, Neighbour
      */
     public void checkFileEntry(String filename,Neighbour leavingNode) {
         int filehash = calculateHash(filename);

@@ -656,7 +656,7 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * This method deletes a file from the network
-     * @param file
+     * @param file, File
      */
     public void deleteFileOwner(File file){
         try {
@@ -680,11 +680,9 @@ public class Node implements NodeInterface, Observer {
 
                 //fourth the downloads
                 HashSet<Neighbour> downloads = fiche.getDownloads();
-                Iterator<Neighbour> it = downloads.iterator();
-                while(it.hasNext()){
-                    Neighbour next = it.next();
+                for (Neighbour next : downloads) {
                     NodeInterface downloadStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
-                    replicatedStub.deleteFile(rootPath+"download/"+ file.getName());
+                    replicatedStub.deleteFile(rootPath + "download/" + file.getName());
                 }
 
                 //Lastly remove file entry
