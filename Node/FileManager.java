@@ -386,8 +386,9 @@ public class FileManager extends Thread {
         if(map.containsKey(filehash)){ //Check if map contains the filename to be sure
             if(map.get(filehash).getDownloads().size()==0){
                 //File has never been downloaded ==> remove file from system
-                map.remove(filehash);
-                new File(rootPath+"/"+REPLICATED_FOLDER+"/"+filename).delete();
+                //map.remove(filehash);
+                //new File(rootPath+"/"+REPLICATED_FOLDER+"/"+filename).delete();
+                rootNode.deleteFileOwner(filename);
             }else{
                 //File has been downloaded
                 FileEntry fiche = map.get(filehash);

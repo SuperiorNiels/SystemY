@@ -656,44 +656,51 @@ public class Node implements NodeInterface, Observer {
 
     /**
      * This method deletes a file from the network
-     * @param file, File
+     * @param filename
      */
-    public void deleteFileOwner(File file){
+    public void deleteFileOwner(String filename){
         try {
             NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            Neighbour owner = nameServer.getOwner(file.getName());
+            Neighbour owner = nameServer.getOwner(filename);
             if(calculateHash(owner.getName())==calculateHash(this.getName())){
                 //You are the owner check the file entry en delete it at all nodes
-                FileEntry fiche = this.getFileEntry(file.getName());
+                FileEntry fiche = this.getFileEntry(filename);
 
                 //First remove the file from the fileAgent
+                removeFileFromFileAgent(filename);
+                Thread waitForFileAgent = new Thread(new WaitForFileAgent(this,filename));
+                waitForFileAgent.join();
+
 
                 //second the replicated
                 Neighbour replicated = fiche.getReplicated();
                 NodeInterface replicatedStub = (NodeInterface) Naming.lookup("//" + replicated.getIp() + "/Node");
-                replicatedStub.deleteFile(rootPath+"replicated/"+ file.getName());
+                replicatedStub.deleteFile(rootPath+"replicated/"+ filename);
 
                 //third the local
                 Neighbour local = fiche.getLocal();
                 NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
-                replicatedStub.deleteFile(rootPath+"local/"+ file.getName());
+                replicatedStub.deleteFile(rootPath+"local/"+ filename);
 
                 //fourth the downloads
                 HashSet<Neighbour> downloads = fiche.getDownloads();
                 for (Neighbour next : downloads) {
                     NodeInterface downloadStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
-                    replicatedStub.deleteFile(rootPath + "download/" + file.getName());
+                    replicatedStub.deleteFile(rootPath + "download/" + filename);
                 }
 
                 //Lastly remove file entry
-                manager.removeFileEntry(file.getName());
+                manager.removeFileEntry(filename);
             }else{
                 //You are not the owner, pass the function to the owner node
                 NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
-                ownerStub.deleteFileOwner(file);
+                ownerStub.deleteFileOwner(filename);
             }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.err.println("FileAgent never received! Restarting delete procedure...");
+            this.deleteFileOwner(filename);
         }
     }
 
