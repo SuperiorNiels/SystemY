@@ -69,30 +69,7 @@ public void logOff(){
 public void open(){
     headController.toLoading();
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    try {
-        if (Desktop.isDesktopSupported()) {
-            File localf = new File("files\\local\\"+ file);
-            File replif = new File("files\\replicated\\"+ file);
-            File downlf = new File("files\\download\\" + file);
-            if(localf.exists()){
-                System.out.println("in local");
-                Desktop.getDesktop().open(localf);
-            }
-            else if(replif.exists()) {
-                System.out.println("in replicated");
-                Desktop.getDesktop().open(replif);
-            }
-            else if(downlf.exists()){
-                System.out.println("in download");
-                Desktop.getDesktop().open(downlf);
-            } else{
-                //download the file from the network
-
-            }
-        }
-    } catch (IOException ioe) {
-        System.err.println("could not open file");;
-    }
+    node.openFile(file);
     headController.closeLoading();
     System.out.println("opening : " + file);
 }
