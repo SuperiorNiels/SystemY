@@ -797,4 +797,13 @@ public class Node implements NodeInterface, Observer {
             System.out.println("Problem with RMI in node while asking for owner of a file.");
         }
     }
+
+    public ArrayList<String> getFilesToRemove() {
+        return filesToRemove;
+    }
+
+    private ArrayList<String> filesToRemove = new ArrayList<>();
+    public void removeFileFromFileAgent(String filename) {
+        filesToRemove.add(filename);
+    }
 }

@@ -80,6 +80,16 @@ public class FileAgent extends Agent {
                     request.unlock();
                 }
             }
+
+            // Check files to_remove from file
+            ArrayList<String> to_remove = node.getFilesToRemove();
+            for(String file : to_remove) {
+                if(files.containsKey(file)) {
+                    files.remove(file);
+                    to_remove.remove(file);
+                }
+            }
+
             node.setFiles(files);
         }
 
