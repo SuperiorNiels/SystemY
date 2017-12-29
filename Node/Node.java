@@ -879,4 +879,8 @@ public class Node implements NodeInterface, Observer {
     public void removeFileFromFileAgent(String filename) {
         filesToRemove.add(filename);
     }
+
+    public Boolean fileInSystem(String filename) {
+        return files.containsKey(filename);
+    }
 }

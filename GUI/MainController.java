@@ -32,73 +32,72 @@ public class MainController {
     private TreeMap<String, FileRequest> oldFiles;
     private int delay;
 
-public void delete(){
-    String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    //System.out.println("delete : " + file);
-    node.deleteFileOwner(file);
-}
-
-public void deleteLocal() {
-    String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    //System.out.println("deleteLocal : " + file);
-    try {
-        node.locallyRemoveFile(file);
-    } catch (NullPointerException e) {
-        headController.toError("Error: Cannot delete file!");
-    } catch (FileLocationException e) {
-        headController.toError("Error: file is replicated or local, file not deleted!");
+    public void delete(){
+        String file = fileName_list.getSelectionModel().getSelectedItem().toString();
+        //System.out.println("delete : " + file);
+        if(node.fileInSystem(file)) {
+            node.deleteFileOwner(file);
+        }
     }
-}
 
-public void init(HeadController headcontroller){
+    public void deleteLocal() {
+        String file = fileName_list.getSelectionModel().getSelectedItem().toString();
+        //System.out.println("deleteLocal : " + file);
+        if(node.fileInSystem(file)) {
+            try {
+                node.locallyRemoveFile(file);
+            } catch (NullPointerException e) {
+                headController.toError("Error: Cannot delete file!");
+            } catch (FileLocationException e) {
+                headController.toError("Error: file is replicated or local, file not deleted!");
+            }
+        }
+    }
+
+    public void init(HeadController headcontroller){
         this.headController =headcontroller;
         this.delay = headcontroller.getDelay();
-    };
+    }
 
-public void initData(){
+    public void initData(){
         node = headController.getNode();
         nameLabel.setText(node.getName());
         node.setMainController(this);
-}
+    }
 
-public void logOff(){
+    public void logOff(){
         Stage currentWindow = (Stage) Log_off_bnt.getScene().getWindow();
         currentWindow.close();
         headController.toLogoff();
     }
 
-public void open(){
-    headController.toLoading();
-    String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    node.openFile(file);
-    headController.closeLoading();
-    System.out.println("opening : " + file);
-}
+    public void open(){
+        headController.toLoading();
+        String file = fileName_list.getSelectionModel().getSelectedItem().toString();
+        node.openFile(file);
+        headController.closeLoading();
+        System.out.println("opening : " + file);
+    }
 
-public void view(Parent root){
+    public void view(Parent root){
         if(view == null)
             view = new Scene(root,viewWidth,viewHeight);
         Stage stage = new Stage();
         stage.setResizable(false);
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent arg0) {
-                headController.toLogoff();
-            }
-        });
+        stage.setOnCloseRequest(arg0 -> headController.toLogoff());
         stage.setTitle("SystemY GUI");
         stage.setScene(view);
         stage.show();
     }
 
-public void viewNetwork(){
+    public void viewNetwork(){
         headController.toLoading();
         headController.toNetwork();
         headController.closeLoading();
     }
 
-public void update(){
-    System.out.println("update");
+    public void update(){
+        System.out.println("update");
         newFiles = node.getFiles();
 
         if(oldFiles == null){
