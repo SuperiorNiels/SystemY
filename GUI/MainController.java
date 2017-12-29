@@ -10,11 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import Node.Node;
+import Node.FileLocationException;
 import javafx.stage.WindowEvent;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class MainController {
@@ -42,8 +40,13 @@ public void delete(){
 public void deleteLocal() {
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
     System.out.println("deleteLocal : " + file);
-    File localf = new File("files\\local\\"+ file);
-    localf.delete();
+    try {
+        node.locallyRemoveFile(file);
+    } catch (NullPointerException e) {
+
+    } catch (FileLocationException e) {
+
+    }
 }
 
 public void init(HeadController headcontroller){
@@ -66,32 +69,7 @@ public void logOff(){
 public void open(){
     headController.toLoading();
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    try {
-        if (Desktop.isDesktopSupported()) {
-            File localf = new File("files\\local\\"+ file);
-            File replif = new File("files\\replicated\\"+ file);
-            File downlf = new File("files\\download\\" + file);
-            if(localf.exists()){
-                System.out.println("in local");
-                Desktop.getDesktop().open(localf);
-            }
-            else if(replif.exists()) {
-                System.out.println("in replicated");
-                Desktop.getDesktop().open(replif);
-            }
-            else if(downlf.exists()){
-                System.out.println("in download");
-                Desktop.getDesktop().open(downlf);
-            } else{
-                //download the file from the network
-                node.startDownload(file);
-                while(!downlf.exists()){}
-                Desktop.getDesktop().open(downlf);
-            }
-        }
-    } catch (IOException ioe) {
-        System.err.println("could not open file");;
-    }
+    node.openFile(file);
     headController.closeLoading();
     System.out.println("opening : " + file);
 }
