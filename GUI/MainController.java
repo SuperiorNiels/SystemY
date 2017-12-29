@@ -43,9 +43,9 @@ public void deleteLocal() {
     try {
         node.locallyRemoveFile(file);
     } catch (NullPointerException e) {
-        headController.toError();
+        headController.toError("Error: Cannot delete file!");
     } catch (FileLocationException e) {
-        headController.toError();
+        headController.toError("Error: file is replicated or local, file not deleted!");
     }
 }
 
