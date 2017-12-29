@@ -43,9 +43,9 @@ public void deleteLocal() {
     try {
         node.locallyRemoveFile(file);
     } catch (NullPointerException e) {
-
+        headController.toError();
     } catch (FileLocationException e) {
-
+        headController.toError();
     }
 }
 
