@@ -196,7 +196,25 @@ public class Node implements NodeInterface, Observer {
                     } catch (Exception e) {
                         System.out.println("Enter filename as parameter.");
                     }
-                } else if(parts[0].toLowerCase().equals("remove")) {
+                } else if(parts[0].toLowerCase().equals("lremove")) {
+                    try {
+                        String filename = parts[1];
+                        if(filename != null) {
+                            locallyRemoveFile(filename);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Enter filename as parameter.");
+                    }
+                } else if(parts[0].toLowerCase().equals("nremove")) {
+                    try {
+                        String filename = parts[1];
+                        if(filename != null) {
+                            deleteFileOwner(filename);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Enter filename as parameter.");
+                    }
+                } else if(parts[0].toLowerCase().equals("removenode")) {
                     try {
                         String nodename = parts[1];
                         NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + namingServerIp + "/NamingServer");
