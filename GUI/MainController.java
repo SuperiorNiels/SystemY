@@ -3,27 +3,19 @@ package GUI;
 import Agents.FileRequest;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import Node.Node;
 import javafx.stage.WindowEvent;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.*;
-
 
 public class MainController {
 
@@ -39,7 +31,7 @@ public class MainController {
     private HeadController headController;
     private Scene view;
     private TreeMap<String, FileRequest> newFiles;
-    private TreeMap<String, FileRequest> oldFiles = null;
+    private TreeMap<String, FileRequest> oldFiles;
     private int delay;
 
 public void delete(){
@@ -63,7 +55,6 @@ public void initData(){
         node = headController.getNode();
         nameLabel.setText(node.getName());
         node.setMainController(this);
-        update();
 }
 
 public void logOff(){
@@ -75,9 +66,34 @@ public void logOff(){
 public void open(){
     headController.toLoading();
     String file = fileName_list.getSelectionModel().getSelectedItem().toString();
-    node.openFile(file);
+    try {
+        if (Desktop.isDesktopSupported()) {
+            File localf = new File("files\\local\\"+ file);
+            File replif = new File("files\\replicated\\"+ file);
+            File downlf = new File("files\\download\\" + file);
+            if(localf.exists()){
+                System.out.println("in local");
+                Desktop.getDesktop().open(localf);
+            }
+            else if(replif.exists()) {
+                System.out.println("in replicated");
+                Desktop.getDesktop().open(replif);
+            }
+            else if(downlf.exists()){
+                System.out.println("in download");
+                Desktop.getDesktop().open(downlf);
+            } else{
+                //download the file from the network
+                node.startDownload(file);
+                while(!downlf.exists()){}
+                Desktop.getDesktop().open(downlf);
+            }
+        }
+    } catch (IOException ioe) {
+        System.err.println("could not open file");;
+    }
     headController.closeLoading();
-    //System.out.println("opening : " + file);
+    System.out.println("opening : " + file);
 }
 
 public void view(Parent root){
@@ -103,21 +119,32 @@ public void viewNetwork(){
     }
 
 public void update(){
+    System.out.println("update");
         newFiles = node.getFiles();
 
-        Set values1 = new HashSet(newFiles.values());
-        Set values2 = new HashSet(oldFiles.values());
-        boolean equal = values1.equals(values2);
-
-        if(!equal) {
+        if(oldFiles == null){
             fileName_list.getItems().clear();
             for (Map.Entry<String, FileRequest> entry : newFiles.entrySet()) {
                 fileName_list.getItems().add(entry.getKey());
                 System.out.println(entry.getKey());
             }
             fileName_list.getSelectionModel().selectFirst();
-        }else{
             oldFiles = newFiles;
+        }else {
+            Set values1 = new HashSet(newFiles.values());
+            Set values2 = new HashSet(oldFiles.values());
+            boolean equal = values1.equals(values2);
+
+            if (!equal) {
+                fileName_list.getItems().clear();
+                for (Map.Entry<String, FileRequest> entry : newFiles.entrySet()) {
+                    fileName_list.getItems().add(entry.getKey());
+                    System.out.println(entry.getKey());
+                }
+                fileName_list.getSelectionModel().selectFirst();
+            } else {
+                oldFiles = newFiles;
+            }
         }
     }
 
