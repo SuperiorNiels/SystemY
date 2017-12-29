@@ -21,6 +21,7 @@ public class HeadController {
     private FXMLLoader logoff   = new FXMLLoader();
     private FXMLLoader loading  = new FXMLLoader();
     private FXMLLoader nameAlreadyExist = new FXMLLoader();
+    private FXMLLoader error    = new FXMLLoader();
 
     private LoginController   loginController  ;
     private MainController    mainController   ;
@@ -28,6 +29,7 @@ public class HeadController {
     private LogoffController  logoffController ;
     private LoadingController loadingController;
     private NameAlreadyExistController nameAlreadyExistController;
+    private ErrorController   errorController;
 
     private Parent rlogin  ;
     private Parent rmain   ;
@@ -35,6 +37,7 @@ public class HeadController {
     private Parent rlogoff ;
     private Parent rloading;
     private Parent rNameExist;
+    private Parent rerror  ;
 
     private Node node;
     private int delay = 300;
@@ -46,6 +49,7 @@ public class HeadController {
         logoff.setLocation(  getClass().getResource("logoffView.fxml" ));
         loading.setLocation( getClass().getResource("LoadingView.fxml"));
         nameAlreadyExist.setLocation(getClass().getResource("NameAlreadyExist.fxml"));
+        error.setLocation(   getClass().getResource("errorView.fxml"  ));
 
         rlogin   = login.load();
         rmain    = main.load();
@@ -53,6 +57,7 @@ public class HeadController {
         rlogoff  = logoff.load();
         rloading = loading.load();
         rNameExist = nameAlreadyExist.load();
+        rerror   = error.load();
 
         loginController   = login.getController()  ;
         mainController    = main.getController()   ;
@@ -60,6 +65,7 @@ public class HeadController {
         logoffController  = logoff.getController() ;
         loadingController = loading.getController();
         nameAlreadyExistController = nameAlreadyExist.getController();
+        errorController   = error.getController();
 
         loginController.init(this  );
         mainController.init(this   );
@@ -67,6 +73,7 @@ public class HeadController {
         logoffController.init(this );
         loadingController.init(this);
         nameAlreadyExistController.init(this);
+        errorController.init(this);
     }
 
     public Node getNode(){
@@ -104,6 +111,8 @@ public class HeadController {
     public void toNameAlreadyExist(){
         nameAlreadyExistController.view(rNameExist);
     }
+
+    public void toError(){errorController.view(rerror);}
 
     public int getDelay(){return this.delay;}
 
