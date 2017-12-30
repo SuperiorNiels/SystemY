@@ -5,6 +5,8 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
 
 import Node.Node;
@@ -83,7 +85,8 @@ public class FileAgent extends Agent {
 
             ArrayList<String> to_remove = node.getFilesToRemove(); // Check files to_remove from file
             ArrayList<String> remove_from_list = new ArrayList<>();
-            for(String file : to_remove) {
+            for(Iterator<String> it = to_remove.iterator(); it.hasNext(); ) {
+                String file = it.next();
                 if(files.containsKey(file)) {
                     files.remove(file);
                     remove_from_list.add(file);
