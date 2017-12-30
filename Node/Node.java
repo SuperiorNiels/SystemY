@@ -9,7 +9,9 @@ import Network.MulticastService;
 import Network.PollingService;
 
 import java.awt.*;
+import java.awt.List;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
@@ -41,6 +43,8 @@ public class Node implements NodeInterface, Observer {
     private TreeMap<String, FileRequest> files = new TreeMap<>();
     private LoginController loginController;
     private MainController mainController;
+
+    private ArrayList<String> filesToRemove = new ArrayList<>();
 
     public Node() {
         Scanner input = new Scanner(System.in);
@@ -687,8 +691,8 @@ public class Node implements NodeInterface, Observer {
                 //First remove the file from the fileAgent
                 removeFileFromFileAgent(filename);
                 Thread waitForFileAgent = new Thread(new WaitForFileAgent(this,filename));
+                waitForFileAgent.start();
                 waitForFileAgent.join();
-
 
                 //second the replicated
                 Neighbour replicated = fiche.getReplicated();
@@ -698,13 +702,13 @@ public class Node implements NodeInterface, Observer {
                 //third the local
                 Neighbour local = fiche.getLocal();
                 NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
-                replicatedStub.deleteFile(rootPath+"local/"+ filename);
+                localStub.deleteFile(rootPath+"local/"+ filename);
 
                 //fourth the downloads
                 HashSet<Neighbour> downloads = fiche.getDownloads();
                 for (Neighbour next : downloads) {
                     NodeInterface downloadStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
-                    replicatedStub.deleteFile(rootPath + "download/" + filename);
+                    downloadStub.deleteFile(rootPath + "download/" + filename);
                 }
 
                 //Lastly remove file entry
@@ -723,8 +727,35 @@ public class Node implements NodeInterface, Observer {
     }
 
     public void deleteFile(String target){
-        if(!new File(target).delete()){
-            throw new NullPointerException("Could not delete file: not found! ");
+        String filename = new File(target).getName();
+        FilenameFilter filter  = (dir, name) -> {
+            boolean result = false;
+            if(name.equals(filename))
+                result = true;
+            return result;
+        };
+        boolean result = false;
+        result |= deleteFileFromFolder(rootPath+"download/",filter);
+        result |= deleteFileFromFolder(rootPath+"local/",filter);
+        result |= deleteFileFromFolder(rootPath+"replicated/",filter);
+        if(!result){
+            System.err.println("Could not delete file: not found!");
+        }
+    }
+
+    /**
+     * Delete a specific file from a folder, it searches the folder for the file and removes it
+     * @param folder, String
+     * @param filter, FilenameFilter
+     * @return, false if the file was not found/ not deleted, true if the file was deleted
+     */
+    private boolean deleteFileFromFolder(String folder,FilenameFilter filter){
+        File folderFile = new File(folder);
+        String[] files  = folderFile.list(filter);
+        try{
+            return new File(folder + files[0]).delete();
+        }catch (Exception e){
+            return false;
         }
     }
 
@@ -875,7 +906,6 @@ public class Node implements NodeInterface, Observer {
         return filesToRemove;
     }
 
-    private ArrayList<String> filesToRemove = new ArrayList<>();
     public void removeFileFromFileAgent(String filename) {
         filesToRemove.add(filename);
     }

@@ -5,7 +5,7 @@ public class WaitForFileAgent implements Runnable {
     private String filename;
 
     public WaitForFileAgent(Node rootNode, String filename){
-        this.node = node;
+        this.node = rootNode;
         this.filename = filename;
     }
 
