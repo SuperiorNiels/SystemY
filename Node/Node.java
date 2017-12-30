@@ -9,7 +9,6 @@ import Network.MulticastService;
 import Network.PollingService;
 
 import java.awt.*;
-import java.awt.List;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -42,7 +41,6 @@ public class Node implements NodeInterface, Observer {
     // Files map updates by file agent
     private TreeMap<String, FileRequest> files = new TreeMap<>();
     private LoginController loginController;
-    private MainController mainController;
 
     private ArrayList<String> filesToRemove = new ArrayList<>();
 
@@ -62,8 +60,6 @@ public class Node implements NodeInterface, Observer {
     public void setLoginController(LoginController l){
         this.loginController = l;
     }
-
-    public void setMainController(MainController m ){this.mainController = m;}
 
     public Boolean getLoggedIn() {
         return logged_in;
