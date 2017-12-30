@@ -205,7 +205,7 @@ public class Node implements NodeInterface, Observer {
                     try {
                         String filename = parts[1];
                         if(filename != null) {
-                            deleteFileOwner(filename);
+                            deleteFileOwner(filename,false);
                         }
                     } catch (Exception e) {
                         System.out.println("Enter filename as parameter.");
@@ -672,12 +672,15 @@ public class Node implements NodeInterface, Observer {
      * This method deletes a file from the network
      * @param filename
      */
-    public void deleteFileOwner(String filename){
+    public void deleteFileOwner(String filename,boolean shuttingDown){
         try {
-            NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
-            Neighbour owner = nameServer.getOwner(filename);
+            Neighbour owner = new Neighbour(name,ip);
+            if(!shuttingDown){
+                NamingInterface nameServer = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+                owner = nameServer.getOwner(filename);
+            }
             if(calculateHash(owner.getName())==calculateHash(this.getName())){
-                //You are the owner check the file entry en delete it at all nodes
+                //You are the owner check the file entry and delete it at all nodes
                 FileEntry fiche = this.getFileEntry(filename);
 
                 //First remove file entry
@@ -695,9 +698,11 @@ public class Node implements NodeInterface, Observer {
                 replicatedStub.deleteFile(rootPath+"replicated/"+ filename);
 
                 //Fourth the local
-                Neighbour local = fiche.getLocal();
-                NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
-                localStub.deleteFile(rootPath+"local/"+ filename);
+                if(!shuttingDown){
+                    Neighbour local = fiche.getLocal();
+                    NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
+                    localStub.deleteFile(rootPath+"local/"+ filename);
+                }
 
                 //Lastly the downloads
                 HashSet<Neighbour> downloads = fiche.getDownloads();
@@ -708,13 +713,13 @@ public class Node implements NodeInterface, Observer {
             }else{
                 //You are not the owner, pass the function to the owner node
                 NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
-                ownerStub.deleteFileOwner(filename);
+                ownerStub.deleteFileOwner(filename,false);
             }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             System.err.println("FileAgent never received! Restarting delete procedure...");
-            this.deleteFileOwner(filename);
+            this.deleteFileOwner(filename,false);
         }
     }
 

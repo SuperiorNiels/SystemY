@@ -261,7 +261,7 @@ public class FileManager extends Thread {
                             //System.out.println("File deleted.");
                             break;
                     }
-                }
+                 }
                 key.reset();
             }
         }
@@ -388,7 +388,7 @@ public class FileManager extends Thread {
                 //File has never been downloaded ==> remove file from system
                 //map.remove(filehash);
                 //new File(rootPath+"/"+REPLICATED_FOLDER+"/"+filename).delete();
-                rootNode.deleteFileOwner(filename);
+                rootNode.deleteFileOwner(filename,true);
             }else{
                 //File has been downloaded
                 FileEntry fiche = map.get(filehash);

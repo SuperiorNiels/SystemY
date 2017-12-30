@@ -36,7 +36,7 @@ public class MainController {
         String file = fileName_list.getSelectionModel().getSelectedItem().toString();
         //System.out.println("delete : " + file);
         if(node.fileInSystem(file)) {
-            node.deleteFileOwner(file);
+            node.deleteFileOwner(file,false);
         }
     }
 
