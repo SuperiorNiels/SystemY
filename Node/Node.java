@@ -680,32 +680,31 @@ public class Node implements NodeInterface, Observer {
                 //You are the owner check the file entry en delete it at all nodes
                 FileEntry fiche = this.getFileEntry(filename);
 
-                //First remove the file from the fileAgent
+                //First remove file entry
+                manager.removeFileEntry(filename);
+
+                //Second remove the file from the fileAgent
                 removeFileFromFileAgent(filename);
                 Thread waitForFileAgent = new Thread(new WaitForFileAgent(this,filename));
                 waitForFileAgent.start();
                 waitForFileAgent.join();
 
-                //second the replicated
+                //Third the replicated
                 Neighbour replicated = fiche.getReplicated();
                 NodeInterface replicatedStub = (NodeInterface) Naming.lookup("//" + replicated.getIp() + "/Node");
                 replicatedStub.deleteFile(rootPath+"replicated/"+ filename);
 
-                //third the local
+                //Fourth the local
                 Neighbour local = fiche.getLocal();
                 NodeInterface localStub = (NodeInterface) Naming.lookup("//" + local.getIp() + "/Node");
                 localStub.deleteFile(rootPath+"local/"+ filename);
 
-                //fourth the downloads
+                //Lastly the downloads
                 HashSet<Neighbour> downloads = fiche.getDownloads();
                 for (Neighbour next : downloads) {
                     NodeInterface downloadStub = (NodeInterface) Naming.lookup("//" + next.getIp() + "/Node");
                     downloadStub.deleteFile(rootPath + "download/" + filename);
                 }
-
-                //Lastly remove file entry
-                manager.removeFileEntry(filename);
-
             }else{
                 //You are not the owner, pass the function to the owner node
                 NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
