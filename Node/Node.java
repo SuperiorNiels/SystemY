@@ -705,6 +705,7 @@ public class Node implements NodeInterface, Observer {
 
                 //Lastly remove file entry
                 manager.removeFileEntry(filename);
+
             }else{
                 //You are not the owner, pass the function to the owner node
                 NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
