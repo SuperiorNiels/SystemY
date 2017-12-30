@@ -62,7 +62,6 @@ public class MainController {
     public void initData(){
         node = headController.getNode();
         nameLabel.setText(node.getName());
-        node.setMainController(this);
     }
 
     public void logOff(){

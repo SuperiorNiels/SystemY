@@ -11,7 +11,7 @@ public class ErrorController {
     HeadController headController;
     private Scene view;
     private Stage stage;
-    private int viewWidth  = 253;
+    private int viewWidth  = 350;
     private int viewHeight = 77;
     @FXML
     private Label string;

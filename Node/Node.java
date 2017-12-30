@@ -3,7 +3,6 @@ package Node;
 import Agents.AgentHandler;
 import Agents.FileRequest;
 import GUI.LoginController;
-import GUI.MainController;
 import NameServer.NamingInterface;
 import Network.MulticastService;
 import Network.PollingService;
@@ -71,9 +70,6 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, FileRequest> files) {
         this.files = files;
-        /*if(gui){
-            mainController.update();
-        }*/
     }
 
     public boolean isRunning() {
