@@ -49,6 +49,7 @@ public class LogoffController {
     }
 
     public void mainView(){
+        headController.toMain();
         Stage currentWindow = (Stage) logoff_yes_bnt.getScene().getWindow();
         currentWindow.close();
     }
