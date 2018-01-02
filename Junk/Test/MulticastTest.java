@@ -1,4 +1,4 @@
-package Test;
+package Junk.Test;
 
 import Network.MulticastObservable;
 import Network.MulticastService;

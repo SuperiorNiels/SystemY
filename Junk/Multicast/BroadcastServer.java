@@ -1,4 +1,4 @@
-package Multicast;
+package Junk.Multicast;
 
 import java.io.IOException;
 import java.net.*;

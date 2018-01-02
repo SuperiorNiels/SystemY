@@ -1,4 +1,4 @@
-package Discovery;
+package Junk.Discovery;
 
 
 import java.net.DatagramPacket;

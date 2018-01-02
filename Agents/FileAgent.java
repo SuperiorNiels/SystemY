@@ -51,34 +51,35 @@ public class FileAgent extends Agent {
             ArrayList<String> downloaded = node.getDownloaded();
             for (String name : files.keySet()) {
                 // Go through map and check for download requests
+                FileRequest request = files.get(name);
                 if (requests.contains(name)) {
-                    FileRequest request = files.get(name);
                     Neighbour current = new Neighbour(node.getName(),node.getIp());
                     if(!request.hasInQueue(current)) {request.addRequest(current); }
-                    if(!request.getLocked()) {
-                        // A node can download the file
-                        // Always at least one neighbour in queue so don't need to check
-                        Neighbour to_download = request.popRequest();
-                        // Check if to_download is correct node else perform rmi call to let the node download the file
-                        if(!(node.calculateHash(to_download.getName())== node.calculateHash(node.getName()))) {
-                            // Perform RMI function
-                            try {
-                                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + to_download.getIp() + "/Node");
-                                nodeStub.downloadFile(name);
-                            } catch (NotBoundException | MalformedURLException | RemoteException e) {
-                                System.out.println("Problem with RMI to node in fileAgent.");
-                            }
-                        } else {
-                            // The current can download the file
-                            node.downloadFile(name);
-                        }
-                        request.lock();
-                    }
                 }
+
+                if(!request.getLocked()) {
+                    // A node can download the file
+                    // Always at least one neighbour in queue so don't need to check
+                    Neighbour to_download = request.popRequest();
+                    // Check if to_download is correct node else perform rmi call to let the node download the file
+                    if(!(node.calculateHash(to_download.getName())== node.calculateHash(node.getName()))) {
+                        // Perform RMI function
+                        try {
+                            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + to_download.getIp() + "/Node");
+                            nodeStub.downloadFile(name);
+                        } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                            System.out.println("Problem with RMI to node in fileAgent.");
+                        }
+                    } else {
+                        // The current can download the file
+                        node.downloadFile(name);
+                    }
+                    request.lock();
+                }
+
                 // Check for the downloaded files in the node map (so we can clear the lock)
                 if(downloaded.contains(name)) {
                     // the current node has downloaded the file, remove the lock
-                    FileRequest request = files.get(name);
                     request.unlock();
                 }
             }
