@@ -17,5 +17,4 @@ public abstract class Agent implements Serializable, Runnable {
     public void setType(AgentType type) {
         this.type = type;
     }
-
 }

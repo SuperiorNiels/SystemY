@@ -60,21 +60,23 @@ public class FileAgent extends Agent {
                 if(!request.getLocked()) {
                     // A node can download the file
                     // Always at least one neighbour in queue so don't need to check
-                    Neighbour to_download = request.popRequest();
-                    // Check if to_download is correct node else perform rmi call to let the node download the file
-                    if(!(node.calculateHash(to_download.getName())== node.calculateHash(node.getName()))) {
-                        // Perform RMI function
-                        try {
-                            NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + to_download.getIp() + "/Node");
-                            nodeStub.downloadFile(name);
-                        } catch (NotBoundException | MalformedURLException | RemoteException e) {
-                            System.out.println("Problem with RMI to node in fileAgent.");
+                    if (!request.isEmpty()) {
+                        Neighbour to_download = request.popRequest();
+                        // Check if to_download is correct node else perform rmi call to let the node download the file
+                        if (!(node.calculateHash(to_download.getName()) == node.calculateHash(node.getName()))) {
+                            // Perform RMI function
+                            try {
+                                NodeInterface nodeStub = (NodeInterface) Naming.lookup("//" + to_download.getIp() + "/Node");
+                                nodeStub.downloadFile(name);
+                            } catch (NotBoundException | MalformedURLException | RemoteException e) {
+                                System.out.println("Problem with RMI to node in fileAgent.");
+                            }
+                        } else {
+                            // The current can download the file
+                            node.downloadFile(name);
                         }
-                    } else {
-                        // The current can download the file
-                        node.downloadFile(name);
+                        request.lock();
                     }
-                    request.lock();
                 }
 
                 // Check for the downloaded files in the node map (so we can clear the lock)
