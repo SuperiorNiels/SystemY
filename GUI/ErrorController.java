@@ -33,6 +33,7 @@ public class ErrorController {
 
         stage.setResizable(false);
         stage.setTitle("SystemY Error");
+        stage.setOnCloseRequest(arg0 -> this.close());
         stage.setScene(view);
         stage.show();
     }

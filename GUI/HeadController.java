@@ -116,10 +116,6 @@ public class HeadController {
         loadingController.close();
     }
 
-    public Stage getLoadingStage() {
-        return loadingController.getStage();
-    }
-
     public void closeLogin(){loginController.close();}
 
     public void toNameAlreadyExist(){
