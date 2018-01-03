@@ -37,14 +37,14 @@ public class LoginController {
     private ChoiceBox interface_select;
     @FXML
     private Label errorLabel;
-    private int delay;
-    private boolean nodeExist = false;
     private boolean triedToLogin = false;
     Stage stage;
 
+    private GUI_Controller gui;
+
     private HeadController headController;
     public void init(HeadController headcontroller) throws SocketException {
-        this.headController =headcontroller;
+        this.headController = headcontroller;
 
         for (NetworkInterface ni :
                 Collections.list(NetworkInterface.getNetworkInterfaces())) {
@@ -56,51 +56,39 @@ public class LoginController {
         }
 
         interface_select.getSelectionModel().selectFirst();
-        this.delay = headcontroller.getDelay();
     }
 
-    public void login(){
+    public void setGUI(GUI_Controller gui) {
+        this.gui = gui;
+    }
+
+    public void login() {
         validEntered = true;
         String name = login_name_text.getText();
-        if(name.equals(""))
+        if (name.equals(""))
             validEntered = false;
 
-        String ip   =  interface_select.getSelectionModel().getSelectedItem().toString();
+        String ip = interface_select.getSelectionModel().getSelectedItem().toString();
         String ipParts[] = ip.split("/");
         System.out.println(ipParts[1]);
 
-        if(validEntered) {
+        if (validEntered) {
             Stage currentWindow = (Stage) login_name_text.getScene().getWindow();
-            headController.toLoading();
-            if(!triedToLogin){
-                node = new Node(name, ipParts[1]);
-            }
-            else
+            if (!triedToLogin) {
+                node = new Node(name, ipParts[1], gui);
+            } else
                 node.setName(name);
 
-            node.setLoginController(this);
             headController.setNode(node);
+            headController.toLoading();
             node.bootstrap();
-            while ((node.getLoggedIn() == false)&& !nodeExist) {
+            /*while ((node.getLoggedIn() == false)&& !nodeExist) {
                 //check if name already exits
                 //if name already exits stop and warn the user
                 //else wait for bootstrap, etc.
-            }
-            if(!nodeExist) {
-                //if this is a new node and its logged in normaly
-                //close the window and go to main view
-                currentWindow.close();
-                System.out.println(headController);
-                headController.toMain();
-                headController.closeLoading();
-            }else{
-                //if the node name already exits.
-                //close the loading scene.
-                headController.closeLogin();
-                headController.toNameAlreadyExist();
-                headController.closeLoading();
-            }
-        }else{
+            }*/
+            headController.closeLogin();
+        } else {
             errorLabel.setText("Please enter a name");
         }
     }
@@ -125,10 +113,7 @@ public class LoginController {
 
     public void textEnterd(){
         errorLabel.setText("");
-        this.nodeExist = false;
     }
-
-    public void setNodeExitst(Boolean b){this.nodeExist = b;}
 
     public void close(){
         stage.close();

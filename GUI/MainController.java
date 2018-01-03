@@ -29,8 +29,6 @@ public class MainController {
     private HeadController headController;
     private Scene view;
     private TreeMap<String, FileRequest> newFiles;
-    private TreeMap<String, FileRequest> oldFiles;
-    private int delay;
 
     public void delete(){
         String file = fileName_list.getSelectionModel().getSelectedItem().toString();
@@ -47,16 +45,15 @@ public class MainController {
             try {
                 node.locallyRemoveFile(file);
             } catch (NullPointerException e) {
-                headController.toError("Error: Cannot delete file!");
+                headController.toError("Error: Cannot delete file!",false);
             } catch (FileLocationException e) {
-                headController.toError("Error: file is replicated or local, file not deleted!");
+                headController.toError("Error: file is replicated or local, file not deleted!",false);
             }
         }
     }
 
     public void init(HeadController headcontroller){
         this.headController =headcontroller;
-        this.delay = headcontroller.getDelay();
     }
 
     public void initData(){
@@ -71,10 +68,10 @@ public class MainController {
     }
 
     public void open(){
-        headController.toLoading();
+        //headController.toLoading();
         String file = fileName_list.getSelectionModel().getSelectedItem().toString();
         node.openFile(file);
-        headController.closeLoading();
+        //headController.closeLoading();
         System.out.println("opening : " + file);
     }
 
@@ -96,33 +93,14 @@ public class MainController {
     }
 
     public void update(){
-        System.out.println("update");
+        //System.out.println("update");
         newFiles = node.getFiles();
-
-        if(oldFiles == null){
-            fileName_list.getItems().clear();
-            for (Map.Entry<String, FileRequest> entry : newFiles.entrySet()) {
-                fileName_list.getItems().add(entry.getKey());
-                System.out.println(entry.getKey());
-            }
-            fileName_list.getSelectionModel().selectFirst();
-            oldFiles = newFiles;
-        }else {
-            Set values1 = new HashSet(newFiles.values());
-            Set values2 = new HashSet(oldFiles.values());
-            boolean equal = values1.equals(values2);
-
-            if (!equal) {
-                fileName_list.getItems().clear();
-                for (Map.Entry<String, FileRequest> entry : newFiles.entrySet()) {
-                    fileName_list.getItems().add(entry.getKey());
-                    System.out.println(entry.getKey());
-                }
-                fileName_list.getSelectionModel().selectFirst();
-            } else {
-                oldFiles = newFiles;
-            }
+        fileName_list.getItems().clear();
+        for (Map.Entry<String, FileRequest> entry : newFiles.entrySet()) {
+            fileName_list.getItems().add(entry.getKey());
+            //System.out.println(entry.getKey());
         }
+        fileName_list.getSelectionModel().selectFirst();
     }
 
 }

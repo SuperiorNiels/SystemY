@@ -3,6 +3,7 @@ package GUI;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -15,9 +16,13 @@ public class ErrorController {
     private int viewHeight = 77;
     @FXML
     private Label string;
+    @FXML
+    Button ok_button;
+
+    private Boolean close = false;
 
     public void init(HeadController headcontroller){
-        this.headController =headcontroller;
+        this.headController = headcontroller;
     }
 
     public void view(Parent root){
@@ -34,9 +39,16 @@ public class ErrorController {
 
     public void close(){
         stage.close();
+        if(close) {
+            System.exit(1);
+        }
     }
 
     public void setString(String text){
         string.setText(text);
+    }
+
+    public void setClose(Boolean close) {
+        this.close = close;
     }
 }

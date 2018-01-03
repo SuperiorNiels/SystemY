@@ -13,7 +13,7 @@ public class WaitForFileAgent implements Runnable {
     public void run() {
         while(node.getFilesToRemove().contains(filename)){
             //Do nothing, waiting for the file agent
-            System.out.println("\rWaiting for fileAgent...");
+            //System.out.printf("\rWaiting for fileAgent...");
         }
     }
 }

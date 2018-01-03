@@ -4,6 +4,7 @@ package GUI;
 import javafx.fxml.FXMLLoader;
 import Node.Node;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -30,6 +31,8 @@ public class HeadController {
     private LoadingController loadingController;
     private NameAlreadyExistController nameAlreadyExistController;
     private ErrorController   errorController;
+
+    public GUI_Controller GUI_Controller;
 
     private Parent rlogin  ;
     private Parent rmain   ;
@@ -74,6 +77,9 @@ public class HeadController {
         loadingController.init(this);
         nameAlreadyExistController.init(this);
         errorController.init(this);
+
+        GUI_Controller = new GUI_Controller(this);
+
     }
 
     public Node getNode(){
@@ -85,6 +91,10 @@ public class HeadController {
     }
 
     public void toLogin(){loginController.view(rlogin);}
+
+    public void setLoginGui() {
+        loginController.setGUI(GUI_Controller);
+    }
 
     public void toLogoff(){
         logoffController.initData();
@@ -106,13 +116,19 @@ public class HeadController {
         loadingController.close();
     }
 
+    public Stage getLoadingStage() {
+        return loadingController.getStage();
+    }
+
     public void closeLogin(){loginController.close();}
 
     public void toNameAlreadyExist(){
         nameAlreadyExistController.view(rNameExist);
     }
 
-    public void toError(String text){
+    public void toError(String text, Boolean close) {
+        // if close = true, shutdown the application
+        errorController.setClose(close);
         errorController.setString(text);
         errorController.view(rerror);
     }

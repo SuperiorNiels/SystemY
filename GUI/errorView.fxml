@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 
-<AnchorPane prefHeight="77.0" prefWidth="253.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.ErrorController">
-  <children>
-    <Label fx:id="string" layoutX="35.0" layoutY="31.0" prefWidth="183.0" text="Error:" />
-  </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="187.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.ErrorController">
+   <children>
+      <Button fx:id="ok_button" layoutX="129.0" layoutY="148.0" mnemonicParsing="false" onAction="#close" text="OK!" AnchorPane.bottomAnchor="8.0" AnchorPane.leftAnchor="129.0" AnchorPane.rightAnchor="129.0" AnchorPane.topAnchor="148.0" />
+      <Label fx:id="string" layoutX="7.0" layoutY="6.0" prefHeight="128.0" prefWidth="305.0" text="Label" textAlignment="CENTER" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="8.0" />
+   </children>
 </AnchorPane>

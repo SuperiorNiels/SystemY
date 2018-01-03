@@ -16,7 +16,7 @@ public class WaitForNameServer extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if(!node.getAcceptedByNameServer()) {
+        if(!node.getLoggedIn()) {
             // node is not accepted, shutdown the node
             System.err.println("No response from the name server.");
             node.failedToAddNode();

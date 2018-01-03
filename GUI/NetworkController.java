@@ -59,12 +59,7 @@ public class NetworkController {
             view = new Scene(root,viewWidth,viewHeight);
         Stage stage = new Stage();
         stage.setResizable(false);
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent arg0) {
-                headController.toMain();
-            }
-        });
+
         stage.setTitle("SystemY Network");
         stage.setScene(view);
         stage.show();

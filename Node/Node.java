@@ -2,7 +2,7 @@ package Node;
 
 import Agents.AgentHandler;
 import Agents.FileRequest;
-import GUI.LoginController;
+import GUI.GUI_Controller;
 import NameServer.NamingInterface;
 import Network.MulticastService;
 import Network.PollingService;
@@ -35,13 +35,11 @@ public class Node implements NodeInterface, Observer {
     private volatile boolean logged_in = false;
     private volatile boolean failedNode = false;
 
-    private Boolean acceptedByNameServer = false;
-
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
     // Files map updates by file agent
     private TreeMap<String, FileRequest> files = new TreeMap<>();
-    private LoginController loginController;
+    private GUI_Controller guicontroller;
 
     private ArrayList<String> filesToRemove = new ArrayList<>();
 
@@ -52,14 +50,11 @@ public class Node implements NodeInterface, Observer {
         bootstrap();
     }
 
-    public Node(String name,String ip) {
+    public Node(String name,String ip, GUI_Controller guicontroller) {
         this.name = name;
         this.ip   = ip;
         this.gui = true;
-    }
-
-    public void setLoginController(LoginController l){
-        this.loginController = l;
+        this.guicontroller = guicontroller;
     }
 
     public Boolean getLoggedIn() {
@@ -72,10 +67,6 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, FileRequest> files) {
         this.files = files;
-    }
-
-    public Boolean getAcceptedByNameServer() {
-        return acceptedByNameServer;
     }
 
     public boolean isRunning() {
@@ -260,7 +251,6 @@ public class Node implements NodeInterface, Observer {
                 System.out.println("Name: " + parts[1] + " IP: " + parts[2]);
                 break;
             case "01":
-                logged_in = true;
                 System.out.println("Nameserver message received. #hosts: " + parts[1]);
                 // fills in the ip of the nameserver
                 namingServerIp = parts[4];
@@ -274,7 +264,8 @@ public class Node implements NodeInterface, Observer {
                     }
                 } else {
                     // you are the new node that just joined
-                    acceptedByNameServer = true; // node is accepted so set to true
+                    logged_in = true;
+                    guicontroller.openWindow();
                     Neighbour self = new Neighbour(name, ip);
                     while (getNumberOfNodesInNetwork() != 0 && (previous.equals(self) || next.equals(self))) {
                         // wait till your neighbours are set
@@ -584,7 +575,7 @@ public class Node implements NodeInterface, Observer {
             //Causes RMI problem
             System.exit(1);
         } else {
-            loginController.setNodeExitst(true);
+            guicontroller.closeWithError();
         }
 
     }
