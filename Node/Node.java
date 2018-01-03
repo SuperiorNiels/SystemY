@@ -35,6 +35,8 @@ public class Node implements NodeInterface, Observer {
     private volatile boolean logged_in = false;
     private volatile boolean failedNode = false;
 
+    private Boolean acceptedByNameServer = false;
+
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
     // Files map updates by file agent
@@ -70,6 +72,10 @@ public class Node implements NodeInterface, Observer {
 
     public void setFiles(TreeMap<String, FileRequest> files) {
         this.files = files;
+    }
+
+    public Boolean getAcceptedByNameServer() {
+        return acceptedByNameServer;
     }
 
     public boolean isRunning() {
@@ -119,6 +125,9 @@ public class Node implements NodeInterface, Observer {
             //sends the multicast to the network
             multicast.sendMulticast("00;" + name + ";" + ip);
             System.out.println("Node started.");
+
+            // Start accept check for name server. When no response from the name server comes, shutdown node.
+            new WaitForNameServer(this).start();
 
             // Start a new polling service
             new PollingService(this).start();
@@ -265,6 +274,7 @@ public class Node implements NodeInterface, Observer {
                     }
                 } else {
                     // you are the new node that just joined
+                    acceptedByNameServer = true; // node is accepted so set to true
                     Neighbour self = new Neighbour(name, ip);
                     while (getNumberOfNodesInNetwork() != 0 && (previous.equals(self) || next.equals(self))) {
                         // wait till your neighbours are set
@@ -565,7 +575,7 @@ public class Node implements NodeInterface, Observer {
      * Function that gets called by the name server through RMI when the node can't be added
      */
     public void failedToAddNode(){
-        System.err.println("Failed to add the node to the Nameserver. Node name already taken!");
+        System.err.println("Failed to add the node to the name server.");
         if(!gui) {
             /*Scanner input = new Scanner(System.in);
             System.out.println("Hostname: ");
