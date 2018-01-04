@@ -1,14 +1,102 @@
-try {
-            if(!this.next.equals(next)) {
-                this.next = next;
-                manager.updateFilesNewNode();
-                manager.initialize();
-            }
-            if(!this.previous.equals(previous)) {
-                this.previous = previous;
-            }
-        } catch (NullPointerException e) {
-            // Neighbors are not set yet
-            this.next = next;
-            this.previous = previous;
+if (parts[0].toLowerCase().equals("multicast")) {
+    if (parts.length != 1) {
+        multicast.sendMulticast(parts[1]);
+    } else {
+        System.err.println("Please enter a message to multicast.");
+    }
+} else if (parts[0].toLowerCase().equals("print")) {
+    try {
+        if (parts[1].toLowerCase().equals("nodes")) {
+            System.out.println("Previous: " + previous.toString());
+            System.out.println("Next: " + next.toString());
+            System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
+        } else if (parts[1].toLowerCase().equals("hash")) {
+            System.out.println(calculateHash(name));
+        } else if (parts[1].toLowerCase().equals("entries")) {
+            manager.printMap();
+        } else if (parts[1].toLowerCase().equals("files")) {
+            printFiles();
+        } else {
+            System.out.println("Enter correct parameter for what to print.");
         }
+    } catch (Exception e) {
+        System.out.println("Enter parameter for what to print.");
+    }
+} else if (parts[0].toLowerCase().equals("shutdown")) {
+    System.out.println("shutting down.");
+    shutDown();
+    //closes the socket
+    multicast.terminate();
+    //stops SystemY process
+    System.exit(0);
+} else if (parts[0].toLowerCase().equals("download")) {
+    try {
+        String filename = parts[1].toLowerCase().trim();
+        if (files.containsKey(filename)) {
+            startDownload(filename);
+        } else {
+            System.out.println("File not found in system.");
+        }
+    } catch (Exception e) {
+        System.out.println("Please enter a filename as parameter.");
+    }
+} else if(parts[0].toLowerCase().equals("open")) {
+    try {
+        String filename = parts[1].toLowerCase().trim();
+        if (files.containsKey(filename)) {
+            openFile(filename);
+        } else {
+            System.out.println("File not found in system.");
+        }
+    } catch (Exception e) {
+        System.out.println("Please enter a filename as parameter.");
+    }
+} else if(parts[0].toLowerCase().equals("owner")) {
+    try {
+        String filename = parts[1];
+        if(filename != null) {
+            NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
+            Neighbour node = namingStub.getOwner(filename);
+            System.out.println("Owner: "+node.toString());                       }
+    } catch (Exception e) {
+        System.out.println("Enter filename as parameter.");
+    }
+} else if(parts[0].toLowerCase().equals("lremove")) {
+    try {
+        String filename = parts[1];
+        if(filename != null) {
+            locallyRemoveFile(filename);
+        }
+    } catch (Exception e) {
+        System.out.println("Enter filename as parameter.");
+    }
+} else if(parts[0].toLowerCase().equals("nremove")) {
+    try {
+        String filename = parts[1];
+        if(filename != null) {
+            deleteFileOwner(filename,false);
+        }
+    } catch (Exception e) {
+        System.out.println("Enter filename as parameter.");
+    }
+} else if(parts[0].toLowerCase().equals("removenode")) {
+    try {
+        String nodename = parts[1];
+        NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + namingServerIp + "/NamingServer");
+        namingStub.removeNode(nodename);
+        System.out.println("Node removed from name server.");
+    } catch (RemoteException e) {
+        System.out.println("RMI to nameserver failed.");
+    } catch (NullPointerException e) {
+        System.out.println("Failed to remove node. Node not found.");
+    } catch (MalformedURLException e) {
+        System.out.println("Malformed URL");
+    } catch (NotBoundException e) {
+        System.out.println("Not bound");
+    } catch (ArrayIndexOutOfBoundsException e) {
+        System.out.println("Enter name of node to remove.");
+    }
+} else {
+    System.err.println("Command not found.");
+}
+}

@@ -127,15 +127,9 @@ public class Node implements NodeInterface, Observer {
                 Scanner input = new Scanner(System.in);
                 String command = input.nextLine();
                 String parts[] = command.split(" ");
-                if (parts[0].toLowerCase().equals("multicast")) {
-                    if (parts.length != 1) {
-                        multicast.sendMulticast(parts[1]);
-                    } else {
-                        System.err.println("Please enter a message to multicast.");
-                    }
-                } else if (parts[0].toLowerCase().equals("print")) {
+                if (parts[0].toLowerCase().equals("print")) {
                     try {
-                        if (parts[1].toLowerCase().equals("nodes")) {
+                        if (parts[1].toLowerCase().equals("network")) {
                             System.out.println("Previous: " + previous.toString());
                             System.out.println("Next: " + next.toString());
                             System.out.println("#nodes in network: " + getNumberOfNodesInNetwork());
@@ -146,10 +140,10 @@ public class Node implements NodeInterface, Observer {
                         } else if (parts[1].toLowerCase().equals("files")) {
                             printFiles();
                         } else {
-                            System.out.println("Enter correct parameter for what to print.");
+                            System.out.println("Enter correct parameter for what to print. <network:files:entries>");
                         }
                     } catch (Exception e) {
-                        System.out.println("Enter parameter for what to print.");
+                        System.out.println("Enter correct parameter for what to print. <network:files:entries>");
                     }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
@@ -158,77 +152,85 @@ public class Node implements NodeInterface, Observer {
                     multicast.terminate();
                     //stops SystemY process
                     System.exit(0);
-                } else if (parts[0].toLowerCase().equals("fail")) {
-                    failure(previous);
                 } else if (parts[0].toLowerCase().equals("download")) {
                     try {
-                        String filename = parts[1].toLowerCase().trim();
+                        int startPosition = command.indexOf("\"") + "\"".length();
+                        int endPosition = command.indexOf("\"", startPosition);
+                        String filename = command.substring(startPosition, endPosition);
                         if (files.containsKey(filename)) {
                             startDownload(filename);
                         } else {
-                            System.out.println("File not found in system.");
+                            System.out.println("File: "+filename+" not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
                     }
                 } else if(parts[0].toLowerCase().equals("open")) {
                     try {
-                        String filename = parts[1].toLowerCase().trim();
+                        int startPosition = command.indexOf("\"") + "\"".length();
+                        int endPosition = command.indexOf("\"", startPosition);
+                        String filename = command.substring(startPosition, endPosition);
                         if (files.containsKey(filename)) {
                             openFile(filename);
                         } else {
-                            System.out.println("File not found in system.");
+                            System.out.println("File: "+filename+" not found in system.");
                         }
                     } catch (Exception e) {
                         System.out.println("Please enter a filename as parameter.");
                     }
                 } else if(parts[0].toLowerCase().equals("owner")) {
                     try {
-                        String filename = parts[1];
-                        if(filename != null) {
+                        int startPosition = command.indexOf("\"") + "\"".length();
+                        int endPosition = command.indexOf("\"", startPosition);
+                        String filename = command.substring(startPosition, endPosition);
+                        if(filename.length() != 0) {
                             NamingInterface namingStub = (NamingInterface) Naming.lookup("//"+namingServerIp+"/NamingServer");
                             Neighbour node = namingStub.getOwner(filename);
-                            System.out.println("Owner: "+node.toString());                       }
-                    } catch (Exception e) {
-                        System.out.println("Enter filename as parameter.");
-                    }
-                } else if(parts[0].toLowerCase().equals("lremove")) {
-                    try {
-                        String filename = parts[1];
-                        if(filename != null) {
-                            locallyRemoveFile(filename);
+                            System.out.println("Owner: "+node.toString());
+                        } else {
+                            System.out.println("Please enter a filename as parameter");
                         }
                     } catch (Exception e) {
-                        System.out.println("Enter filename as parameter.");
+                        System.out.println("Please enter a filename as parameter");
                     }
-                } else if(parts[0].toLowerCase().equals("nremove")) {
+                } else if(parts[0].toLowerCase().equals("delete")) {
                     try {
-                        String filename = parts[1];
-                        if(filename != null) {
-                            deleteFileOwner(filename,false);
-                        }
+                        int startPosition = command.indexOf("\"") + "\"".length();
+                            int endPosition = command.indexOf("\"", startPosition);
+                            String filename = command.substring(startPosition, endPosition);
+                            if(filename.length() != 0) {
+                                if (files.containsKey(filename)) {
+                                    if (parts[1].toLowerCase().equals("local")) {
+                                        try {
+                                            locallyRemoveFile(filename);
+                                            System.out.println("File deleted!");
+                                        } catch (FileLocationException e) {
+                                            System.out.println("Cannot delete file, file in replicated or local folder.");
+                                        }
+                                    } else if (parts[1].toLowerCase().equals("public")) {
+                                        deleteFileOwner(filename, false);
+                                        System.out.println("File deleted!");
+                                    }
+                                } else {
+                                    System.out.println("File: "+filename+" not found in system.");
+                                }
+                            } else {
+                                System.out.println("Please enter a filename as parameter.");
+                            }
                     } catch (Exception e) {
-                        System.out.println("Enter filename as parameter.");
+                        System.out.println("Please enter a filename as parameter.");
                     }
-                } else if(parts[0].toLowerCase().equals("removenode")) {
-                    try {
-                        String nodename = parts[1];
-                        NamingInterface namingStub = (NamingInterface) Naming.lookup("//" + namingServerIp + "/NamingServer");
-                        namingStub.removeNode(nodename);
-                        System.out.println("Node removed from name server.");
-                    } catch (RemoteException e) {
-                        System.out.println("RMI to nameserver failed.");
-                    } catch (NullPointerException e) {
-                        System.out.println("Failed to remove node. Node not found.");
-                    } catch (MalformedURLException e) {
-                        System.out.println("Malformed URL");
-                    } catch (NotBoundException e) {
-                        System.out.println("Not bound");
-                    } catch (ArrayIndexOutOfBoundsException e) {
-                        System.out.println("Enter name of node to remove.");
-                    }
+                } else if(parts[0].toLowerCase().equals("help")) {
+                    System.out.println("---------- SystemY commands ----------");
+                    System.out.println("- print <network:files:entries>");
+                    System.out.println("- owner \"filename\"");
+                    System.out.println("- open \"filename\"");
+                    System.out.println("- download \"filename\"");
+                    System.out.println("- delete <local:public> \"filename\"");
+                    System.out.println("- shutdown");
+                    System.out.println("- help");
                 } else {
-                    System.err.println("Command not found.");
+                    System.err.println("Command not found. Run 'help' for a list of commands.");
                 }
             }
         } catch (IOException e) {
@@ -265,7 +267,9 @@ public class Node implements NodeInterface, Observer {
                 } else {
                     // you are the new node that just joined
                     logged_in = true;
-                    guicontroller.openWindow();
+                    if(gui) {
+                        guicontroller.openWindow();
+                    }
                     Neighbour self = new Neighbour(name, ip);
                     while (getNumberOfNodesInNetwork() != 0 && (previous.equals(self) || next.equals(self))) {
                         // wait till your neighbours are set
