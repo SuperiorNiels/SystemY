@@ -265,7 +265,8 @@ public class Node implements NodeInterface, Observer {
                 } else {
                     // you are the new node that just joined
                     logged_in = true;
-                    guicontroller.openWindow();
+                    if(gui)
+                        guicontroller.openWindow();
                     Neighbour self = new Neighbour(name, ip);
                     while (getNumberOfNodesInNetwork() != 0 && (previous.equals(self) || next.equals(self))) {
                         // wait till your neighbours are set
@@ -714,13 +715,13 @@ public class Node implements NodeInterface, Observer {
             }else{
                 //You are not the owner, pass the function to the owner node
                 NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
-                ownerStub.deleteFileOwner(filename,false);
+                ownerStub.deleteFileOwner(filename,shuttingDown);
             }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             System.err.println("FileAgent never received! Restarting delete procedure...");
-            this.deleteFileOwner(filename,false);
+            this.deleteFileOwner(filename,shuttingDown);
         }
     }
 
