@@ -41,11 +41,16 @@ public class LogoffController {
 
     public void logOff() throws IOException {
         headController.toLoading();
-        node.shutDown();
-        headController.closeLoading();
-        Stage currentWindow = (Stage) logoff_yes_bnt.getScene().getWindow();
-        currentWindow.close();
-        System.exit(0);
+        try {
+            node.shutDown();
+            Stage currentWindow = (Stage) logoff_yes_bnt.getScene().getWindow();
+            currentWindow.close();
+            System.exit(1);
+        } catch (NullPointerException e) {
+            headController.toError("Problem while shutting down. \nNode not correctly shutdown.", true);
+        } finally {
+            headController.closeLoading();
+        }
     }
 
     public void mainView(){

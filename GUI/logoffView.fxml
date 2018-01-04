@@ -9,9 +9,9 @@
 
 <AnchorPane prefHeight="132.0" prefWidth="379.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.LogoffController">
   <children>
-    <Button fx:id="logoff_yes_bnt" layoutX="126.0" layoutY="92.0" mnemonicParsing="false" onAction="#mainView" text="Yes" />
-    <Button fx:id="logoff_No_bnt" layoutX="199.0" layoutY="92.0" mnemonicParsing="false" onAction="#logOff" text="No" />
-    <Text layoutX="128.0" layoutY="49.0" scaleX="1.3869337198687832" scaleY="1.315712187958884" strokeType="OUTSIDE" strokeWidth="0.0" text="Are you handsome?">
+    <Button fx:id="logoff_yes_bnt" layoutX="126.0" layoutY="92.0" mnemonicParsing="false" onAction="#logOff" text="Yes" />
+    <Button fx:id="logoff_No_bnt" layoutX="199.0" layoutY="92.0" mnemonicParsing="false" onAction="#mainView" text="No" />
+    <Text layoutX="128.0" layoutY="49.0" scaleX="1.3869337198687832" scaleY="1.315712187958884" strokeType="OUTSIDE" strokeWidth="0.0" text="Are you sure?">
       <font>
         <Font size="14.0" />
       </font>
