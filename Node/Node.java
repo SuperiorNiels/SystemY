@@ -718,13 +718,13 @@ public class Node implements NodeInterface, Observer {
             }else{
                 //You are not the owner, pass the function to the owner node
                 NodeInterface ownerStub = (NodeInterface) Naming.lookup("//" + owner.getIp() + "/Node");
-                ownerStub.deleteFileOwner(filename,false);
+                ownerStub.deleteFileOwner(filename,shuttingDown);
             }
         } catch (NotBoundException | MalformedURLException | RemoteException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             System.err.println("FileAgent never received! Restarting delete procedure...");
-            this.deleteFileOwner(filename,false);
+            this.deleteFileOwner(filename,shuttingDown);
         }
     }
 
