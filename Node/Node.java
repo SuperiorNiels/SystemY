@@ -140,10 +140,10 @@ public class Node implements NodeInterface, Observer {
                         } else if (parts[1].toLowerCase().equals("files")) {
                             printFiles();
                         } else {
-                            System.out.println("Enter correct parameter for what to print. <network:files:entries>");
+                            System.out.println("Enter correct parameter for what to print <network:files:entries>.");
                         }
                     } catch (Exception e) {
-                        System.out.println("Enter correct parameter for what to print. <network:files:entries>");
+                        System.out.println("Enter correct parameter for what to print <network:files:entries>. ");
                     }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
@@ -210,6 +210,8 @@ public class Node implements NodeInterface, Observer {
                                     } else if (parts[1].toLowerCase().equals("public")) {
                                         deleteFileOwner(filename, false);
                                         System.out.println("File deleted!");
+                                    } else {
+                                        System.out.println("Please enter correct paramater <local:public>.");
                                     }
                                 } else {
                                     System.out.println("File: "+filename+" not found in system.");
