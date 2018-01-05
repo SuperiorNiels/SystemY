@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="132.0" prefWidth="379.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.LogoffController">
+<AnchorPane prefHeight="132.0" prefWidth="379.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GUI.LogoffController">
   <children>
     <Button fx:id="logoff_yes_bnt" layoutX="126.0" layoutY="92.0" mnemonicParsing="false" onAction="#logOff" text="Yes" />
     <Button fx:id="logoff_No_bnt" layoutX="199.0" layoutY="92.0" mnemonicParsing="false" onAction="#mainView" text="No" />
-    <Text layoutX="128.0" layoutY="49.0" scaleX="1.3869337198687832" scaleY="1.315712187958884" strokeType="OUTSIDE" strokeWidth="0.0" text="Are you sure?">
+    <Text layoutX="88.0" layoutY="48.0" scaleX="1.3869337198687832" scaleY="1.315712187958884" strokeType="OUTSIDE" strokeWidth="0.0" text="Are you sure you want to logoff?">
       <font>
         <Font size="14.0" />
       </font>
