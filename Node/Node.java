@@ -143,7 +143,7 @@ public class Node implements NodeInterface, Observer {
                             System.out.println("Enter correct parameter for what to print <network:hash:files:entries>.");
                         }
                     } catch (Exception e) {
-                        System.out.println("Enter correct parameter for what to print <network:files:entries>. ");
+                        System.out.println("Enter correct parameter for what to print <network:hash:files:entries>. ");
                     }
                 } else if (parts[0].toLowerCase().equals("shutdown")) {
                     System.out.println("shutting down.");
