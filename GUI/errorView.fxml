@@ -8,7 +8,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="187.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="GUI.ErrorController">
   <children>
-    <Label fx:id="string" prefHeight="128.0" prefWidth="305.0" text="Label" textAlignment="CENTER" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="8.0" />
+    <Label fx:id="string" alignment="CENTER" prefHeight="128.0" prefWidth="305.0" text="Label" textAlignment="CENTER" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="8.0" />
     <Button fx:id="ok_button" layoutX="132.0" layoutY="152.0" mnemonicParsing="false" onAction="#close" text="ok" />
   </children>
 </AnchorPane>

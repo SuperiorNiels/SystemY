@@ -15,7 +15,7 @@ public class GUI_Controller {
             @Override
             public void run() {
                 controller.closeLoading();
-                controller.toError("Name server error!",true);
+                controller.toError("Failed to add node to the nameserver",true);
             }
         });
     }
