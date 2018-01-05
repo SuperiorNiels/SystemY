@@ -34,6 +34,8 @@ public class Node implements NodeInterface, Observer {
     private boolean gui = false;
     private volatile boolean logged_in = false;
     private volatile boolean failedNode = false;
+    private ArrayList<String> requests = new ArrayList<>();
+    private ArrayList<String> dowloaded = new ArrayList<>();
 
     // AgentHandler, handler for fileAgent and failureAgent
     private AgentHandler agentHandler;
@@ -73,6 +75,9 @@ public class Node implements NodeInterface, Observer {
         return running;
     }
 
+    /**
+     * prints the files that are present in the system
+     */
     private void printFiles() {
         if(files.size() != 0) {
             int i = 0;
@@ -123,6 +128,7 @@ public class Node implements NodeInterface, Observer {
             // Start a new polling service
             new PollingService(this).start();
 
+            //The following code is used to control the node with CLI
             while(running && !gui) {
                 Scanner input = new Scanner(System.in);
                 String command = input.nextLine();
@@ -433,11 +439,6 @@ public class Node implements NodeInterface, Observer {
         return "Name: "+name+" IP: "+ip;
     }
 
-    /**
-     *
-     * @param ip
-     * sets the ip of the nameServer
-     */
     public void setNameServerIp(String ip){
         namingServerIp = ip;
     }
@@ -751,7 +752,7 @@ public class Node implements NodeInterface, Observer {
      * Delete a specific file from a folder, it searches the folder for the file and removes it
      * @param folder, String
      * @param filter, FilenameFilter
-     * @return, false if the file was not found/ not deleted, true if the file was deleted
+     * @return false if the file was not found/ not deleted, true if the file was deleted
      */
     private boolean deleteFileFromFolder(String folder,FilenameFilter filter){
         File folderFile = new File(folder);
@@ -767,13 +768,12 @@ public class Node implements NodeInterface, Observer {
         return requests;
     }
 
-    private ArrayList<String> requests = new ArrayList<>();
+
 
     public ArrayList<String> getDownloaded() {
         return dowloaded;
     }
 
-    private ArrayList<String> dowloaded = new ArrayList<>();
 
 
     /**
@@ -884,6 +884,13 @@ public class Node implements NodeInterface, Observer {
         }
     }
 
+    /**
+     * functions that delets a file from this node
+     * @param filename
+     * @throws FileLocationException
+     * @throws NullPointerException
+     */
+
     public void locallyRemoveFile(String filename) throws FileLocationException, NullPointerException {
         File local = new File(rootPath+"local/"+filename);
         File replicated = new File(rootPath+"replicated/"+filename);
@@ -910,7 +917,7 @@ public class Node implements NodeInterface, Observer {
         return filesToRemove;
     }
 
-    public void removeFileFromFileAgent(String filename) {
+    private void removeFileFromFileAgent(String filename) {
         filesToRemove.add(filename);
     }
 

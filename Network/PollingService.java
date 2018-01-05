@@ -1,6 +1,5 @@
 package Network;
 
-import Agents.AgentHandlerInterface;
 import Node.Node;
 import Node.Neighbour;
 
@@ -12,8 +11,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Timer;
-import java.util.TimerTask;
+
 
 public class PollingService extends Thread implements PollingServiceInterface {
 

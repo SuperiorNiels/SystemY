@@ -13,7 +13,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.util.*;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;

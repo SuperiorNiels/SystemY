@@ -1,6 +1,5 @@
 package Agents;
 
-import NameServer.NamingInterface;
 import Node.Node;
 import Node.FileEntry;
 import Node.Neighbour;
@@ -8,8 +7,6 @@ import Node.NodeInterface;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;

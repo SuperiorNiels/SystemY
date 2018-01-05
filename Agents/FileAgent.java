@@ -6,7 +6,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.TreeMap;
 
 import Node.Node;
@@ -15,7 +14,7 @@ import Node.NodeInterface;
 
 public class FileAgent extends Agent {
 
-    private TreeMap<String, FileRequest> files = new TreeMap<String, FileRequest>();
+    private TreeMap<String, FileRequest> files = new TreeMap<>();
     private Node node;
 
     private AgentHandler handler;
@@ -32,7 +31,7 @@ public class FileAgent extends Agent {
         return handler;
     }
 
-    public void setHandler(AgentHandler handler) {
+    private void setHandler(AgentHandler handler) {
         this.handler = handler;
     }
 
@@ -102,7 +101,9 @@ public class FileAgent extends Agent {
         }
 
         //check if a failed node was detected; if so don't start the next agent
-        if(!node.checkFailedNode())
-            handler.startNextAgent(this);
+            if(!node.checkFailedNode())
+                handler.startNextAgent(this);
+
+
     }
 }
