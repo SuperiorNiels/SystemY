@@ -7,13 +7,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class ErrorController {
 
     HeadController headController;
     private Scene view;
     private Stage stage;
-    private int viewWidth  = 350;
-    private int viewHeight = 77;
+    private int viewWidth  = 320;
+    private int viewHeight = 200;
     @FXML
     private Label string;
     @FXML
@@ -32,7 +34,7 @@ public class ErrorController {
             stage = new Stage();
 
         stage.setResizable(false);
-        stage.setTitle("SystemY Error");
+        stage.setTitle("SystemY");
         stage.setOnCloseRequest(arg0 -> this.close());
         stage.setScene(view);
         stage.show();

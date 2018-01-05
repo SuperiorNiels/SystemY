@@ -29,7 +29,6 @@ public class HeadController {
     private NetworkController networkController;
     private LogoffController  logoffController ;
     private LoadingController loadingController;
-    private NameAlreadyExistController nameAlreadyExistController;
     private ErrorController   errorController;
 
     public GUI_Controller GUI_Controller;
@@ -39,7 +38,6 @@ public class HeadController {
     private Parent rnetwork;
     private Parent rlogoff ;
     private Parent rloading;
-    private Parent rNameExist;
     private Parent rerror  ;
 
     private Node node;
@@ -51,7 +49,6 @@ public class HeadController {
         network.setLocation( getClass().getResource("networkView.fxml"));
         logoff.setLocation(  getClass().getResource("logoffView.fxml" ));
         loading.setLocation( getClass().getResource("LoadingView.fxml"));
-        nameAlreadyExist.setLocation(getClass().getResource("NameAlreadyExist.fxml"));
         error.setLocation(   getClass().getResource("errorView.fxml"  ));
 
         rlogin   = login.load();
@@ -59,7 +56,6 @@ public class HeadController {
         rnetwork = network.load();
         rlogoff  = logoff.load();
         rloading = loading.load();
-        rNameExist = nameAlreadyExist.load();
         rerror   = error.load();
 
         loginController   = login.getController()  ;
@@ -67,7 +63,6 @@ public class HeadController {
         networkController = network.getController();
         logoffController  = logoff.getController() ;
         loadingController = loading.getController();
-        nameAlreadyExistController = nameAlreadyExist.getController();
         errorController   = error.getController();
 
         loginController.init(this  );
@@ -75,7 +70,6 @@ public class HeadController {
         networkController.init(this);
         logoffController.init(this );
         loadingController.init(this);
-        nameAlreadyExistController.init(this);
         errorController.init(this);
 
         GUI_Controller = new GUI_Controller(this);
@@ -117,10 +111,6 @@ public class HeadController {
     }
 
     public void closeLogin(){loginController.close();}
-
-    public void toNameAlreadyExist(){
-        nameAlreadyExistController.view(rNameExist);
-    }
 
     public void toError(String text, Boolean close) {
         // if close = true, shutdown the application

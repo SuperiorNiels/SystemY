@@ -36,6 +36,8 @@ public class MainController {
         if(node.fileInSystem(file)) {
             node.deleteFileOwner(file,false);
         }
+        //no error but a pop-up that the file is delted
+        headController.toError("file deleted" , false);
     }
 
     public void deleteLocal() {
