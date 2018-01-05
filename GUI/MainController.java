@@ -46,6 +46,7 @@ public class MainController {
         if(node.fileInSystem(file)) {
             try {
                 node.locallyRemoveFile(file);
+                headController.toError("file deleted.",false);
             } catch (NullPointerException e) {
                 headController.toError("Error: Cannot delete file!",false);
             } catch (FileLocationException e) {
