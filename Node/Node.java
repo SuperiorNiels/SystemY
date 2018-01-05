@@ -140,7 +140,7 @@ public class Node implements NodeInterface, Observer {
                         } else if (parts[1].toLowerCase().equals("files")) {
                             printFiles();
                         } else {
-                            System.out.println("Enter correct parameter for what to print <network:files:entries>.");
+                            System.out.println("Enter correct parameter for what to print <network:hash:files:entries>.");
                         }
                     } catch (Exception e) {
                         System.out.println("Enter correct parameter for what to print <network:files:entries>. ");
@@ -224,7 +224,7 @@ public class Node implements NodeInterface, Observer {
                     }
                 } else if(parts[0].toLowerCase().equals("help")) {
                     System.out.println("---------- SystemY commands ----------");
-                    System.out.println("- print <network:files:entries>");
+                    System.out.println("- print <network:hash:files:entries>");
                     System.out.println("- owner \"filename\"");
                     System.out.println("- open \"filename\"");
                     System.out.println("- download \"filename\"");
