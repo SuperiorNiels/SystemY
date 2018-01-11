@@ -31,7 +31,7 @@ public class FileAgent extends Agent {
         return handler;
     }
 
-    private void setHandler(AgentHandler handler) {
+    public void setHandler(AgentHandler handler) {
         this.handler = handler;
     }
 
