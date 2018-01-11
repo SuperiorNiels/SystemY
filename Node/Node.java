@@ -917,7 +917,7 @@ public class Node implements NodeInterface, Observer {
         return filesToRemove;
     }
 
-    private void removeFileFromFileAgent(String filename) {
+    public void removeFileFromFileAgent(String filename) {
         filesToRemove.add(filename);
     }
 
