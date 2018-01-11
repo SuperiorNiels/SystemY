@@ -403,6 +403,7 @@ public class Node implements NodeInterface, Observer {
                 //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
+                manager.updateFilesNewNode(myNext);
             }
         } else {
             //Only 1 node in network, new node is next and previous.
