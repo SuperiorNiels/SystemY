@@ -387,7 +387,7 @@ public class Node implements NodeInterface, Observer {
                 Neighbour previous_next = next;
                 next = new Neighbour(new_name, new_ip);
                 // update the files.
-                //manager.updateFilesNewNode(myNext);
+                manager.updateFilesNewNode(myNext);
                 System.out.println("New node is my new next: RMI to "+new_ip);
                 try {
                     NodeInterface stub = (NodeInterface) Naming.lookup("//"+new_ip+"/Node");
@@ -403,9 +403,7 @@ public class Node implements NodeInterface, Observer {
                 //The new node will have you as next
                 // update previous with new node
                 previous = new Neighbour(new_name, new_ip);
-                //manager.updateFilesNewNode(myNext);
             }
-            manager.updateFilesNewNode(myNext);
         } else {
             //Only 1 node in network, new node is next and previous.
             manager.clearEntries();
