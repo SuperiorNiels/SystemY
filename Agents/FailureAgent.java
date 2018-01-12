@@ -56,7 +56,7 @@ public class FailureAgent extends Agent {
                     int fileHash = file.getKey();
                     //if fiche null ==> fiche was owned by the failing node
                     if (fiche == null) {
-                        //You are the only one with the file left ==> move to local and filemanager will take care of the replication
+                        //You are the only one with the file left ==> replicate
                         String filename = getFile(fileHash,"./files/replicated/").getName();
                         if(filename!=null){
                             //Replicate the file again to make sure the copy remains in the system

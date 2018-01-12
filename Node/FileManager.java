@@ -417,7 +417,7 @@ public class FileManager extends Thread {
      * if hash(file) is closer to hash next
      * send file to next, update nameserver about owner
      */
-    public void updateFilesNewNode(int nextOfNextHash ){
+    public void checkFilesNewNextNode(int nextOfNextHash ){
         Neighbour next = rootNode.getNext();
         try {
             for(Iterator<Map.Entry<Integer, FileEntry>> it = map.entrySet().iterator(); it.hasNext(); ) {
@@ -428,7 +428,7 @@ public class FileManager extends Thread {
                 int nextHash = calculateHash(rootNode.getNext().getName());
                 //Check for filehash bigger then your next's hash
                 //And the special case when a new highest node joins --> he needs all the lower than the lowest node file entries
-                if ((fileHash > nextHash) || (fileHash < myHash && nextOfNextHash < nextHash )){
+                if ((fileHash > nextHash && myHash < nextHash) || (fileHash < myHash && nextOfNextHash < nextHash )){
                     if (fiche.getReplicated().getName().equals(rootNode.getName())) {
                         // First replace file
                         rootNode.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
@@ -467,6 +467,37 @@ public class FileManager extends Thread {
             }
         } catch (RemoteException | NotBoundException | MalformedURLException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * This method check if your owned files
+     * that are not replicated by yourself need to be moved to a new previous node
+     */
+    public void checkFilesNewPreviousNode(){
+        Neighbour prev = rootNode.getPrevious();
+        for(Iterator<Map.Entry<Integer, FileEntry>> it = map.entrySet().iterator(); it.hasNext(); ) {
+            Map.Entry<Integer, FileEntry> entry = it.next();
+            FileEntry fiche = entry.getValue();
+            //You are the owner of a file and your previous got updated ==> all files you do not replicate yourself
+            // should be moved to the new node
+            if(!fiche.getReplicated().getName().equals(rootNode.getName())){
+                NodeInterface nodeStub = null;
+                try {
+                    nodeStub = (NodeInterface) Naming.lookup("//" + fiche.getReplicated().getIp() + "/Node");
+                    // First remote replace file
+                    nodeStub.moveFile(rootPath + "/" + REPLICATED_FOLDER + "/" + fiche.getFileName(), rootPath + "/" + DOWNLOAD_FOLDER + "/" + fiche.getFileName());
+                    //sent remote via tcp to next
+                    nodeStub.remoteSendFile(prev.getIp(), PORT, rootPath + "/" + DOWNLOAD_FOLDER, fiche.getFileName(), REPLICATED_FOLDER,false);
+                    //the next node is now download location of file
+                    fiche.addNode(new Neighbour(fiche.getReplicated().getName(), fiche.getReplicated().getIp()));
+
+                    rootNode.createFileEntry(fiche.getOwner(), prev, fiche.getLocal(), fiche.getFileName(), fiche.getDownloads());
+                } catch (NotBoundException | RemoteException | MalformedURLException e) {
+                    System.err.println("Error checking or sending your files when new previous node detected!");
+                }
+
+            }
         }
     }
 
